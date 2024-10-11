@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm") version "2.0.10"
+    kotlin("plugin.serialization") version "2.0.10"
     alias(libs.plugins.jetbrains.compose)
     alias(libs.plugins.compose.compiler)
     id("application")
@@ -18,7 +19,15 @@ repositories {
 dependencies {
     implementation(libs.datetime)
     implementation(compose.desktop.currentOs)
-
+    implementation("io.ktor:ktor-client-core:2.3.12")
+    implementation("io.ktor:ktor-client-cio:2.3.12")
+    implementation("io.ktor:ktor-client-serialization:2.3.12")
+    implementation("io.ktor:ktor-client-plugins:2.3.12")
+    implementation(platform("io.github.jan-tennert.supabase:bom:3.0.0"))
+    implementation("io.github.jan-tennert.supabase:postgrest-kt")
+    implementation("io.github.jan-tennert.supabase:supabase-kt")
+    implementation("io.github.jan-tennert.supabase:auth-kt:3.0.0")
+    implementation("org.slf4j:slf4j-simple:2.0.16")
 
     testImplementation(kotlin("test"))
 }

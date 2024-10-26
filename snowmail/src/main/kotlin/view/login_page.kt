@@ -14,7 +14,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
-
+import ca.uwaterloo.controller.SignInController
+import ca.uwaterloo.persistence.DBStorage
+import kotlinx.coroutines.runBlocking
 
 @Composable
 fun loginPage(NavigateToSignup: () -> Unit, NavigateToHome: () -> Unit) {
@@ -79,10 +81,10 @@ fun loginPage(NavigateToSignup: () -> Unit, NavigateToHome: () -> Unit) {
 
 
         Row(Modifier.fillMaxWidth()) { loginForm(NavigateToSignup, NavigateToHome) }
-        }
-
-
     }
+
+
+}
 
 
 @Composable
@@ -100,6 +102,8 @@ fun loginForm(NavigateToSignup: () -> Unit, NavigateToHome: () -> Unit) {
 
 @Composable
 fun loginWithAccount(NavigateToSignup: () -> Unit, NavigateToHome: () -> Unit) {
+    val dbStorage = DBStorage()
+    val signInController = SignInController(dbStorage)
     Column (
         modifier = Modifier.fillMaxWidth().padding(horizontal = 160.dp).padding(vertical = 15.dp)){
 
@@ -128,27 +132,40 @@ fun loginWithAccount(NavigateToSignup: () -> Unit, NavigateToHome: () -> Unit) {
 
         // sign in button
 
-        val SUCCESS = false
-        val EMAILDOESNOTEXIST = false
+//        val SUCCESS = false
+//        val EMAILDOESNOTEXIST = false
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
             Button(
                 onClick = {
+                    runBlocking {
+                        val signInResult = signInController.signInUser(email, password)
+
+                        signInResult.onSuccess { userId ->
+                            // If sign-in succeeds, navigate to home page
+                            NavigateToHome()
+                        }.onFailure { error ->
+                            // Show error message if sign-in fails
+                            errorMessage = error.message ?: "Login failed. Please try again."
+                            email = ""
+                            password = ""
+                        }
+                    }
                     // if successful, navigate to home page
-                    if (SUCCESS) {
-                        NavigateToHome()
-                    }
-                    // if email doesn't exist, show and clear
-                    else if (EMAILDOESNOTEXIST) {
-                        errorMessage = "Email does not exist, please register first"
-                        email = ""
-                        password = ""
-                    }
-                    // if password and email does not match
-                    else {
-                        errorMessage = "Email and password do not match, please try again"
-                        email = ""
-                        password = ""
-                    }
+//                    if (SUCCESS) {
+//                        NavigateToHome()
+//                    }
+//                    // if email doesn't exist, show and clear
+//                    else if (EMAILDOESNOTEXIST) {
+//                        errorMessage = "Email does not exist, please register first"
+//                        email = ""
+//                        password = ""
+//                    }
+//                    // if password and email does not match
+//                    else {
+//                        errorMessage = "Email and password do not match, please try again"
+//                        email = ""
+//                        password = ""
+//                    }
                 },
                 colors = ButtonDefaults.buttonColors(backgroundColor = Color(buttonColor))
             ) {
@@ -177,7 +194,7 @@ fun loginWithAccount(NavigateToSignup: () -> Unit, NavigateToHome: () -> Unit) {
 @Composable
 fun loginWithGmail() {
     Column(
-       horizontalAlignment = Alignment.CenterHorizontally) {
+        horizontalAlignment = Alignment.CenterHorizontally) {
         Text("Or log in with")
         // val iconfile = File("gmail_icon.png")
 
@@ -222,4 +239,3 @@ fun main() {
         }
     }
 }
-

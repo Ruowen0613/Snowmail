@@ -19,7 +19,7 @@ class DBStorage {
         install(Auth)
     }
 
-    //register a new user and return user id
+    //register a new user with email and password and return user id
     //password needs to be at least 6 chars
     //if the email has already used, log in
     //have to check data is inserted successfully in user_profile (need to implemented later)
@@ -28,7 +28,7 @@ class DBStorage {
         password: String,
         firstname: String,
         lastname: String
-    ): Result<String> {  // 修改返回类型为 Result<String>
+    ): Result<String> {
         return try {
             // Register user with built-in email provider
             supabase.auth.signUpWith(Email) {
@@ -52,31 +52,68 @@ class DBStorage {
         } catch (e: Exception) {
             // Return specific error message as failure
             val errorMessage = if (e.message?.contains("User already registered") == true) {
-                "User already registered. Please log in."
+                "User already registered. Please sign in."
             } else {
                 "Error during sign-up: ${e.message}"
             }
             Result.failure(Exception(errorMessage))
         }
     }
+
+    //sign in the user with email and password
+    suspend fun signInUser(email: String, password: String): Result<String> {
+        return try {
+            val result = supabase.auth.signInWith(Email) {
+                this.email = email
+                this.password = password
+            }
+
+            val user = supabase.auth.currentUserOrNull()
+            if (user != null) {
+                Result.success(user.id) // Sign-in successful, return user ID
+            } else {
+                Result.failure(Exception("Invalid credentials or session not created."))
+            }
+        } catch (e: Exception) {
+            val errorMessage = when {
+                e.message?.contains("Invalid login credentials") == true -> "Sign in in failed. Please use the correct email and password."
+                else -> "Sign-in failed: ${e.message}"
+            }
+            Result.failure(Exception(errorMessage))
+        }
+    }
+
+
+    //sign out the user in the current session
+    suspend fun signOutUser(): String {
+        return try {
+            // Sign out the current user
+            supabase.auth.signOut()
+            "User signed out successfully."
+        } catch (e: Exception) {
+            "Error during sign-out: ${e.message}"
+        }
+    }
+
 }
 
 //
 // just for testing
 //
-fun main() = runBlocking {
+fun main() = runBlocking<Unit> {
     val dbStorage = DBStorage()
 
     val email = "wrw040613@gmail.com"
-    val password = "sssssss"
+    val password = "scsssss"
     val firstname = "Cherry"
     val lastname = "Wang"
 
-    // 调用 signUpUser 方法并打印结果
-    val userId = dbStorage.signUpUser(email, password, firstname, lastname)
-    if (userId != null) {
-        println("User signed up successfully with ID: $userId")
-    } else {
-        println("Sign-up failed.")
-    }
+    //test sign up
+//    println (dbStorage.signUpUser(email, password, firstname, lastname))
+
+    //test sign in
+//    println (dbStorage.signInUser(email, password))
+
+    //test sign out
+//    println(dbStorage.signOutUser())
 }

@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
-import ca.uwaterloo.controller.SignInController
+import ca.uwaterloo.controller.SignUpController
 import ca.uwaterloo.persistence.DBStorage
 
 
@@ -67,7 +67,7 @@ fun SignUpPage(NavigateToLogin: () -> Unit, NavigateToHome: () -> Unit) {
 @Composable
 fun RegisterForm(NavigateToLogin: () -> Unit, NavigateToHome: () -> Unit) {
     val dbStorage = DBStorage()
-    val signInController = SignInController(dbStorage)
+    val signInController = SignUpController(dbStorage)
     Box (Modifier.fillMaxWidth(0.7f).fillMaxHeight().background(Color(formColor))) {
         Row {
             Column(Modifier.fillMaxWidth(0.1f)) { Box {} }

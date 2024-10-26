@@ -5,30 +5,23 @@ import kotlinx.coroutines.runBlocking
 
 class SignInController(private val dbStorage: DBStorage) {
 
-    // Sign up a new user and return either userId or error message
-    fun signUpUser(email: String, password: String, firstname: String, lastname: String): Result<String> {
-        return runBlocking {
-            dbStorage.signUpUser(email, password, firstname, lastname)
-        }
+    //Sign in the user and return either the user id or error message
+    suspend fun signInUser(email: String, password: String): Result<String> {
+        return dbStorage.signInUser(email, password)
     }
+
+//    suspend fun logoutUser(): String {
+//        return dbStorage.signOutUser()
+//    }
 }
 
-// Testing SignInController
-fun main() {
+fun main() = runBlocking<Unit> {
     val dbStorage = DBStorage()
     val signInController = SignInController(dbStorage)
 
-    // Test user registration
     val email = "wrw040613@gmail.com"
-    val password = "sssssss"
-    val firstname = "Cherry"
-    val lastname = "Wang"
+    val password = "s"
 
-    val result = signInController.signUpUser(email, password, firstname, lastname)
-
-    result.onSuccess { userId ->
-        println("Sign-up process completed. User ID: $userId")
-    }.onFailure { error ->
-        println("Sign-up process failed. Error: ${error.message}")
-    }
+    // call loginUser and return results
+    println(signInController.signInUser(email, password))
 }

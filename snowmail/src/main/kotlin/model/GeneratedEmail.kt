@@ -4,6 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class GeneratedEmail(
-    val subject: String,
-    val body: String
+    val subject: String?,
+    val body: String?
 )

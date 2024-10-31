@@ -46,7 +46,7 @@ fun main() {
 }
 
 @Composable
-fun WelcomePage(NavigateToSignup: () -> Unit, NavigateToLogin: () -> Unit, NavigateToWelcomePage1: () -> Unit) {
+fun WelcomePage(NavigateToSignup: () -> Unit, NavigateToLogin: () -> Unit, NavigateToWelcomePage1: () -> Unit, NavigateToEmailGenerationPage: () -> Unit) {
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
@@ -78,6 +78,13 @@ fun WelcomePage(NavigateToSignup: () -> Unit, NavigateToLogin: () -> Unit, Navig
             ) {
                 Text("Sign Up")
             }
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Button(onClick = NavigateToEmailGenerationPage) {
+                Text("Email Generation")
+            }
+
         }
 
 

@@ -17,6 +17,20 @@ import kotlin.concurrent.thread
 import service.EmailGenerationService
 
 fun main() {
+    // Initialize the OpenAIClient
+    val httpClient = HttpClient(CIO)
+    val openAIClient = OpenAIClient(httpClient)
+
+    // Initialize the EmailGenerationService
+    val emailGenerationService = EmailGenerationService(openAIClient)
+
+    // Start the Ktor server in a separate thread
+    thread {
+        embeddedServer(Netty, port = 8080) {
+            configureRouting(emailGenerationService)
+        }.start(wait = true)
+    }
+
 
     application {
         Window(onCloseRequest = ::exitApplication, state = WindowState(size = DpSize(1200.dp, 800.dp))) {
@@ -34,12 +48,13 @@ fun websitePage() {
     when (currentPage) {
         "login" -> loginPage ({ currentPage = "signup" }, {currentPage = "homepage"})
         "signup" -> SignUpPage ({ currentPage = "login"}, { currentPage = "homepage"})
-        "welcome" -> WelcomePage ({ currentPage = "signup"}, {currentPage = "login"}, {currentPage = "welcome1"})
+        "welcome" -> WelcomePage ({ currentPage = "signup"}, {currentPage = "login"}, {currentPage = "welcome1"}, {currentPage = "emailgeneration"})
         "welcome1" -> WelcomePage1 ({ currentPage = "signup"}, {currentPage = "login"}, {currentPage = "welcome2"}, {currentPage = "welcome3"}, {currentPage = "welcome4"})
         "welcome2" -> WelcomePage2 ({ currentPage = "signup"}, {currentPage = "login"}, {currentPage = "welcome3"})
         "welcome3" -> WelcomePage3 ({ currentPage = "signup"}, {currentPage = "login"}, {currentPage = "welcome4"})
         "welcome4" -> WelcomePage4 ({ currentPage = "signup"}, {currentPage = "login"})
         "homepage" -> homePage()
+        "emailgeneration" -> EmailGenerationPage()
     }
 }
 

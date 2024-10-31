@@ -10,13 +10,16 @@ import io.ktor.server.routing.*
 
 import service.EmailGenerationService
 import model.UserInput
+import model.UserProfile
 
 
 fun Route.emailRoutes(emailGenerationService: EmailGenerationService) {
     post("/generate-email") {
         try {
             val userInput = call.receive<UserInput>()
-            val generatedEmail = emailGenerationService.generateEmail(userInput)
+            val userProfile = call.receive<UserProfile>()
+
+            val generatedEmail = emailGenerationService.generateEmail(userInput, userProfile)
             call.respond(HttpStatusCode.OK, generatedEmail)
         } catch (e: Exception) {
             call.respond(HttpStatusCode.InternalServerError, "Failed to generate email: ${e.message}")

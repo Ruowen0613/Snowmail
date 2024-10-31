@@ -1,16 +1,16 @@
-package ca.uwaterloo.model
+package model
 
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class UserProfile(
-    var user_id: String,
-    var first_name: String,
-    var last_name: String,
-    var skills: String? = null,
-    var city_name: String? = null,
-    val resume_url: String? = null,
-    val linkedin_url: String? = null,
-    val github_url: String? = null,
-    val personal_website_url: String? = null,
+    var userId: String,
+    var firstName: String,
+    var lastName: String,
+    var skills: List<String>? = null,
+    var cityName: String? = null,
+    val resumeUrl: String? = null,
+    val linkedinUrl: String? = null,
+    val githubUrl: String? = null,
+    val personalWebsiteUrl: String? = null,
 ) {}

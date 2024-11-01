@@ -23,6 +23,10 @@ import androidx.compose.runtime.remember
 
 import integration.SupabaseClient
 
+object UserSession {
+    var userId: String? = null
+}
+
 @Composable
 fun loginPage(NavigateToSignup: () -> Unit, NavigateToHome: () -> Unit) {
     Column (
@@ -149,6 +153,7 @@ fun loginWithAccount(NavigateToSignup: () -> Unit, NavigateToHome: () -> Unit) {
 
                         signInResult.onSuccess { userId ->
                             // If sign-in succeeds, navigate to home page
+                            UserSession.userId = userId
                             NavigateToHome()
                         }.onFailure { error ->
                             // Show error message if sign-in fails
@@ -234,7 +239,6 @@ fun WebsitePage2() {
     when (currentPage) {
         "login" -> loginPage ({ currentPage = "signup" }, {currentPage = "profilePage"})
         "signup" -> SignUpPage ({ currentPage = "login"}, { currentPage = "login"})
-        "profilePage" -> ProfilePage()
     }
 }
 

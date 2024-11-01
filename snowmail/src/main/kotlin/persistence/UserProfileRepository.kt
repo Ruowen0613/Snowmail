@@ -37,7 +37,7 @@ class UserProfileRepository(private val supabase: SupabaseClient) {
             val education = supabase.from("education")
                 .select {
                     filter {
-                        eq("userId", userId)
+                        eq("user_id", userId)
                     }
                 }
                 .decodeList<Education>()
@@ -78,7 +78,7 @@ class UserProfileRepository(private val supabase: SupabaseClient) {
             val workExperience = supabase.from("work_experience")
                 .select {
                     filter {
-                        eq("userId", userId)
+                        eq("user_id", userId)
                     }
                 }
                 .decodeList<WorkExperience>()

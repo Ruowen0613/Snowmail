@@ -10,18 +10,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.Dispatchers
 import model.UserInput
 import model.UserProfile
-import io.ktor.client.call.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.serialization.kotlinx.json.*
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.encodeToString
 //import kotlinx.serialization.Serializable
 
 import androidx.compose.ui.window.application
@@ -29,10 +21,11 @@ import androidx.compose.ui.window.Window
 import service.EmailGenerationService
 import integration.OpenAIClient
 import androidx.compose.foundation.background
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
+import ca.uwaterloo.model.Education
+import ca.uwaterloo.model.WorkExperience
+import kotlinx.datetime.LocalDate
 
 
 @Composable
@@ -58,12 +51,13 @@ fun EmailGenerationPage() {
     var descriptionInput by remember { mutableStateOf("description") }
     var recruiterNameInput by remember { mutableStateOf("recruiter name") }
 
-    var userInput = UserInput(
-        jobDescription = descriptionInput,
+    val userInput = UserInput(
+        jobDescription = "Software Engineer",
         recruiterEmail = "recruiter@example.com",
         jobTitle = "Software Engineer",
-        company = companyInput,
-        recruiterName = recruiterNameInput
+        company = "Example Corp",
+        recruiterName = "Jane Doe",
+        fileURLs = listOf("https://example.com/resume.pdf"),
     )
 
     val userProfile = UserProfile(
@@ -71,6 +65,29 @@ fun EmailGenerationPage() {
         firstName = "John",
         lastName = "Doe",
         skills = listOf("Java", "Kotlin", "SQL")
+    )
+
+    val education = Education(
+        id = 12,
+        userId = "123",
+        degreeId = 3,
+        institutionName = "University of Waterloo",
+        major = "Computer Science",
+        gpa = 3.8f,
+        startDate = LocalDate(2019, 9, 1),
+        endDate = LocalDate(2023, 6, 1)
+    )
+
+
+
+    val workExperience = WorkExperience(
+        userId = "123",
+        currentlyWorking = false,
+        startDate = LocalDate(2021, 5, 1),
+        endDate = LocalDate(2021, 8, 1),
+        companyName = "Example Corp",
+        title = "Software Engineer",
+        description = "Developed backend systems, deployed scalable solutions, and built efficient ETL pipelines for financial data processing."
     )
 
 
@@ -129,7 +146,7 @@ fun EmailGenerationPage() {
 //                    emailContent = "Error: ${e.message}"
 //                }
                 try {
-                    val generatedEmail = emailGenerationService.generateEmail(userInput, userProfile)
+                    val generatedEmail = emailGenerationService.generateEmail(userInput, userProfile, listOf(education), listOf(workExperience))
                     println("Generated Email: ${generatedEmail.body}")
                     emailContent = generatedEmail.body ?: "Failed to generate email"
                     showDialog = true

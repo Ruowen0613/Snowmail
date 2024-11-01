@@ -9,4 +9,5 @@ data class UserInput(
     val company: String?,
     val recruiterName: String?,
     val recruiterEmail: String?,
+    var fileURLs: List<String>?,
 )

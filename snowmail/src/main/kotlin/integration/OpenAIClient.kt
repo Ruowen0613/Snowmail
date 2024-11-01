@@ -1,5 +1,7 @@
 package integration
 
+import ca.uwaterloo.model.Education
+import ca.uwaterloo.model.WorkExperience
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.cio.*
@@ -10,6 +12,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 import io.ktor.http.*
+import kotlinx.datetime.LocalDate
 import kotlinx.serialization.json.Json
 
 
@@ -38,25 +41,47 @@ data class Message(
 
 class OpenAIClient(private val httpClient: HttpClient) {
 
-    suspend fun generateEmail(userInput: UserInput, userProfile: UserProfile): GeneratedEmail {
-        val prompt = buildPrompt(userInput, userProfile)
+    suspend fun generateEmail(userInput: UserInput, userProfile: UserProfile, education: List<Education>, workExperience: List<WorkExperience>): GeneratedEmail {
+        val prompt = buildPrompt(userInput, userProfile, education, workExperience)
         val message = prepareMessage(prompt)
         val response = sendOpenAIRequest(message)
         val emailContent = getEmailContent(response)
         return parseGeneratedText(emailContent)
     }
 
-    private fun buildPrompt(userInput: UserInput, userProfile: UserProfile): String {
+    private fun buildPrompt(userInput: UserInput, userProfile: UserProfile, education: List<Education>, workExperience: List<WorkExperience>): String {
         val skills = userProfile.skills?.joinToString(", ") ?: "Not provided"
+
+        val educationDetails = education.joinToString("\n") { e ->
+            """
+            - Institution: ${e.institutionName}
+            - Degree: ${e.major}
+            - GPA: ${e.gpa ?: "Not provided"}
+            - Start Date: ${e.startDate}
+            - End Date: ${e.endDate}
+            """.trimIndent()
+        }
+
+        val workExperienceDetails = workExperience.joinToString("\n") { w ->
+            """
+            - Company: ${w.companyName}
+            - Position: ${w.title}
+            - Description: ${w.description}
+            """.trimIndent()
+        }
+
 
         return """
             Job Description: ${userInput.jobDescription}
             User Profile:
             - First Name: ${userProfile.firstName}
             - Last Name: ${userProfile.lastName}
-            - User ID: ${userProfile.userId}
             - Skills: $skills
-        """.trimIndent()
+            Education:
+            $educationDetails
+            Work Experience:
+            $workExperienceDetails
+            """.trimIndent()
     }
 
     private fun prepareMessage(prompt: String): List<Map<String, String>> {
@@ -71,12 +96,30 @@ class OpenAIClient(private val httpClient: HttpClient) {
                     - A brief introduction of the applicant
                     - Highlights of relevant skills and experiences tailored to the job description
                     - A clear, polite call to action for follow-up
-                    - A formal closing
+                    - A formal closing with the applicant's name and something like "Best regards" or "Sincerely"
                     Keep the tone professional and succinct, avoiding overly casual language or excessive detail.
+                    
+                    Real Example of a Job Application Email:
+                    Subject: Software Engineer Internship Opportunities at Coinbase
+                    
+                    Hi Jane,
+
+                    I hope this message finds you well. My name is John Doe, a third-year Computer Science student at the University of Waterloo, and I’m excited about the innovative work happening at Coinbase. With my background in data engineering and software development, I’m confident I can contribute meaningfully to your team.
+
+                    Here’s a quick snapshot of my relevant experience:
+
+                    - **Manulife**: As a Data Engineer Intern, I worked on optimizing CI/CD pipelines, automated GitHub  repo access management, and implemented scalable solutions for database migrations and cloud deployment.
+                    - **Baraka (YC ’21)**: As a Software Engineer Intern, I developed backend systems, deployed scalable solutions, and built efficient ETL pipelines for financial data processing.
+
+                    I would love to discuss your team’s current challenges and explore how I can help solve them. I'm happy to volunteer my time to demonstrate the value I can bring. Would you be available for a brief 15-minute conversation this week?
+                    I have attached my resume, looking forward to hearing from you.
+
+                    Best regards,
+                    John Doe
+                    
                 """.trimIndent()
             ),
-            mapOf("role" to "user", "content" to prompt)
-        )
+            mapOf("role" to "user", "content" to prompt))
     }
 
     private suspend fun sendOpenAIRequest(message: List<Map<String, String>>): HttpResponse {
@@ -129,7 +172,8 @@ suspend fun main() {
         recruiterEmail = "recruiter@example.com",
         jobTitle = "Software Engineer",
         company = "Example Corp",
-        recruiterName = "Jane Doe"
+        recruiterName = "Jane Doe",
+        fileURLs = listOf("https://example.com/resume.pdf"),
     )
 
     val userProfile = UserProfile(
@@ -139,6 +183,29 @@ suspend fun main() {
         skills = listOf("Java", "Kotlin", "SQL")
     )
 
-    println(openAIClient.generateEmail(userInput, userProfile))
+    val education = Education(
+        id = 12,
+        userId = "123",
+        degreeId = 3,
+        institutionName = "University of Waterloo",
+        major = "Computer Science",
+        gpa = 3.8f,
+        startDate = LocalDate(2019, 9, 1),
+        endDate = LocalDate(2023, 6, 1)
+    )
+
+
+
+    val workExperience = WorkExperience(
+        userId = "123",
+        currentlyWorking = false,
+        startDate = LocalDate(2021, 5, 1),
+        endDate = LocalDate(2021, 8, 1),
+        companyName = "Example Corp",
+        title = "Software Engineer",
+        description = "Developed backend systems, deployed scalable solutions, and built efficient ETL pipelines for financial data processing."
+    )
+
+    println(openAIClient.generateEmail(userInput, userProfile, listOf(education), listOf(workExperience)))
     println("Done")
 }

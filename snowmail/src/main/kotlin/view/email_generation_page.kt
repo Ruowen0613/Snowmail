@@ -333,26 +333,61 @@ fun EditableAlertDialog(
 ) {
     var text by remember { mutableStateOf(initialText) }
     var recipientEmailAddy by remember { mutableStateOf("") }
+    var emailSubject by remember { mutableStateOf("") }
     AlertDialog(
         onDismissRequest = onDismissRequest,
         title = { Text(title) },
         text = {
+            Spacer(modifier = Modifier.height(8.dp))
             Column {
-                TextField(
+                OutlinedTextField(
                     value = recipientEmailAddy,
                     onValueChange = { recipientEmailAddy = it },
                     label = { Text("Recipient Email") },
                     modifier = Modifier
+                        .clip(RoundedCornerShape(32.dp)) // Rounded corners
+                        .background(Color.White) // White background
+                        .padding(32.dp)
                         .fillMaxWidth()
-                        .background(Color.Transparent)
+                        .background(Color.Transparent),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        //focusedLabelColor = Color.Transparent,
+                        //unfocusedLabelColor = Color.Transparent,
+                        //focusedBorderColor = Color.Transparent,
+                        //unfocusedBorderColor = Color.Transparent
+                    )
                 )
-//                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = emailSubject,
+                    onValueChange = { emailSubject = it },
+                    label = { Text("Subject") },
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(32.dp)) // Rounded corners
+                        .background(Color.White) // White background
+                        .padding(32.dp)
+                        .fillMaxWidth()
+                        .background(Color.Transparent),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        //focusedLabelColor = Color.Transparent,
+                        //unfocusedLabelColor = Color.Transparent,
+                        //focusedBorderColor = Color.Transparent,
+                        //unfocusedBorderColor = Color.Transparent
+                    )
+                )
+                Spacer(modifier = Modifier.height(8.dp))
                 TextField(
                     value = text,
                     onValueChange = { text = it },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(Color.Transparent)
+                        .background(Color.Transparent),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedLabelColor = Color.Transparent,
+                        unfocusedLabelColor = Color.Transparent,
+                        focusedBorderColor = Color.Transparent,
+                        unfocusedBorderColor = Color.Transparent
+                    )
                 )
             }
         },
@@ -363,7 +398,7 @@ fun EditableAlertDialog(
                     senderEmail = "cs346test@gmail.com",
                     password = "qirk dyef rvbv bkka",
                     recipient = recipientEmailAddy,
-                    subject = "Generated Email",
+                    subject = emailSubject,
                     text = text,
                     fileURLs = listOf(),
                     fileNames = listOf()

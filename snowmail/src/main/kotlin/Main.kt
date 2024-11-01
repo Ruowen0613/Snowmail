@@ -44,13 +44,13 @@ fun websitePage() {
     when (currentPage) {
         "login" -> loginPage ({ currentPage = "signup" }, {currentPage = "profilePage"})
         "signup" -> SignUpPage ({ currentPage = "login"}, { currentPage = "login"})
-        "welcome" -> WelcomePage ({ currentPage = "signup"}, {currentPage = "login"}, {currentPage = "welcome1"}, {currentPage = "emailgeneration"})
+        "welcome" -> WelcomePage ({ currentPage = "signup"}, {currentPage = "login"}, {currentPage = "welcome1"})
         "welcome1" -> WelcomePage1 ({ currentPage = "signup"}, {currentPage = "login"}, {currentPage = "welcome2"}, {currentPage = "welcome3"}, {currentPage = "welcome4"})
         "welcome2" -> WelcomePage2 ({ currentPage = "signup"}, {currentPage = "login"}, {currentPage = "welcome3"})
         "welcome3" -> WelcomePage3 ({ currentPage = "signup"}, {currentPage = "login"}, {currentPage = "welcome4"})
         "welcome4" -> WelcomePage4 ({ currentPage = "signup"}, {currentPage = "login"})
-        "profilePage" -> ProfilePage(UserSession.userId ?: "DefaultUserId")
-        "emailgeneration" -> EmailGenerationPage()
+        "profilePage" -> ProfilePage(UserSession.userId ?: "DefaultUserId", { currentPage = "profilePage"}, { currentPage = "emailgeneration"}, { currentPage = "profilePage"})
+        "emailgeneration" -> EmailGenerationPage({ currentPage = "profilePage"}, { currentPage = "profilePage"}, { currentPage = "profilePage"})
     }
 }
 

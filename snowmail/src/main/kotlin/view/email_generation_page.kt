@@ -41,6 +41,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 
 import ca.uwaterloo.controller.ProfileController
+import controller.send_email
 import integration.SupabaseClient
 import kotlinx.coroutines.runBlocking
 
@@ -331,13 +332,20 @@ fun EditableAlertDialog(
     onConfirm: (String) -> Unit
 ) {
     var text by remember { mutableStateOf(initialText) }
-
+    var recipientEmailAddy by remember { mutableStateOf("") }
     AlertDialog(
         onDismissRequest = onDismissRequest,
         title = { Text(title) },
         text = {
             Column {
-//                Text("Edit the text below:")
+                TextField(
+                    value = recipientEmailAddy,
+                    onValueChange = { recipientEmailAddy = it },
+                    label = { Text("Recipient Email") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.Transparent)
+                )
 //                Spacer(modifier = Modifier.height(8.dp))
                 TextField(
                     value = text,
@@ -349,7 +357,17 @@ fun EditableAlertDialog(
             }
         },
         confirmButton = {
-            Button(onClick = { onConfirm(text) },
+            Button(onClick = {
+                onConfirm(text)
+                send_email(
+                    senderEmail = "cs346test@gmail.com",
+                    password = "qirk dyef rvbv bkka",
+                    recipient = recipientEmailAddy,
+                    subject = "Generated Email",
+                    text = text,
+                    fileURLs = listOf(),
+                    fileNames = listOf()
+                )},
                     colors = ButtonDefaults.buttonColors(
                     backgroundColor = Color(0xFF487B96),
                 contentColor = MaterialTheme.colors.onPrimary

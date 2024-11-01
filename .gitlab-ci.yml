@@ -12,20 +12,20 @@ build-job:       # This job runs in the build stage, which runs first.
   stage: build
   script:
     - echo "Compiling the Kotlin code..."
-    - ./gradlew clean build       # Build the project with Gradle
-  artifacts:                       # Save build artifacts for use in later stages
-    paths:
-      - build/libs/
-    expire_in: 1 day               # Artifacts available for 1 day
+    - ./gradlew build       # Build the project with Gradle
+  # artifacts:                       # Save build artifacts for use in later stages
+  #   paths:
+  #     - build/libs/
+  #   expire_in: 1 day               # Artifacts available for 1 day
 
-unit-test-job:   # This job runs in the test stage after build-job.
-  stage: test
-  script:
-    - echo "Running unit tests..."
-    - ./gradlew test               # Run unit tests
-  artifacts:
-    reports:
-      junit: build/test-results/test/  # Collect test reports for GitLab's Test summary
+# unit-test-job:   # This job runs in the test stage after build-job.
+#   stage: test
+#   script:
+#     - echo "Running unit tests..."
+#     - ./gradlew test               # Run unit tests
+#   artifacts:
+#     reports:
+#       junit: build/test-results/test/  # Collect test reports for GitLab's Test summary
 
 lint-test-job:   # This job also runs in the test stage in parallel with unit-test-job.
   stage: test
@@ -34,12 +34,12 @@ lint-test-job:   # This job also runs in the test stage in parallel with unit-te
     - ./gradlew ktlintCheck        # Run Kotlin lint checks (assuming you use ktlint)
   allow_failure: true              # Optionally, allow linting to fail without failing the pipeline
 
-deploy-job:      # This job runs in the deploy stage after test jobs pass.
-  stage: deploy
-  environment: production
-  script:
-    - echo "Deploying application..."
-    - ./deploy.sh                  # Replace with actual deployment commands
-  only:
-    - main                          # Only deploy on the main branch
+# deploy-job:      # This job runs in the deploy stage after test jobs pass.
+#   stage: deploy
+#   environment: production
+#   script:
+#     - echo "Deploying application..."
+#     - ./deploy.sh                  # Replace with actual deployment commands
+#   only:
+#     - main                          # Only deploy on the main branch
 

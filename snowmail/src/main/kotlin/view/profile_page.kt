@@ -56,6 +56,7 @@ fun ProfilePage(userId: String,
     var userName by remember { mutableStateOf("") }
     var educationList by remember { mutableStateOf<List<Education>>(emptyList()) }
     var errorMessage by remember { mutableStateOf("") }
+    var userEmail by remember { mutableStateOf("") }
 
     var workExperienceList by remember { mutableStateOf<List<WorkExperience>>(emptyList()) }
 
@@ -90,6 +91,7 @@ fun ProfilePage(userId: String,
         val getNameResult = profileController.getUserName(userId)
         val educationResult = profileController.getEducation(userId)
         val experienceResult = profileController.getWorkExperience(userId)
+        val getEmailResult = profileController.getUserEmail(userId)
 
         getNameResult.onSuccess { name ->
 
@@ -112,7 +114,16 @@ fun ProfilePage(userId: String,
             workExperienceList = experiences
         }
             .onFailure { error -> errorMessage = error.message ?: "Failed to retrieve work experience records" }
+
+        getEmailResult.onSuccess { email ->
+
+            userEmail = email
+        }.onFailure { error ->
+
+            errorMessage = error.message ?: "Failed to retrieve user email"
+        }
     }
+
 
     Column(
         modifier = Modifier
@@ -259,7 +270,7 @@ fun ProfilePage(userId: String,
                     ) {
 
                         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            ProfileDetail(label = "Email Address", value = email)
+                            ProfileDetail(label = "Email Address", value = userEmail)
                             ProfileDetail(label = "Location", value = location)
                             ProfileDetail(label = "Phone", value = phone)
                         }

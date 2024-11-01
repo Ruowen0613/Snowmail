@@ -20,6 +20,7 @@ dependencies {
     implementation(libs.datetime)
     implementation(compose.desktop.currentOs)
     implementation(libs.json)
+    implementation(libs.ktor.client)
 //    implementation(libs.ktor.client.core) // Core Ktor client
 //    implementation(libs.ktor.client.cio) // CIO engine for Ktor client
 //    implementation(libs.ktor.client.content.negotiation) // Content negotiation

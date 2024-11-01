@@ -20,8 +20,7 @@ dependencies {
     implementation(libs.datetime)
     implementation(compose.desktop.currentOs)
     implementation(libs.json)
-
-    implementation(libs.ktor.client)
+    implementation(libs.ktor.client.cio)
 //    implementation(libs.ktor.client.core) // Core Ktor client
 //    implementation(libs.ktor.client.cio) // CIO engine for Ktor client
 //    implementation(libs.ktor.client.content.negotiation) // Content negotiation
@@ -56,6 +55,10 @@ dependencies {
     implementation(libs.supabase.realtime)
     implementation(libs.supabase.auth)
     implementation(kotlin("stdlib-jdk8"))
+
+    // for javamail
+    implementation("javax.mail:javax.mail-api:1.6.2")
+    implementation("com.sun.mail:javax.mail:1.6.2")
 }
 
 tasks.test {

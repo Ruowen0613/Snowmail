@@ -9,13 +9,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import ca.uwaterloo.controller.SignUpController
-import ca.uwaterloo.persistence.DBStorage
+
+
+// import ca.uwaterloo.persistence.DBStorage
+
+import integration.SupabaseClient
 
 
 val fullPageColor = 0xFFebecf0
@@ -66,7 +71,7 @@ fun SignUpPage(NavigateToLogin: () -> Unit, NavigateToHome: () -> Unit) {
 
 @Composable
 fun RegisterForm(NavigateToLogin: () -> Unit, NavigateToHome: () -> Unit) {
-    val dbStorage = DBStorage()
+    val dbStorage = SupabaseClient()
     val signInController = SignUpController(dbStorage)
     Box (Modifier.fillMaxWidth(0.7f).fillMaxHeight().background(Color(formColor))) {
         Row {
@@ -113,7 +118,9 @@ fun RegisterForm(NavigateToLogin: () -> Unit, NavigateToHome: () -> Unit) {
                 Row(modifier = Modifier.fillMaxHeight(0.03f)) {}
                 // password input
                 Row { Text("Password") }
-                Row { OutlinedTextField(value = password, onValueChange = { password = it }, singleLine = true, modifier = Modifier.fillMaxWidth()) }
+                Row { OutlinedTextField(value = password, onValueChange = { password = it }, singleLine = true, modifier = Modifier.fillMaxWidth(),
+                    visualTransformation = PasswordVisualTransformation()
+                ) }
 
                 val errorInformation = true
                 var errorMessage by remember { mutableStateOf("") }
@@ -224,17 +231,13 @@ fun WebsitePage() {
     var currentPage by remember { mutableStateOf("signup") }
 
     when (currentPage) {
-        "login" -> loginPage ({ currentPage = "signup" }, {currentPage = "homepage"})
-        "signup" -> SignUpPage ({ currentPage = "login"}, { currentPage = "home"})
-        "homepage" -> homePage()
+        "login" -> loginPage ({ currentPage = "signup" }, {currentPage = "login"})
+        "signup" -> SignUpPage ({ currentPage = "login"}, { currentPage = "login"})
+        "profilePage" -> ProfilePage()
     }
 }
 
-// to be implement
-@Composable
-fun homePage() {
-    Text("This is homepage, in progress...")
-}
+
 
 
 fun main() {

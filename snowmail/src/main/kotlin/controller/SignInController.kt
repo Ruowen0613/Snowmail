@@ -1,13 +1,15 @@
 package ca.uwaterloo.controller
 
-import ca.uwaterloo.persistence.DBStorage
+// import ca.uwaterloo.persistence.DBStorage
 import kotlinx.coroutines.runBlocking
 
-class SignInController(private val dbStorage: DBStorage) {
+import integration.SupabaseClient
+
+class SignInController(private val dbStorage: SupabaseClient) {
 
     //Sign in the user and return either the user id or error message
     suspend fun signInUser(email: String, password: String): Result<String> {
-        return dbStorage.signInUser(email, password)
+        return dbStorage.authRepository.signInUser(email, password)
     }
 
 //    suspend fun logoutUser(): String {
@@ -16,7 +18,7 @@ class SignInController(private val dbStorage: DBStorage) {
 }
 
 fun main() = runBlocking<Unit> {
-    val dbStorage = DBStorage()
+    val dbStorage = SupabaseClient()
     val signInController = SignInController(dbStorage)
 
     val email = "wrw040613@gmail.com"

@@ -4,11 +4,7 @@
     <CLASSES>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.ktor/ktor-client-cio-jvm/3.0.0-rc-1/5958504c1bce22d3480a873dc6e5e2d759680499/ktor-client-cio-jvm-3.0.0-rc-1.jar!/" />
     </CLASSES>
-    <JAVADOC>
-      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.ktor/ktor-client-cio-jvm/3.0.0-rc-1/d5de464ccd7429e2aaf98788d3998a927fd64396/ktor-client-cio-jvm-3.0.0-rc-1-javadoc.jar!/" />
-    </JAVADOC>
-    <SOURCES>
-      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.ktor/ktor-client-cio-jvm/3.0.0-rc-1/628726a24825d30a6b0794e179965c5718f91731/ktor-client-cio-jvm-3.0.0-rc-1-sources.jar!/" />
-    </SOURCES>
+    <JAVADOC />
+    <SOURCES />
   </library>
 </component>

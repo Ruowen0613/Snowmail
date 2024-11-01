@@ -1,21 +1,23 @@
 package ca.uwaterloo.controller
 
-import ca.uwaterloo.persistence.DBStorage
+//import ca.uwaterloo.persistence.DBStorage
 import kotlinx.coroutines.runBlocking
 
-class SignUpController(private val dbStorage: DBStorage) {
+import integration.SupabaseClient
+
+class SignUpController(private val dbStorage: SupabaseClient) {
 
     // Sign up a new user and return either userId or error message
     fun signUpUser(email: String, password: String, firstname: String, lastname: String): Result<String> {
         return runBlocking {
-            dbStorage.signUpUser(email, password, firstname, lastname)
+            dbStorage.authRepository.signUpUser(email, password, firstname, lastname)
         }
     }
 }
 
 // Testing SignUpController
 fun main() {
-    val dbStorage = DBStorage()
+    val dbStorage = SupabaseClient()
     val signUpController = SignUpController(dbStorage)
 
     // Test user registration

@@ -57,7 +57,6 @@ class OpenAIClient(private val httpClient: HttpClient) {
             - Institution: ${e.institutionName}
             - Degree: ${e.major}
             - GPA: ${e.gpa ?: "Not provided"}
-            - Start Date: ${e.startDate}
             - End Date: ${e.endDate}
             """.trimIndent()
         }
@@ -207,5 +206,4 @@ suspend fun main() {
     )
 
     println(openAIClient.generateEmail(userInput, userProfile, listOf(education), listOf(workExperience)))
-    println("Done")
 }

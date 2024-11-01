@@ -16,6 +16,15 @@ class ProfileController(private val dbStorage: SupabaseClient) {
         return dbStorage.userProfileRepository.getUserName(userId)
     }
 
+    // get user's email and display it on profile page
+    suspend fun getUserEmail(userId: String): Result<String> {
+        return dbStorage.userProfileRepository.getUserEmail(userId)
+    }
+
+    suspend fun editUserProfile(userId: String, cityName: String?, phone: String?): Result<Boolean> {
+        return dbStorage.userProfileRepository.updateUserProfile(userId, cityName, phone)
+    }
+
     //
     //education exp
     //
@@ -74,8 +83,6 @@ class ProfileController(private val dbStorage: SupabaseClient) {
             description = description
         )
     }
-
-
 }
 
 fun main() = runBlocking<Unit> {
@@ -83,12 +90,32 @@ fun main() = runBlocking<Unit> {
     val profileController = ProfileController(dbStorage)
 
     val userId = "c9498eec-ac17-4a3f-8d91-61efba3f7277"
+    //val userId = "a365a4c4-6427-4461-8cb4-2850fab8ac8c"
+
+    //test get user's name
 //    val profileResult = profileController.getUserName(userId)
-//
 //    profileResult.onSuccess { fullName ->
 //        println("User Profile Name: $fullName")
 //    }.onFailure { error ->
 //        println("Error fetching user profile: ${error.message}")
+//    }
+
+    //test get user's email
+//    val profileResult = profileController.getUserEmail(userId)
+//    profileResult.onSuccess { email ->
+//        println("email: $email")
+//    }.onFailure { error ->
+//        println("Error fetching user profile: ${error.message}")
+//    }
+
+    //test editing city and phone
+//    val cityName = "New York"
+//    val phone = "+1234567890"
+//    val result = profileController.editUserProfile(userId, cityName, phone)
+//    result.onSuccess {
+//        println("User profile updated successfully.")
+//    }.onFailure { error ->
+//        println("Error updating user profile: ${error.message}")
 //    }
 
 
@@ -137,8 +164,8 @@ fun main() = runBlocking<Unit> {
 //    }.onFailure { error ->
 //        println("Error fetching education records: ${error.message}")
 //    }
-//
-//    // test getting work exp
+
+    // test getting work exp
 //    val workExperienceResult = profileController.getWorkExperience(userId)
 //    workExperienceResult.onSuccess { workExperienceList ->
 //        println("Work experience records:")

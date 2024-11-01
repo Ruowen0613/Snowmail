@@ -32,7 +32,6 @@ fun WebsitePageWelcome() {
     when (currentPage) {
         "login" -> loginPage ({ currentPage = "signup" }, {currentPage = "profilePage"})
         "signup" -> SignUpPage ({ currentPage = "login"}, { currentPage = "login"})
-        "profilePage" -> ProfilePage()
     }
 }
 
@@ -46,7 +45,7 @@ fun main() {
 }
 
 @Composable
-fun WelcomePage(NavigateToSignup: () -> Unit, NavigateToLogin: () -> Unit, NavigateToWelcomePage1: () -> Unit, NavigateToEmailGenerationPage: () -> Unit) {
+fun WelcomePage(NavigateToSignup: () -> Unit, NavigateToLogin: () -> Unit, NavigateToWelcomePage1: () -> Unit) {
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
@@ -79,11 +78,11 @@ fun WelcomePage(NavigateToSignup: () -> Unit, NavigateToLogin: () -> Unit, Navig
                 Text("Sign Up")
             }
 
-            Spacer(modifier = Modifier.width(8.dp))
-
-            Button(onClick = NavigateToEmailGenerationPage) {
-                Text("Email Generation")
-            }
+//            Spacer(modifier = Modifier.width(8.dp))
+//
+//            Button(onClick = NavigateToEmailGenerationPage) {
+//                Text("Email Generation")
+//            }
 
         }
 

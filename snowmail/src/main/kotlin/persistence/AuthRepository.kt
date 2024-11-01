@@ -33,7 +33,8 @@ class AuthRepository(private val supabase: SupabaseClient) {
             val userProfile = UserProfile(
                 userId = user.id,
                 firstName = firstname,
-                lastName = lastname
+                lastName = lastname,
+                email = email
             )
             supabase.from("user_profile").insert(userProfile)
 

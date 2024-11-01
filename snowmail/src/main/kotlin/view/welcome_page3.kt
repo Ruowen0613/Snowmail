@@ -34,7 +34,6 @@ fun WebsitePageWelcome3() {
     when (currentPage) {
         "login" -> loginPage ({ currentPage = "signup" }, {currentPage = "profilePage"})
         "signup" -> SignUpPage ({ currentPage = "login"}, { currentPage = "login"})
-        "profilePage" -> ProfilePage()
     }
 }
 

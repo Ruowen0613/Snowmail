@@ -53,12 +53,17 @@ fun EmailGenerationPage() {
     // Create an instance of EmailGenerationService
     val emailGenerationService = EmailGenerationService(openAIClient)
 
-    val userInput = UserInput(
-        jobDescription = "Software Engineer",
+    // user input values
+    var companyInput by remember { mutableStateOf("company name") }
+    var descriptionInput by remember { mutableStateOf("description") }
+    var recruiterNameInput by remember { mutableStateOf("recruiter name") }
+
+    var userInput = UserInput(
+        jobDescription = descriptionInput,
         recruiterEmail = "recruiter@example.com",
         jobTitle = "Software Engineer",
-        company = "Example Corp",
-        recruiterName = "Jane Doe"
+        company = companyInput,
+        recruiterName = recruiterNameInput
     )
 
     val userProfile = UserProfile(
@@ -68,10 +73,7 @@ fun EmailGenerationPage() {
         skills = listOf("Java", "Kotlin", "SQL")
     )
 
-    // user input values
-    var companyInput by remember { mutableStateOf("") }
-    var descriptionInput by remember { mutableStateOf("") }
-    var recruiterNameInput by remember { mutableStateOf("") }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -129,6 +131,8 @@ fun EmailGenerationPage() {
                 try {
                     val generatedEmail = emailGenerationService.generateEmail(userInput, userProfile)
                     println("Generated Email: ${generatedEmail.body}")
+                    emailContent = generatedEmail.body ?: "Failed to generate email"
+                    showDialog = true
                 } catch (e: Exception) {
                     println("Error: ${e.message}")
                 }
@@ -138,18 +142,18 @@ fun EmailGenerationPage() {
         }
     }
 
-//        if (showDialog) {
-//            AlertDialog(
-//                onDismissRequest = { showDialog = false },
-//                title = { Text("Generated Email") },
-//                text = { Text(emailContent) },
-//                confirmButton = {
-//                    Button(onClick = { showDialog = false }) {
-//                        Text("Close")
-//                    }
-//                }
-//            )
-//        }
+        if (showDialog) {
+            AlertDialog(
+                onDismissRequest = { showDialog = false },
+                title = { Text("Generated Email") },
+                text = { Text(emailContent) },
+                confirmButton = {
+                    Button(onClick = { showDialog = false }) {
+                        Text("Close")
+                    }
+                }
+            )
+        }
     }
 }
 

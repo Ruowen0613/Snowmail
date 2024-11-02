@@ -141,9 +141,6 @@ fun RegisterForm(NavigateToLogin: () -> Unit, NavigateToHome: () -> Unit) {
                         // if password is missing
                         else if (password.isEmpty())  errorMessage = "please fill in password"
 
-                        // if email does not end with .com
-                        else if (!email.endsWith(".com")) errorMessage = "Please enter a valid email"
-
                         // if password is too short
                         else if (password.length < 6) errorMessage = "Password is too short"
 

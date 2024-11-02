@@ -42,7 +42,7 @@ fun ProfilePage(userId: String,
                 NavigateToDocuments: () -> Unit, NavigateToEmialGen: () -> Unit,
                 NavigateToProgress: () -> Unit) {
     val dbStorage = SupabaseClient()
-    val profileController = ProfileController(dbStorage)
+    val profileController = ProfileController(dbStorage.userProfileRepository)
 
     var email by remember { mutableStateOf("user@gmail.com") }
     var location by remember { mutableStateOf("") }
@@ -527,7 +527,7 @@ fun EditContactDialog(onDismiss: () -> Unit) {
                     value = location,
                     onValueChange = { location = it },
                     label = { Text("Location") },
-                    placeholder = { Text("Type city") },
+                    placeholder = { Text("Enter city") },
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -643,7 +643,7 @@ fun EditEducationDialog(
                 OutlinedTextField(value = gpa, onValueChange = { gpa = it }, label = { Text("GPA") }, modifier = Modifier.fillMaxWidth())
 
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                    OutlinedTextField(value = startMonth, onValueChange = { startMonth = it }, label = { Text("Start Month") }, modifier = Modifier.weight(1f))
+                    OutlinedTextField(value = startMonth, onValueChange = { startMonth = it }, label = { Text("Start Month") }, modifier = Modifier.weight(1f), placeholder = { Text("(ex: 7 for July)") })
                     OutlinedTextField(value = startYear, onValueChange = { startYear = it }, label = { Text("Start Year") }, modifier = Modifier.weight(1f))
                 }
 
@@ -743,7 +743,7 @@ fun EditExperienceDialog(
 
 
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                    OutlinedTextField(value = startMonth, onValueChange = { startMonth = it }, label = { Text("Start Month") }, modifier = Modifier.weight(1f))
+                    OutlinedTextField(value = startMonth, onValueChange = { startMonth = it }, label = { Text("Start Month") }, modifier = Modifier.weight(1f), placeholder = { Text("(ex: 7 for July)") })
                     OutlinedTextField(value = startYear, onValueChange = { startYear = it }, label = { Text("Start Year") }, modifier = Modifier.weight(1f))
                 }
 

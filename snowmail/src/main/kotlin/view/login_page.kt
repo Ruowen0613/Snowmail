@@ -112,7 +112,7 @@ fun loginForm(NavigateToSignup: () -> Unit, NavigateToHome: () -> Unit) {
 @Composable
 fun loginWithAccount(NavigateToSignup: () -> Unit, NavigateToHome: () -> Unit) {
     val dbStorage = SupabaseClient()
-    val signInController = SignInController(dbStorage)
+    val signInController = SignInController(dbStorage.authRepository)
     Column (
         modifier = Modifier.fillMaxWidth().padding(horizontal = 160.dp).padding(vertical = 15.dp)){
 

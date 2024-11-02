@@ -1,9 +1,9 @@
 package controller
 
+import ca.uwaterloo.model.Education
+import ca.uwaterloo.model.WorkExperience
 import io.ktor.http.*
 import io.ktor.server.application.*
-import io.ktor.server.engine.*
-import io.ktor.server.netty.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -18,8 +18,10 @@ fun Route.emailRoutes(emailGenerationService: EmailGenerationService) {
         try {
             val userInput = call.receive<UserInput>()
             val userProfile = call.receive<UserProfile>()
+            val education = call.receive<List<Education>>()
+            val workExperience = call.receive<List<WorkExperience>>()
 
-            val generatedEmail = emailGenerationService.generateEmail(userInput, userProfile)
+            val generatedEmail = emailGenerationService.generateEmail(userInput, userProfile, education, workExperience)
             call.respond(HttpStatusCode.OK, generatedEmail)
         } catch (e: Exception) {
             call.respond(HttpStatusCode.InternalServerError, "Failed to generate email: ${e.message}")

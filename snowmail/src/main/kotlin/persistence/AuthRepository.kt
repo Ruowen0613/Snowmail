@@ -7,13 +7,13 @@ import model.UserProfile
 import io.github.jan.supabase.postgrest.from
 
 
-class AuthRepository(private val supabase: SupabaseClient) {
+class AuthRepository(private val supabase: SupabaseClient) : IAuthRepository{
 
     //register a new user with email and password and return user id
     //password needs to be at least 6 chars
     //if the email has already used, log in
     //have to check data is inserted successfully in user_profile (need to implemented later)
-    suspend fun signUpUser(
+    override suspend fun signUpUser(
         email: String,
         password: String,
         firstname: String,
@@ -52,7 +52,7 @@ class AuthRepository(private val supabase: SupabaseClient) {
     }
 
     //sign in the user with email and password
-    suspend fun signInUser(email: String, password: String): Result<String> {
+    override suspend fun signInUser(email: String, password: String): Result<String> {
         return try {
             val result = supabase.auth.signInWith(Email) {
                 this.email = email
@@ -75,7 +75,7 @@ class AuthRepository(private val supabase: SupabaseClient) {
     }
 
     //sign out the user in the current session
-    suspend fun signOutUser(): String {
+    override suspend fun signOutUser(): String {
         return try {
             // Sign out the current user
             supabase.auth.signOut()

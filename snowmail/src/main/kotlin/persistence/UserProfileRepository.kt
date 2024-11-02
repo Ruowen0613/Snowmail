@@ -15,9 +15,9 @@ import kotlinx.datetime.LocalDate
 import kotlinx.serialization.Contextual
 import java.util.*
 
-class UserProfileRepository(private val supabase: SupabaseClient) {
+class UserProfileRepository(private val supabase: SupabaseClient) : IUserProfileRepository{
 
-    suspend fun getUserName(userId: String): Result<String> {
+    override suspend fun getUserName(userId: String): Result<String> {
         return try {
             // fetch user's name from db based on userid
             val userProfile = supabase.from("user_profile")
@@ -33,7 +33,7 @@ class UserProfileRepository(private val supabase: SupabaseClient) {
             Result.failure(Exception("Failed to fetch profile: ${e.message}"))
         }
     }
-    suspend fun getUserEmail(userId: String): Result<String> {
+    override suspend fun getUserEmail(userId: String): Result<String> {
         return try {
             // fetch user's email from db based on userid
             val emailResult = supabase.from("user_profile")
@@ -51,7 +51,7 @@ class UserProfileRepository(private val supabase: SupabaseClient) {
         }
     }
 
-    suspend fun updateUserProfile(userId: String, cityName: String?, phone: String?): Result<Boolean> {
+    override suspend fun updateUserProfile(userId: String, cityName: String?, phone: String?): Result<Boolean> {
         return try {
             withContext(Dispatchers.IO) {
                 supabase.from("user_profile")
@@ -67,7 +67,7 @@ class UserProfileRepository(private val supabase: SupabaseClient) {
         }
     }
 
-    suspend fun getEducation(userId: String): Result<List<Education>> {
+    override suspend fun getEducation(userId: String): Result<List<Education>> {
         return try {
             val education = supabase.from("education")
                 .select {
@@ -82,7 +82,7 @@ class UserProfileRepository(private val supabase: SupabaseClient) {
         }
     }
 
-    suspend fun addEducation(
+    override suspend fun addEducation(
         userId: String,
         degreeId: Int,
         major: String,
@@ -108,7 +108,7 @@ class UserProfileRepository(private val supabase: SupabaseClient) {
         }
     }
 
-    suspend fun getWorkExperience(userId: String): Result<List<WorkExperience>> {
+    override suspend fun getWorkExperience(userId: String): Result<List<WorkExperience>> {
         return try {
             val workExperience = supabase.from("work_experience")
                 .select {
@@ -123,7 +123,7 @@ class UserProfileRepository(private val supabase: SupabaseClient) {
         }
     }
 
-    suspend fun addWorkExperience(
+    override suspend fun addWorkExperience(
         userId: String,
         companyName: String,
         currentlyWorking: Boolean,
@@ -152,5 +152,3 @@ class UserProfileRepository(private val supabase: SupabaseClient) {
 
 
 }
-
-

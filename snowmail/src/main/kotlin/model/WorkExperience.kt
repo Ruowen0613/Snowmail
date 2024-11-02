@@ -13,6 +13,6 @@ data class WorkExperience(
     @SerialName("currently_working") val currentlyWorking: Boolean,
     @SerialName("title") val title: String,
     @SerialName("start_date") val startDate: LocalDate,
-    @SerialName("end_date") val endDate: LocalDate?,
+    @SerialName("end_date") val endDate: LocalDate,
     @SerialName("description") val description: String?
 )

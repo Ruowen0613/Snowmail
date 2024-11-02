@@ -6,23 +6,24 @@ import model.UserProfile
 
 import integration.SupabaseClient
 import ca.uwaterloo.model.WorkExperience
+import ca.uwaterloo.persistence.IUserProfileRepository
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.LocalDate
 
-class ProfileController(private val dbStorage: SupabaseClient) {
+class ProfileController(private val userProfileRepository: IUserProfileRepository) {
 
     // get user's name and display it on profile page
     suspend fun getUserName(userId: String): Result<String> {
-        return dbStorage.userProfileRepository.getUserName(userId)
+        return userProfileRepository.getUserName(userId)
     }
 
     // get user's email and display it on profile page
     suspend fun getUserEmail(userId: String): Result<String> {
-        return dbStorage.userProfileRepository.getUserEmail(userId)
+        return userProfileRepository.getUserEmail(userId)
     }
 
     suspend fun editUserProfile(userId: String, cityName: String?, phone: String?): Result<Boolean> {
-        return dbStorage.userProfileRepository.updateUserProfile(userId, cityName, phone)
+        return userProfileRepository.updateUserProfile(userId, cityName, phone)
     }
 
     //
@@ -31,7 +32,7 @@ class ProfileController(private val dbStorage: SupabaseClient) {
 
     // get education exp by user id
     suspend fun getEducation(userId: String): Result<List<Education>> {
-        return dbStorage.userProfileRepository.getEducation(userId)
+        return userProfileRepository.getEducation(userId)
     }
 
     // add education record to db
@@ -44,7 +45,7 @@ class ProfileController(private val dbStorage: SupabaseClient) {
         endDate: LocalDate,
         institutionName: String
     ): Result<Boolean> {
-        return dbStorage.userProfileRepository.addEducation(
+        return userProfileRepository.addEducation(
             userId = userId,
             degreeId = degreeId,
             major = major,
@@ -60,7 +61,7 @@ class ProfileController(private val dbStorage: SupabaseClient) {
     //
     // get work exp by user id
     suspend fun getWorkExperience(userId: String): Result<List<WorkExperience>> {
-        return dbStorage.userProfileRepository.getWorkExperience(userId)
+        return userProfileRepository.getWorkExperience(userId)
     }
 
     // add work exp record to db
@@ -73,7 +74,7 @@ class ProfileController(private val dbStorage: SupabaseClient) {
         endDate: LocalDate,
         description: String?
     ): Result<Boolean> {
-        return dbStorage.userProfileRepository.addWorkExperience(
+        return userProfileRepository.addWorkExperience(
             userId = userId,
             companyName = companyName,
             currentlyWorking = currentlyWorking,
@@ -87,7 +88,7 @@ class ProfileController(private val dbStorage: SupabaseClient) {
 
 fun main() = runBlocking<Unit> {
     val dbStorage = SupabaseClient()
-    val profileController = ProfileController(dbStorage)
+    val profileController = ProfileController(dbStorage.userProfileRepository)
 
     val userId = "c9498eec-ac17-4a3f-8d91-61efba3f7277"
     //val userId = "a365a4c4-6427-4461-8cb4-2850fab8ac8c"

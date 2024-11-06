@@ -12,14 +12,6 @@ import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 
 fun main() {
-    // Start the Ktor server in a separate thread
-//    thread {
-//        embeddedServer(Netty, port = 8080) {
-//            configureRouting(emailGenerationService)
-//        }.start(wait = true)
-//    }
-
-
     application {
         Window(onCloseRequest = ::exitApplication, state = WindowState(size = DpSize(1200.dp, 800.dp))) {
             websitePage()

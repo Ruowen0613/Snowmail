@@ -7,6 +7,7 @@ import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.status.SessionSource
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.storage.Bucket
 import io.github.jan.supabase.storage.Storage
 import io.github.jan.supabase.storage.storage
 import io.ktor.http.ContentDisposition.Companion.File
@@ -26,6 +27,10 @@ class SupabaseClient {
     val authRepository = AuthRepository(supabase)
     val userProfileRepository = UserProfileRepository(supabase)
     val documentRepository = DocumentRepository(supabase)
+
+    suspend fun retrieveBuckets(): List<Bucket> {
+        return supabase.storage.retrieveBuckets()
+    }
 }
 
 //
@@ -35,9 +40,11 @@ class SupabaseClient {
 fun main() = runBlocking<Unit> {
     val dbStorage = SupabaseClient()
 
+    // val buckets = dbStorage.storage.retrieveBuckets()
+
     val bucket = "user_documents"
     val path = "test-resume.pdf"
-    val file = File("Desktop/test-document.pdf")
+    val file = File(System.getProperty("user.home") + "/Desktop/test-resume.pdf")
 
     // Test uploading a document
     val uploadResult = dbStorage.documentRepository.uploadDocument(bucket, path, file)

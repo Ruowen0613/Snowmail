@@ -10,16 +10,8 @@ import ca.uwaterloo.view.*
 import integration.OpenAIClient
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
-import service.EmailGenerationService
 
 fun main() {
-    // Initialize the OpenAIClient
-    val httpClient = HttpClient(CIO)
-    val openAIClient = OpenAIClient(httpClient)
-
-    // Initialize the EmailGenerationService
-    val emailGenerationService = EmailGenerationService(openAIClient)
-
     // Start the Ktor server in a separate thread
 //    thread {
 //        embeddedServer(Netty, port = 8080) {

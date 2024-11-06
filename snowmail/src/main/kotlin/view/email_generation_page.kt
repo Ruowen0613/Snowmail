@@ -19,7 +19,6 @@ import model.UserProfile
 
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.Window
-import service.EmailGenerationService
 import integration.OpenAIClient
 import androidx.compose.foundation.background
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -34,6 +33,7 @@ import androidx.compose.ui.text.style.TextAlign
 import ca.uwaterloo.controller.ProfileController
 import ca.uwaterloo.model.Education
 import ca.uwaterloo.model.WorkExperience
+import controller.EmailGenerationController
 import controller.send_email
 import integration.SupabaseClient
 import kotlinx.coroutines.runBlocking
@@ -58,7 +58,7 @@ fun EmailGenerationPage(NavigateToDocuments: () -> Unit, NavigateToProfile: () -
     val openAIClient = OpenAIClient(httpClient)
 
     // Create an instance of EmailGenerationService
-    val emailGenerationService = EmailGenerationService(openAIClient)
+    val emailGenerationService = EmailGenerationController(openAIClient)
 
     // user input values
     var companyInput by remember { mutableStateOf("company name") }

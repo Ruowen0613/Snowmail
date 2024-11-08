@@ -21,6 +21,18 @@ class DocumentController(private val documentRepository: IDocumentRepository) {
 }
 
 fun main() = runBlocking<Unit> {
+//    Bucket Structure:
+//    - user_documents
+//        - user_id (folder)
+//            - resume
+//                - resume.pdf
+//            - cover_letter
+//                - cover_letter.pdf
+//            - transcript
+//                - transcript.pdf
+//            - other
+//                - other.pdf
+
     val dbStorage = SupabaseClient()
     val documentController = DocumentController(dbStorage.documentRepository)
 

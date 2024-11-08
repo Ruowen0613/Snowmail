@@ -22,17 +22,25 @@ class DocumentController(private val documentRepository: IDocumentRepository) {
 
 fun main() = runBlocking<Unit> {
     val dbStorage = SupabaseClient()
-    val documentUploadController = DocumentController(dbStorage.documentRepository)
+    val documentController = DocumentController(dbStorage.documentRepository)
 
     val bucket = "user_documents"
-    val path = "test-resume.pdf"
+    val path = "test/resume/test-resume.pdf"
     val file = File(System.getProperty("user.home") + "/Desktop/test-resume.pdf")
 
     // Call uploadDocument and print the result
-    val result = documentUploadController.uploadDocument(bucket, path, file)
+    val result = documentController.uploadDocument(bucket, path, file)
     result.onSuccess {
         println("Upload successful: $it")
     }.onFailure { error ->
         println("Error uploading document: ${error.message}")
     }
+
+    val deleteResult = documentController.deleteDocument(bucket, path)
+    deleteResult.onSuccess {
+        println("Delete successful: $it")
+    }.onFailure { error ->
+        println("Error deleting document: ${error.message}")
+    }
+
 }

@@ -5,12 +5,15 @@ import io.github.jan.supabase.storage.storage
 import java.io.File
 import java.io.InputStream
 
-class DocumentRepository(private val supabase: SupabaseClient) {
+class DocumentRepository(private val supabase: SupabaseClient) : IDocumentRepository {
 
     private val storage = supabase.storage
 
-    suspend fun uploadDocument(bucket: String, path: String, file: File): Result<String> {
+    override suspend fun uploadDocument(bucket: String, path: String, file: File): Result<String> {
         return try {
+            if (!file.exists()) {
+                return Result.failure(Exception("File does not exist: ${file.path}"))
+            }
             val fileContent = file.readBytes()
             storage.from(bucket).upload(path, fileContent)
             Result.success("Document uploaded successfully.")
@@ -19,7 +22,7 @@ class DocumentRepository(private val supabase: SupabaseClient) {
         }
     }
 
-    suspend fun downloadDocument(bucket: String, path: String): Result<ByteArray> {
+    override suspend fun downloadDocument(bucket: String, path: String): Result<ByteArray> {
         return try {
             val fileContent = storage.from(bucket).downloadAuthenticated(path)
             Result.success(fileContent)
@@ -28,7 +31,7 @@ class DocumentRepository(private val supabase: SupabaseClient) {
         }
     }
 
-    suspend fun deleteDocument(bucket: String, path: String): Result<String> {
+    override suspend fun deleteDocument(bucket: String, path: String): Result<String> {
         return try {
             storage.from(bucket).delete(path)
             Result.success("Document deleted successfully.")

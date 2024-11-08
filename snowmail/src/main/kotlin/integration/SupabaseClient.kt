@@ -28,45 +28,67 @@ class SupabaseClient {
     val userProfileRepository = UserProfileRepository(supabase)
     val documentRepository = DocumentRepository(supabase)
 
-    suspend fun retrieveBuckets(): List<Bucket> {
-        return supabase.storage.retrieveBuckets()
+    suspend fun retrieveBuckets(): Result<List<Bucket>> {
+        return try {
+            val buckets = supabase.storage.retrieveBuckets()
+            Result.success(buckets)
+        } catch (e: Exception) {
+            Result.failure(Exception("Error retrieving buckets: ${e.message}"))
+        }
     }
 }
+
+fun main() = runBlocking<Unit> {
+    val dbStorage = SupabaseClient()
+
+    val bucketResult = dbStorage.retrieveBuckets()
+    bucketResult.onSuccess { buckets ->
+        println("Buckets: $buckets")
+    }.onFailure { error ->
+        println("Error retrieving buckets: ${error.message}")
+    }
+
+    val bucket = "user_documents"
+    val path = "Q6-2.jpg"
+    val file = File(System.getProperty("user.home") + "/Desktop/Q6-2.jpg")
+
+    // Test uploading a document
+    // val uploadResult = dbStorage.documentRepository.uploadDocument(bucket, path, file)
+
+//    val deleteResult = dbStorage.documentRepository.deleteDocument(bucket, path)
+//    deleteResult.onSuccess {
+//        println("Delete successful: $it")
+//
+//        // Verify deletion
+//        val verifyResult = dbStorage.documentRepository.downloadDocument(bucket, path)
+//        verifyResult.onSuccess {
+//            println("Document still exists after deletion.")
+//        }.onFailure { error ->
+//            println("Document successfully deleted: ${error.message}")
+//        }
+//    }.onFailure { error ->
+//        println("Error deleting document: ${error.message}")
+//    }
+
+//    val uploadResult = dbStorage.documentRepository.uploadDocument(bucket, path, file)
+//    uploadResult.onSuccess {
+//        println("Upload successful: $it")
+//
+//        // Delete the document after uploading
+//        val deleteResult = dbStorage.documentRepository.deleteDocument(bucket, path)
+//        deleteResult.onSuccess {
+//            println("Delete successful: $it")
+//        }.onFailure { error ->
+//            println("Error deleting document: ${error.message}")
+//        }
+//    }.onFailure { error ->
+//        println("Error uploading document: ${error.message}")
+//    }
+}
+
 
 //
 // just for testing,
 // uncomment any of them when you want to test a single func
 //
-fun main() = runBlocking<Unit> {
-    val dbStorage = SupabaseClient()
 
-    // val buckets = dbStorage.storage.retrieveBuckets()
-
-    val bucket = "user_documents"
-    val path = "test-resume.pdf"
-    val file = File(System.getProperty("user.home") + "/Desktop/test-resume.pdf")
-
-    // Test uploading a document
-    val uploadResult = dbStorage.documentRepository.uploadDocument(bucket, path, file)
-    uploadResult.onSuccess {
-        println("Upload successful: $it")
-    }.onFailure { error ->
-        println("Error uploading document: ${error.message}")
-    }
-
-//    // Test downloading a document
-//    val downloadResult = dbStorage.documentRepository.downloadDocument(bucket, path)
-//    downloadResult.onSuccess { fileContent ->
-//        println("Download successful, file size: ${fileContent.size} bytes")
-//    }.onFailure { error ->
-//        println("Error downloading document: ${error.message}")
-//    }
-//
-//    // Test deleting a document
-//    val deleteResult = dbStorage.documentRepository.deleteDocument(bucket, path)
-//    deleteResult.onSuccess {
-//        println("Delete successful: $it")
-//    }.onFailure { error ->
-//        println("Error deleting document: ${error.message}")
-//    }
-}

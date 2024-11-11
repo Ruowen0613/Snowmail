@@ -50,10 +50,14 @@ dependencies {
 
     testImplementation(kotlin("test"))
 
+
+    // implementation(platform("io.github.jan-tennert.supabase:bom:0.9.0"))
     implementation(platform(libs.supabase.bom))
     implementation(libs.supabase.postgres)
     implementation(libs.supabase.realtime)
     implementation(libs.supabase.auth)
+    implementation(libs.supabase.storage)
+
     implementation(kotlin("stdlib-jdk8"))
 
     // for javamail

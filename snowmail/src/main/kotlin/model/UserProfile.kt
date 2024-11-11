@@ -15,4 +15,5 @@ data class UserProfile(
     @SerialName("linkedin_url") val linkedinUrl: String? = null,
     @SerialName("github_url") val githubUrl: String? = null,
     @SerialName("personal_website_url") val personalWebsiteUrl: String? = null,
+    @SerialName("phone") var phone: String? = null,
 )

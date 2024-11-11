@@ -33,6 +33,7 @@ class UserProfileRepository(private val supabase: SupabaseClient) : IUserProfile
             Result.failure(Exception("Failed to fetch profile: ${e.message}"))
         }
     }
+
     override suspend fun getUserEmail(userId: String): Result<String> {
         return try {
             // fetch user's email from db based on userid
@@ -51,7 +52,43 @@ class UserProfileRepository(private val supabase: SupabaseClient) : IUserProfile
         }
     }
 
-    override suspend fun updateUserProfile(userId: String, cityName: String?, phone: String?): Result<Boolean> {
+    override suspend fun getUserCity(userId: String): Result<String> {
+        return try {
+            // fetch user's city from db based on userid
+            val cityResult = supabase.from("user_profile")
+                .select(columns = Columns.list("city_name")) {
+                    filter {
+                        eq("user_id", userId)
+                    }
+                }
+                .decodeSingle<Map<String, String>>()
+
+            val city = cityResult["city_name"] ?: throw Exception("City not found")
+            Result.success(city)
+        } catch (e: Exception) {
+            Result.failure(Exception("Failed to fetch profile: ${e.message}"))
+        }
+    }
+
+    override suspend fun getUserPhone(userId: String): Result<String> {
+        return try {
+            // fetch user's phone from db based on userid
+            val phoneResult = supabase.from("user_profile")
+                .select(columns = Columns.list("phone")) {
+                    filter {
+                        eq("user_id", userId)
+                    }
+                }
+                .decodeSingle<Map<String, String>>()
+
+            val phone = phoneResult["phone"] ?: throw Exception("Phone not found")
+            Result.success(phone)
+        } catch (e: Exception) {
+            Result.failure(Exception("Failed to fetch profile: ${e.message}"))
+        }
+    }
+
+    override suspend fun updateCityPhone(userId: String, cityName: String?, phone: String?): Result<Boolean> {
         return try {
             withContext(Dispatchers.IO) {
                 supabase.from("user_profile")
@@ -66,6 +103,47 @@ class UserProfileRepository(private val supabase: SupabaseClient) : IUserProfile
             Result.failure(Exception("Failed to update user profile: ${e.message}"))
         }
     }
+
+//    override suspend fun getSkills(userId: String): Result<List<String>> {
+//        return try {
+//            // Fetch user's skills from db based on userid
+//            val skillsResult = supabase.from("user_profile")
+//                .select(columns = Columns.list("skills")) {
+//                    filter {
+//                        eq("user_id", userId)
+//                    }
+//                }
+//                .decodeSingleOrNull<Map<String, String>>()
+//
+//            // Parse the skills string into a list
+//            val skillsString = skillsResult?.get("skills")
+//            val skills = skillsString?.split(", ")?.map { it.trim() } ?: emptyList()
+//
+//            Result.success(skills)
+//        } catch (e: Exception) {
+//            Result.failure(Exception("Failed to fetch skills: ${e.message}"))
+//        }
+//    }
+
+//    override suspend fun updateSkills(userId: String, skills: List<String>): Result<Boolean> {
+//        return try {
+//            withContext(Dispatchers.IO) {
+//                // Convert the list of skills into a comma-separated string
+//                val skillsString = skills.joinToString(", ")
+//
+//                // Update the user's skills in the database
+//                supabase.from("user_profile")
+//                    .update(mapOf("skills" to skillsString)){
+//                        filter {
+//                            eq("user_id", userId)
+//                        }
+//                    }
+//                Result.success(true)
+//            }
+//        } catch (e: Exception) {
+//            Result.failure(Exception("Failed to update skills: ${e.message}"))
+//        }
+//    }
 
     override suspend fun getEducation(userId: String): Result<List<Education>> {
         return try {
@@ -108,6 +186,36 @@ class UserProfileRepository(private val supabase: SupabaseClient) : IUserProfile
         }
     }
 
+    override suspend fun deleteEducation(educationID: String): Result<Boolean> {
+        return try {
+            // check if education exists
+            val existingEducation = supabase.from("education")
+                .select {
+                    filter {
+                        eq("id", educationID)
+                    }
+                }
+                .decodeSingleOrNull<Education>()
+
+            if (existingEducation != null) {
+                // if exists, delete it
+                supabase.from("education")
+                    .delete {
+                        filter {
+                            eq("id", educationID)
+                        }
+                    }
+                Result.success(true)
+            } else {
+                // if not exists, return failure
+                Result.failure(Exception("Education record with ID $educationID not found"))
+            }
+        } catch (e: Exception) {
+            Result.failure(Exception("Failed to delete education: ${e.message}"))
+        }
+    }
+
+
     override suspend fun getWorkExperience(userId: String): Result<List<WorkExperience>> {
         return try {
             val workExperience = supabase.from("work_experience")
@@ -149,6 +257,34 @@ class UserProfileRepository(private val supabase: SupabaseClient) : IUserProfile
         }
     }
 
+    override suspend fun deleteWorkExperience(workExperienceID: String): Result<Boolean> {
+        return try {
+            // check if work experience exists
+            val existingWorkExperience = supabase.from("work_experience")
+                .select {
+                    filter {
+                        eq("id", workExperienceID)
+                    }
+                }
+                .decodeSingleOrNull<WorkExperience>()
+
+            if (existingWorkExperience != null) {
+                // if exists, delete it
+                supabase.from("work_experience")
+                    .delete {
+                        filter {
+                            eq("id", workExperienceID)
+                        }
+                    }
+                Result.success(true)
+            } else {
+                // if not exists, return failure
+                Result.failure(Exception("Work experience with ID $workExperienceID not found"))
+            }
+        } catch (e: Exception) {
+            Result.failure(Exception("Failed to delete work experience: ${e.message}"))
+        }
+    }
 
 
 }

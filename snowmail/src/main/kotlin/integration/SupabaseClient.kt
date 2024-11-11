@@ -1,12 +1,19 @@
 package integration
 
 import ca.uwaterloo.persistence.AuthRepository
+import ca.uwaterloo.persistence.DocumentRepository
 import ca.uwaterloo.persistence.UserProfileRepository
 import io.github.jan.supabase.auth.Auth
+import io.github.jan.supabase.auth.status.SessionSource
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.storage.Bucket
+import io.github.jan.supabase.storage.Storage
+import io.github.jan.supabase.storage.storage
+import io.ktor.http.ContentDisposition.Companion.File
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.LocalDate
+import java.io.File
 
 class SupabaseClient {
     private val supabase = createSupabaseClient(
@@ -15,16 +22,22 @@ class SupabaseClient {
     ) {
         install(Postgrest)
         install(Auth)
+        install(Storage)
     }
     val authRepository = AuthRepository(supabase)
     val userProfileRepository = UserProfileRepository(supabase)
+    val documentRepository = DocumentRepository(supabase)
+
+    suspend fun retrieveBuckets(): Result<List<Bucket>> {
+        return try {
+            val buckets = supabase.storage.retrieveBuckets()
+            Result.success(buckets)
+        } catch (e: Exception) {
+            Result.failure(Exception("Error retrieving buckets: ${e.message}"))
+        }
+    }
 }
 
-
-//
-// just for testing,
-// uncomment any of them when you want to test a single func
-//
 fun main() = runBlocking<Unit> {
     val dbStorage = SupabaseClient()
 
@@ -35,99 +48,92 @@ fun main() = runBlocking<Unit> {
 
 
     val userId = "c9498eec-ac17-4a3f-8d91-61efba3f7277"
+
+//    val bucketResult = dbStorage.retrieveBuckets()
+//    bucketResult.onSuccess { buckets ->
+//        println("Buckets: $buckets")
+//    }.onFailure { error ->
+//        println("Error retrieving buckets: ${error.message}")
+//    }
 //
-//    //test sign up
-//    println (dbStorage.authRepository.signUpUser(email, password, firstname, lastname))
+//    val bucket = "user_documents"
+//    val path = "Q6-2.jpg"
+//    val file = File(System.getProperty("user.home") + "/Desktop/Q6-2.jpg")
+
+    // Test uploading a document
+    // val uploadResult = dbStorage.documentRepository.uploadDocument(bucket, path, file)
+
+//    val deleteResult = dbStorage.documentRepository.deleteDocument(bucket, path)
+//    deleteResult.onSuccess {
+//        println("Delete successful: $it")
 //
-//    //test sign in
-//    println (dbStorage.authRepository.signInUser(email, password))
-//
-//    //test sign out
-//    println(dbStorage.authRepository.signOutUser())
-//
-    //test returning user's name
-//    val profileResult = dbStorage.userProfileRepository.getUserName(userId)
-//        profileResult.onSuccess { fullName ->
-//            println("User Profile Name: $fullName")
+//        // Verify deletion
+//        val verifyResult = dbStorage.documentRepository.downloadDocument(bucket, path)
+//        verifyResult.onSuccess {
+//            println("Document still exists after deletion.")
 //        }.onFailure { error ->
-//            println("Error fetching user profile: ${error.message}")
+//            println("Document successfully deleted: ${error.message}")
 //        }
-
-//    val emailResult = dbStorage.userProfileRepository.getUserEmail(userId)
-//    emailResult.onSuccess { email ->
-//        println("User email: $email")
 //    }.onFailure { error ->
-//        println("Error fetching user email: ${error.message}")
+//        println("Error deleting document: ${error.message}")
 //    }
 
-
-    //test adding work exp
-//    val userId = "c9498eec-ac17-4a3f-8d91-61efba3f7277"
-//    val companyName = "Example Company"
-//    val currentlyWorking = true
-//    val title = "Software Engineer"
-//    val startDate = LocalDate(2020, 1, 1)
-//    val endDate = LocalDate(2022, 1, 1)
-//    val description = "Worked on backend systems."
-//    val result = dbStorage.userProfileRepository.addWorkExperience(
-//        userId = userId,
-//        companyName = companyName,
-//        currentlyWorking = currentlyWorking,
-//        title = title,
-//        startDate = startDate,
-//        endDate = endDate,
-//        description = description
-//    )
+//    val uploadResult = dbStorage.documentRepository.uploadDocument(bucket, path, file)
+//    uploadResult.onSuccess {
+//        println("Upload successful: $it")
 //
+//        // Delete the document after uploading
+//        val deleteResult = dbStorage.documentRepository.deleteDocument(bucket, path)
+//        deleteResult.onSuccess {
+//            println("Delete successful: $it")
+//        }.onFailure { error ->
+//            println("Error deleting document: ${error.message}")
+//        }
+//    }.onFailure { error ->
+//        println("Error uploading document: ${error.message}")
+//    }
+
+    //test get user's skills
+//    val profileResult = dbStorage.userProfileRepository.getSkills(userId)
+//    profileResult.onSuccess { skills ->
+//        println("skills: $skills")
+//    }.onFailure { error ->
+//        println("Error fetching user profile: ${error.message}")
+//    }
+
+    //test update user's skills
+//    val skills = listOf("Java", "Kotlin", "Python")
+//    val result = dbStorage.userProfileRepository.updateSkills(userId, skills)
 //    result.onSuccess {
-//        println("Working experience added successfully.")
+//        println("User profile updated successfully.")
 //    }.onFailure { error ->
-//        println("Error adding working experience: ${error.message}")
+//        println("Error updating user profile: ${error.message}")
 //    }
 
-    //test adding edu exp
-//    val degreeId = "3"
-//    val major = "Computer Science"
-//    val gpa = 3.8f
-//    val startDate = LocalDate(2019, 9, 1)
-//    val endDate = LocalDate(2023, 6, 1)
-//    val institutionName = "University of Waterloo"
-//
-//    val result = dbStorage.userProfileRepository.addEducation(
-//        userId = userId,
-//        degreeId = degreeId,
-//        major = major,
-//        gpa = gpa,
-//        startDate = startDate,
-//        endDate = endDate,
-//        institutionName = institutionName
-//    )
-//
+    //test delete education
+//    val educationId = "10"
+//    val result = dbStorage.userProfileRepository.deleteEducation(educationId)
 //    result.onSuccess {
-//        println("Education record added successfully.")
+//        println("Education deleted successfully.")
 //    }.onFailure { error ->
-//        println("Error adding education record: ${error.message}")
+//        println("Error deleting education: ${error.message}")
 //    }
 
-    // test getting edu exp
-//    val educationResult = dbStorage.userProfileRepository.getEducation(userId)
-//    educationResult.onSuccess { educationList ->
-//        println("Education records:")
-//        educationList.forEach { education ->
-//            println(education)
-//        }
+    //test delete work experience
+//    val workExperienceId = "100"
+//    val result = dbStorage.userProfileRepository.deleteWorkExperience(workExperienceId)
+//    result.onSuccess {
+//        println("Work experience deleted successfully.")
 //    }.onFailure { error ->
-//        println("Error fetching education records: ${error.message}")
+//        println("Error deleting work experience: ${error.message}")
 //    }
 
-    // test getting work exp
-//    val workExperienceResult = dbStorage.userProfileRepository.getWorkExperience(userId)
-//    workExperienceResult.onSuccess { workExperienceList ->
-//        println("Work experience records:")
-//        workExperienceList.forEach { workExperience ->
-//            println(workExperience)
-//        }
-//    }.onFailure { error ->
-//        println("Error fetching work experience records: ${error.message}")
-//    }
+
 }
+
+
+//
+// just for testing,
+// uncomment any of them when you want to test a single func
+//
+

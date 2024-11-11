@@ -8,7 +8,11 @@ import kotlinx.datetime.LocalDate
 interface IUserProfileRepository {
     suspend fun getUserName(userId: String): Result<String>
     suspend fun getUserEmail(userId: String): Result<String>
-    suspend fun updateUserProfile(userId: String, cityName: String?, phone: String?): Result<Boolean>
+    suspend fun getUserCity(userId: String): Result<String>
+    suspend fun getUserPhone(userId: String): Result<String>
+    suspend fun updateCityPhone(userId: String, cityName: String?, phone: String?): Result<Boolean>
+    //suspend fun getSkills(userId: String): Result<List<String>>
+    //suspend fun updateSkills(userId: String, skills: List<String>): Result<Boolean>
     suspend fun getEducation(userId: String): Result<List<Education>>
     suspend fun addEducation(
         userId: String,
@@ -19,6 +23,7 @@ interface IUserProfileRepository {
         endDate: LocalDate,
         institutionName: String
     ): Result<Boolean>
+    suspend fun deleteEducation(educationID: String): Result<Boolean>
     suspend fun getWorkExperience(userId: String): Result<List<WorkExperience>>
     suspend fun addWorkExperience(
         userId: String,
@@ -29,4 +34,5 @@ interface IUserProfileRepository {
         endDate: LocalDate,
         description: String?
     ): Result<Boolean>
+    suspend fun deleteWorkExperience(workExperienceID: String): Result<Boolean>
 }

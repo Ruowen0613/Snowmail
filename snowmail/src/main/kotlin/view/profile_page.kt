@@ -53,10 +53,19 @@ fun ProfilePage(userId: String,
     var showSkillsDialog by remember { mutableStateOf(false) }
     var EditContactDialog by remember { mutableStateOf(false) }
 
+
     var userName by remember { mutableStateOf("") }
     var educationList by remember { mutableStateOf<List<Education>>(emptyList()) }
     var errorMessage by remember { mutableStateOf("") }
     var userEmail by remember { mutableStateOf("") }
+    var userLocation by remember { mutableStateOf("") }
+    var userPhone by remember { mutableStateOf("") }
+
+    var showEditEducationDialog by remember { mutableStateOf(false) }
+    var selectedEducation by remember { mutableStateOf<Education?>(null) }
+    var showEditExperienceDialog by remember { mutableStateOf(false) }
+    var selectedExperience by remember { mutableStateOf<WorkExperience?>(null) }
+
 
     var workExperienceList by remember { mutableStateOf<List<WorkExperience>>(emptyList()) }
 
@@ -86,12 +95,33 @@ fun ProfilePage(userId: String,
         }
     }
 
+    fun refreshContactInfo() {
+        runBlocking {
+            val locationResult = profileController.getUserCity(userId)
+            val phoneResult = profileController.getUserPhone(userId)
+
+            locationResult.onSuccess { city ->
+                userLocation = city
+            }.onFailure { error ->
+                errorMessage = error.message ?: "Failed to retrieve updated location."
+            }
+
+            phoneResult.onSuccess { updatedPhone ->
+                userPhone = updatedPhone
+            }.onFailure { error ->
+                errorMessage = error.message ?: "Failed to retrieve updated phone."
+            }
+        }
+    }
+
     LaunchedEffect(userId) {
 
         val getNameResult = profileController.getUserName(userId)
         val educationResult = profileController.getEducation(userId)
         val experienceResult = profileController.getWorkExperience(userId)
         val getEmailResult = profileController.getUserEmail(userId)
+        val getLocationResult = profileController.getUserCity(userId)
+        val getPhoneResult = profileController.getUserPhone(userId)
 
         getNameResult.onSuccess { name ->
 
@@ -122,6 +152,20 @@ fun ProfilePage(userId: String,
 
             errorMessage = error.message ?: "Failed to retrieve user email"
         }
+
+        getLocationResult.onSuccess { city ->
+            userLocation = city
+        }.onFailure { error ->
+            errorMessage = error.message ?: "Failed to retrieve user location"
+        }
+
+        // Fetch and handle user phone
+        getPhoneResult.onSuccess { phone ->
+            userPhone = phone
+        }.onFailure { error ->
+            errorMessage = error.message ?: "Failed to retrieve user phone"
+        }
+
     }
 
 
@@ -227,7 +271,7 @@ fun ProfilePage(userId: String,
         ) {
 
             Column(
-               modifier = Modifier.padding(8.dp),
+                modifier = Modifier.padding(8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
@@ -248,52 +292,64 @@ fun ProfilePage(userId: String,
                 }
 
 
+
                 if (EditContactDialog) {
-                    EditContactDialog(onDismiss = { EditContactDialog = false })
+                    EditContactDialog(
+                        userId = userId,
+                        profileController = profileController,
+                        userLocation = userLocation, // Add userLocation as a parameter
+                        userPhone = userPhone,
+                        onDismiss = { EditContactDialog = false },
+                        onContactUpdated = {
+                            refreshContactInfo() // Call to refresh contact info after update
+                            EditContactDialog = false // Close dialog after update
+                        }
+                    )
                 }
+
 
                 Spacer(modifier = Modifier.height(4.dp))
 
+                // Profile Details
+                Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+                    SectionTitle("Contact Information")
 
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp),
-                    elevation = 4.dp
-                ) {
-                    Row(
+                    Card(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(8.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                        elevation = 4.dp
                     ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                ProfileDetail(label = "Email Address:", value = userEmail)
+                                ProfileDetail(label = "Location:", value = userLocation ?: "Location not available")
+                                ProfileDetail(label = "Phone: +1 ", value = userPhone ?: "Phone not available")
+                            }
 
-                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            ProfileDetail(label = "Email Address", value = userEmail)
-                            ProfileDetail(label = "Location", value = location)
-                            ProfileDetail(label = "Phone", value = phone)
-                        }
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Spacer(modifier = Modifier.width(8.dp))
 
-
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-
-                            Spacer(modifier = Modifier.width(8.dp))
-
-                            Text(
-                                text = "Resume.pdf",
-                                modifier = Modifier
-                                    .padding(end = 32.dp)
-                                    .clickable {
-                                        // Add the action you want to perform on click here, such as opening the PDF
-                                    },
-                                style = MaterialTheme.typography.body1.copy(
-                                    fontSize = 14.sp,
-                                    color = Color(0xFF2669A0)
+                                Text(
+                                    text = "Resume.pdf",
+                                    modifier = Modifier
+                                        .padding(end = 32.dp)
+                                        .clickable {
+                                            // Add the action to open the resume file
+                                        },
+                                    style = MaterialTheme.typography.body1.copy(
+                                        fontSize = 14.sp,
+                                        color = Color(0xFF2669A0)
+                                    )
                                 )
-                            )
+                            }
                         }
-
                     }
                 }
 
@@ -303,67 +359,167 @@ fun ProfilePage(userId: String,
                         Text(
                             text = "No education records added",
                             fontSize = 14.sp,
-                            color = Color.Gray
+                            color = Color.Gray,
+                            modifier = Modifier.padding(8.dp)
                         )
                     } else {
                         Column(modifier = Modifier.padding(8.dp)) {
                             educationList.forEach { education ->
-                                Text(
-                                    text = "${education.institutionName}, ${education.degreeId} in ${education.major}",
-                                    fontSize = 14.sp,
-                                    color = Color.Black
-                                )
-                                Text(
-                                    text = "GPA: ${education.gpa ?: "N/A"}",
-                                    fontSize = 12.sp,
-                                    color = Color.Gray
-                                )
-                                Text(
-                                    text = "From ${education.startDate} to ${education.endDate}",
-                                    fontSize = 12.sp,
-                                    color = Color.Gray
-                                )
-                                Spacer(modifier = Modifier.height(8.dp))
+                                // Clickable Box for each education record
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable {
+                                            selectedEducation = education
+                                            showEditEducationDialog = true
+                                        }
+                                        .padding(vertical = 8.dp)
+                                ) {
+                                    Column {
+                                        Text(
+                                            text = "${education.institutionName}, ${education.degreeId} in ${education.major}",
+                                            fontSize = 14.sp,
+                                            color = Color.Black
+                                        )
+                                        Text(
+                                            text = "GPA: ${education.gpa ?: "N/A"}",
+                                            fontSize = 12.sp,
+                                            color = Color.Gray
+                                        )
+                                        Text(
+                                            text = "From ${education.startDate} to ${education.endDate}",
+                                            fontSize = 12.sp,
+                                            color = Color.Gray
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
 
                     Row(
-                        modifier = Modifier.padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.End
                     ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.End
+                        IconButton(
+                            onClick = {
+                                selectedEducation = null // Set to null for adding a new record
+                                showEducationDialog = true
+                            },
+                            modifier = Modifier.size(15.dp)
                         ) {
-                            IconButton(
-                                onClick = { showEducationDialog = true },
-                                modifier = Modifier.size(15.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Add,
-                                    contentDescription = "Add",
-                                    tint = Color(0xFF487896)
-                                )
-                            }
-                        }
-
-
-                        if (showEducationDialog) {
-                            EditEducationDialog(
-                                onDismiss = { showEducationDialog = false },
-                                userId = userId,
-                                profileController = profileController,
-                                onEducationAdded = { refreshEducationList() }
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = "Add",
+                                tint = Color(0xFF487896)
                             )
                         }
                     }
+
+                    if (showEducationDialog) {
+                        AddEducationDialog(
+                            onDismiss = { showEducationDialog = false },
+                            userId = userId,
+                            profileController = profileController,
+                            onEducationAdded = { refreshEducationList() }
+                        )
+                    }
+                    // Show Edit or Add Education Dialog
+                    if (showEditEducationDialog) {
+                        EditEducationDialog(
+                            onDismiss = { showEditEducationDialog = false },
+                            userId = userId,
+                            profileController = profileController,
+                            education = selectedEducation, // Pass the selected education record, or null for new
+                            onEducationAdded = {
+                                refreshEducationList()
+                                selectedEducation = null // Reset after editing
+                                showEducationDialog = false
+                            }
+                        )
+                    }
                 }
 
-                SectionTitle("Work experience")
+//
+//                SectionTitle("Work experience")
+//                Card(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+//                    if (workExperienceList.isEmpty()) {
+//
+//                        Text(
+//                            text = "No experiences added",
+//                            fontSize = 14.sp,
+//                            color = Color.Gray,
+//                            modifier = Modifier.padding(8.dp)
+//                        )
+//                    } else {
+//
+//                        Column(modifier = Modifier.padding(8.dp)) {
+//                            workExperienceList.forEach { experience ->
+//                                Column(modifier = Modifier.padding(bottom = 8.dp)) {
+//                                    Text(
+//                                        text = "${experience.companyName} - ${experience.title}",
+//                                        fontSize = 14.sp,
+//                                        color = Color.Black
+//                                    )
+//                                    Text(
+//                                        text = "From ${experience.startDate} to ${
+//                                            experience.endDate ?: "Present"
+//                                        }",
+//                                        fontSize = 12.sp,
+//                                        color = Color.Gray
+//                                    )
+//                                    if (!experience.description.isNullOrEmpty()) {
+//                                        Text(
+//                                            text = experience.description,
+//                                            fontSize = 12.sp,
+//                                            color = Color.Gray
+//                                        )
+//                                    }
+//                                }
+//                                Spacer(modifier = Modifier.height(8.dp))
+//                            }
+//                        }
+//                    }
+//
+//                    Row(
+//                        modifier = Modifier.padding(16.dp),
+//                        verticalAlignment = Alignment.CenterVertically
+//                    ) {
+//                        Row(
+//                            modifier = Modifier.fillMaxWidth(),
+//                            horizontalArrangement = Arrangement.End
+//                        ) {
+//                            IconButton(
+//                                onClick = { showExperienceDialog = true },
+//                                modifier = Modifier.size(15.dp) // Adjust size as needed
+//                            ) {
+//                                Icon(
+//                                    imageVector = Icons.Default.Add,
+//                                    contentDescription = "Add",
+//                                    tint = Color(0xFF487896) // Customize icon color
+//                                )
+//                            }
+//                        }
+//
+//
+//                        if (showExperienceDialog) {
+//                            EditExperienceDialog(
+//                                onDismiss = { showExperienceDialog = false },
+//                                userId = userId,  // Pass userId here
+//                                profileController = profileController,  // Pass profileController here
+//                                onWorkExperienceAdded = { refreshWorkExperienceList() }
+//                            )
+//                        }
+//                    }
+//                }
+
+                // Work Experience Section
+                SectionTitle("Work Experience")
+
                 Card(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
                     if (workExperienceList.isEmpty()) {
-
                         Text(
                             text = "No experiences added",
                             fontSize = 14.sp,
@@ -371,64 +527,86 @@ fun ProfilePage(userId: String,
                             modifier = Modifier.padding(8.dp)
                         )
                     } else {
-
                         Column(modifier = Modifier.padding(8.dp)) {
                             workExperienceList.forEach { experience ->
-                                Column(modifier = Modifier.padding(bottom = 8.dp)) {
-                                    Text(
-                                        text = "${experience.companyName} - ${experience.title}",
-                                        fontSize = 14.sp,
-                                        color = Color.Black
-                                    )
-                                    Text(
-                                        text = "From ${experience.startDate} to ${
-                                            experience.endDate ?: "Present"
-                                        }",
-                                        fontSize = 12.sp,
-                                        color = Color.Gray
-                                    )
-                                    if (!experience.description.isNullOrEmpty()) {
+                                // Clickable Box for each work experience record
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable {
+                                            selectedExperience = experience
+                                            showEditExperienceDialog = true
+                                        }
+                                        .padding(vertical = 8.dp)
+                                ) {
+                                    Column {
                                         Text(
-                                            text = experience.description,
+                                            text = "${experience.companyName} - ${experience.title}",
+                                            fontSize = 14.sp,
+                                            color = Color.Black
+                                        )
+                                        Text(
+                                            text = "From ${experience.startDate} to ${experience.endDate ?: "Present"}",
                                             fontSize = 12.sp,
                                             color = Color.Gray
                                         )
+                                        if (!experience.description.isNullOrEmpty()) {
+                                            Text(
+                                                text = experience.description,
+                                                fontSize = 12.sp,
+                                                color = Color.Gray
+                                            )
+                                        }
                                     }
                                 }
-                                Spacer(modifier = Modifier.height(8.dp))
                             }
                         }
                     }
 
                     Row(
-                        modifier = Modifier.padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.End
                     ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.End
+                        IconButton(
+                            onClick = {
+                                selectedExperience = null // Set to null for adding a new record
+                                showExperienceDialog = true
+                            },
+                            modifier = Modifier.size(15.dp) // Adjust size as needed
                         ) {
-                            IconButton(
-                                onClick = { showExperienceDialog = true },
-                                modifier = Modifier.size(15.dp) // Adjust size as needed
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Add,
-                                    contentDescription = "Add",
-                                    tint = Color(0xFF487896) // Customize icon color
-                                )
-                            }
-                        }
-
-
-                        if (showExperienceDialog) {
-                            EditExperienceDialog(
-                                onDismiss = { showExperienceDialog = false },
-                                userId = userId,  // Pass userId here
-                                profileController = profileController,  // Pass profileController here
-                                onWorkExperienceAdded = { refreshWorkExperienceList() }
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = "Add",
+                                tint = Color(0xFF487896)
                             )
                         }
+                    }
+
+                    // Show Add Experience Dialog
+                    if (showExperienceDialog) {
+                        AddExperienceDialog(
+                            onDismiss = { showExperienceDialog = false },
+                            userId = userId,
+                            profileController = profileController,
+                            onWorkExperienceAdded = { refreshWorkExperienceList() }
+                        )
+                    }
+
+                    // Show Edit Experience Dialog
+                    if (showEditExperienceDialog) {
+                        EditExperienceDialog(
+                            onDismiss = { showEditExperienceDialog = false },
+                            userId = userId,
+                            profileController = profileController,
+                            experience = selectedExperience, // Pass the selected work experience, or null for new
+                            onWorkExperienceAdded = {
+                                refreshWorkExperienceList()
+                                selectedExperience = null // Reset after editing
+                                showEditExperienceDialog = false
+                            }
+                        )
                     }
                 }
 
@@ -472,11 +650,17 @@ fun ProfilePage(userId: String,
 }
 
 @Composable
-fun EditContactDialog(onDismiss: () -> Unit) {
-    var email by remember { mutableStateOf("") }
-    var location by remember { mutableStateOf("") }
-    var phone by remember { mutableStateOf("") }
-    var dateOfBirth by remember { mutableStateOf("") }
+fun EditContactDialog(
+    userId: String,
+    profileController: ProfileController,
+    userLocation: String?, // Add userLocation as a parameter
+    userPhone: String?, // Add userPhone as a parameter
+    onDismiss: () -> Unit,
+    onContactUpdated: () -> Unit
+) {
+    var location by remember { mutableStateOf(userLocation ?: "") }
+    var phone by remember { mutableStateOf(userPhone ?: "") }
+    var errorMessage by remember { mutableStateOf("") }
 
     Dialog(onDismissRequest = onDismiss) {
         Surface(
@@ -513,16 +697,7 @@ fun EditContactDialog(onDismiss: () -> Unit) {
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-
-                OutlinedTextField(
-                    value = email,
-                    onValueChange = { email = it },
-                    label = { Text("Email Address") },
-                    placeholder = { Text("         @gmail.com") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-
+                // Location Input
                 OutlinedTextField(
                     value = location,
                     onValueChange = { location = it },
@@ -531,9 +706,8 @@ fun EditContactDialog(onDismiss: () -> Unit) {
                     modifier = Modifier.fillMaxWidth()
                 )
 
-
+                // Phone Input
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    // Replace this with a country code picker if available
                     Text("+1", modifier = Modifier.padding(end = 8.dp))
                     OutlinedTextField(
                         value = phone,
@@ -543,10 +717,19 @@ fun EditContactDialog(onDismiss: () -> Unit) {
                     )
                 }
 
+                // Error message display
+                if (errorMessage.isNotEmpty()) {
+                    Text(
+                        text = errorMessage,
+                        color = Color.Red,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(10.dp)
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-
+                // Action Buttons
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
@@ -554,12 +737,28 @@ fun EditContactDialog(onDismiss: () -> Unit) {
                     TextButton(onClick = onDismiss) {
                         Text("Cancel")
                     }
-                    Button(onClick = {
-                        onDismiss()
-                    }, colors = ButtonDefaults.buttonColors(
-                        backgroundColor = Color(0xFF487896),
-                        contentColor = Color.White
-                    )) {
+                    Button(
+                        onClick = {
+                            runBlocking {
+                                val result = profileController.updateCityPhone(
+                                    userId = userId,
+                                    cityName = location,
+                                    phone = phone
+                                )
+
+                                result.onSuccess {
+                                    onContactUpdated()    // Trigger any additional actions needed on update
+                                    onDismiss()
+                                }.onFailure { error ->
+                                    errorMessage = error.message ?: "Failed to update contact information."
+                                }
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = Color(0xFF487896),
+                            contentColor = Color.White
+                        )
+                    ) {
                         Text("Save")
                     }
                 }
@@ -568,8 +767,10 @@ fun EditContactDialog(onDismiss: () -> Unit) {
     }
 }
 
+
+
 @Composable
-fun EditEducationDialog(
+fun AddEducationDialog(
     onDismiss: () -> Unit,
     userId: String,
     profileController: ProfileController,
@@ -601,7 +802,7 @@ fun EditEducationDialog(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
 
-                Text("Edit Education", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+                Text("Add Education", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
 
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -698,7 +899,214 @@ fun EditEducationDialog(
 }
 
 @Composable
-fun EditExperienceDialog(
+fun EditEducationDialog(
+    education: Education? = null, // Optional parameter for editing
+    onDismiss: () -> Unit,
+    userId: String,
+    profileController: ProfileController,
+    onEducationAdded: () -> Unit
+) {
+
+    var schoolName by remember { mutableStateOf(education?.institutionName ?: "") }
+    var major by remember { mutableStateOf(education?.major ?: "") }
+    var degreeType by remember { mutableStateOf(education?.degreeId ?: "") }
+    var gpa by remember { mutableStateOf(education?.gpa?.toString() ?: "") }
+    //var startMonth by remember { mutableStateOf(education?.startDate?.month.toString() ?: "") }
+    var startMonth by remember { mutableStateOf(education?.startDate?.month?.value?.toString() ?: "") }
+    var startYear by remember { mutableStateOf(education?.startDate?.year.toString() ?: "") }
+    //var endMonth by remember { mutableStateOf(education?.endDate?.month.toString() ?: "") }
+    var endMonth by remember { mutableStateOf(education?.endDate?.month?.value?.toString() ?: "") }
+    var endYear by remember { mutableStateOf(education?.endDate?.year.toString() ?: "") }
+    var errorMessage by remember { mutableStateOf("") }
+
+    // Dropdown for degree type
+    var expanded by remember { mutableStateOf(false) }
+    val degreeTypes = listOf("Associate's/College Diploma", "Bachelor's", "Doctorate", "High School Diploma/GED", "Master's", "Other")
+
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            shape = RoundedCornerShape(8.dp),
+            color = Color.White,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+
+                Text("Edit Education", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                OutlinedTextField(
+                    value = schoolName,
+                    onValueChange = { schoolName = it },
+                    label = { Text("School Name") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                OutlinedTextField(
+                    value = major,
+                    onValueChange = { major = it },
+                    label = { Text("Major") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+//                Box(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .wrapContentSize(Alignment.TopStart)
+//                ) {
+//                    OutlinedTextField(
+//                        value = degreeType,
+//                        onValueChange = {},
+//                        label = { Text("Degree Type") },
+//                        trailingIcon = {
+//                            Icon(
+//                                imageVector = Icons.Filled.ArrowDropDown,
+//                                contentDescription = "Select Degree Type",
+//                                modifier = Modifier.clickable { expanded = true }
+//                            )
+//                        },
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .clickable { expanded = true },
+//                        readOnly = true
+//                    )
+//                    DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+//                        degreeTypes.forEach { type ->
+//                            DropdownMenuItem(onClick = {
+//                                degreeType = type
+//                                expanded = false
+//                            }) {
+//                                Text(type)
+//                            }
+//                        }
+//                    }
+//                }
+
+                OutlinedTextField(
+                    value = gpa,
+                    onValueChange = { gpa = it },
+                    label = { Text("GPA") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    OutlinedTextField(
+                        value = startMonth,
+                        onValueChange = { startMonth = it },
+                        label = { Text("Start Month") },
+                        modifier = Modifier.weight(1f),
+                        placeholder = { Text("(ex: 7 for July)") }
+                    )
+                    OutlinedTextField(
+                        value = startYear,
+                        onValueChange = { startYear = it },
+                        label = { Text("Start Year") },
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    OutlinedTextField(
+                        value = endMonth,
+                        onValueChange = { endMonth = it },
+                        label = { Text("End Month") },
+                        modifier = Modifier.weight(1f)
+                    )
+                    OutlinedTextField(
+                        value = endYear,
+                        onValueChange = { endYear = it },
+                        label = { Text("End Year") },
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+
+                if (errorMessage.isNotEmpty()) {
+                    Text(
+                        text = errorMessage,
+                        color = Color.Red,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(10.dp)
+                    )
+                }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    TextButton(onClick = onDismiss) {
+                        Text("Cancel")
+                    }
+                    Button(
+                        onClick = {
+                            runBlocking {
+                                val startDate = LocalDate(startYear.toInt(), startMonth.toInt(), 1)
+                                val endDate = LocalDate(endYear.toInt(), endMonth.toInt(), 1)
+                                val gpaValue = gpa.toFloatOrNull()
+                                val degreeId = degreeTypes.indexOf(degreeType) + 1
+
+//                                val result = if (education == null) {
+//                                    // Adding new education record
+//                                    profileController.addEducation(
+//                                        userId = userId,
+//                                        degreeId = degreeId,
+//                                        major = major,
+//                                        gpa = gpaValue,
+//                                        startDate = startDate,
+//                                        endDate = endDate,
+//                                        institutionName = schoolName
+//                                    )
+//                                }
+                                //else {
+                                    // Updating existing education record
+//                                    profileController.updateEducation(
+//                                        userId = userId,
+//                                        educationId = education.id,
+//                                        //degreeId = degreeId,
+//                                        major = major,
+//                                        gpa = gpaValue,
+//                                        startDate = startDate,
+//                                        endDate = endDate,
+//                                        institutionName = schoolName
+//                                    )
+                               //}
+
+//                                result.onSuccess {
+//                                    onEducationAdded()
+//                                    onDismiss()
+//                                }.onFailure { error ->
+//                                    errorMessage = error.message ?: "Failed to save education record."
+//                                }
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = Color(0xFF487896),
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Text("Save")
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+@Composable
+fun AddExperienceDialog(
     onDismiss: () -> Unit,
     userId: String,
     profileController: ProfileController,
@@ -796,6 +1204,184 @@ fun EditExperienceDialog(
                             }
                         }
                     }, colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF487896), contentColor = Color.White)) {
+                        Text("Save")
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun EditExperienceDialog(
+    experience: WorkExperience? = null, // Optional parameter for editing
+    onDismiss: () -> Unit,
+    userId: String,
+    profileController: ProfileController,
+    onWorkExperienceAdded: () -> Unit
+) {
+
+    var company by remember { mutableStateOf(experience?.companyName ?: "") }
+    //var location by remember { mutableStateOf(experience?.location ?: "") }
+    var positionTitle by remember { mutableStateOf(experience?.title ?: "") }
+    var startMonth by remember { mutableStateOf(experience?.startDate?.month?.value?.toString() ?: "") }
+    var startYear by remember { mutableStateOf(experience?.startDate?.year.toString() ?: "") }
+    var endMonth by remember { mutableStateOf(experience?.endDate?.month?.value?.toString() ?: "") }
+    var endYear by remember { mutableStateOf(experience?.endDate?.year.toString() ?: "") }
+    var description by remember { mutableStateOf(experience?.description ?: "") }
+    var isCurrentlyWorking by remember { mutableStateOf(experience?.currentlyWorking ?: false) }
+    var errorMessage by remember { mutableStateOf("") }
+
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            shape = RoundedCornerShape(8.dp),
+            color = Color.White,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text("Edit Work Experience", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+                Spacer(modifier = Modifier.height(8.dp))
+
+                OutlinedTextField(
+                    value = company,
+                    onValueChange = { company = it },
+                    label = { Text("Company") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                OutlinedTextField(
+                    value = positionTitle,
+                    onValueChange = { positionTitle = it },
+                    label = { Text("Position Title") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    OutlinedTextField(
+                        value = startMonth,
+                        onValueChange = { startMonth = it },
+                        label = { Text("Start Month") },
+                        modifier = Modifier.weight(1f),
+                        placeholder = { Text("(ex: 7 for July)") }
+                    )
+                    OutlinedTextField(
+                        value = startYear,
+                        onValueChange = { startYear = it },
+                        label = { Text("Start Year") },
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    OutlinedTextField(
+                        value = endMonth,
+                        onValueChange = { endMonth = it },
+                        label = { Text("End Month") },
+                        modifier = Modifier.weight(1f)
+                    )
+                    OutlinedTextField(
+                        value = endYear,
+                        onValueChange = { endYear = it },
+                        label = { Text("End Year") },
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                    Checkbox(
+                        checked = isCurrentlyWorking,
+                        onCheckedChange = { isCurrentlyWorking = it }
+                    )
+                    Text("I currently work here")
+                }
+
+                OutlinedTextField(
+                    value = description,
+                    onValueChange = { description = it },
+                    label = { Text("Description") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(100.dp)
+                )
+
+                if (errorMessage.isNotEmpty()) {
+                    Text(
+                        text = errorMessage,
+                        color = Color.Red,
+                        modifier = Modifier.padding(10.dp)
+                    )
+                }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    TextButton(onClick = onDismiss) {
+                        Text("Cancel")
+                    }
+                    Button(
+                        onClick = {
+                            runBlocking {
+                                try {
+                                    val startDate = LocalDate(startYear.toInt(), startMonth.toInt(), 1)
+                                    val endDate = if (isCurrentlyWorking) null else LocalDate(endYear.toInt(), endMonth.toInt(), 1)
+
+//                                    val result = if (experience == null) {
+//                                        // Adding new work experience
+//                                        profileController.addWorkExperience(
+//                                            userId = userId,
+//                                            companyName = company,
+//                                            location = location,
+//                                            title = positionTitle,
+//                                            currentlyWorking = isCurrentlyWorking,
+//                                            startDate = startDate,
+//                                            endDate = endDate,
+//                                            description = description.takeIf { it.isNotEmpty() }
+//                                        )
+//                                    } else {
+//                                        // Updating existing work experience
+//                                        profileController.updateWorkExperience(
+//                                            userId = userId,
+//                                            experienceId = experience.id,
+//                                            companyName = company,
+//                                            location = location,
+//                                            title = positionTitle,
+//                                            currentlyWorking = isCurrentlyWorking,
+//                                            startDate = startDate,
+//                                            endDate = endDate,
+//                                            description = description.takeIf { it.isNotEmpty() }
+//                                        )
+//                                    }
+
+//                                    result.onSuccess {
+//                                        onWorkExperienceAdded()
+//                                        onDismiss()
+//                                    }.onFailure { error ->
+//                                        errorMessage = error.message ?: "Failed to save work experience."
+//                                    }
+                                } catch (e: Exception) {
+                                    errorMessage = "Invalid date format"
+                                }
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = Color(0xFF487896),
+                            contentColor = Color.White
+                        )
+                    ) {
                         Text("Save")
                     }
                 }
@@ -914,7 +1500,7 @@ fun SectionTitle(title: String) {
 fun ProfileDetail(label: String, value: String) {
     Row {
         Text(
-            "$label: ",
+            "$label ",
             style = TextStyle(fontSize = 14.sp, color = Color.Black)
         )
         Text(

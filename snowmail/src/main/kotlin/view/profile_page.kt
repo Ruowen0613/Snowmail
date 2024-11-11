@@ -28,7 +28,9 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.foundation.text.ClickableText
 import kotlinx.datetime.LocalDate
 import androidx.compose.material.icons.filled.Delete
-
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 import ca.uwaterloo.controller.ProfileController
 
@@ -993,38 +995,35 @@ fun EditEducationDialog(
                                 val gpaValue = gpa.toFloatOrNull()
                                 val degreeId = degreeTypes.indexOf(degreeType) + 1
 
-//                                val result = if (education == null) {
-//                                    // Adding new education record
-//                                    profileController.addEducation(
-//                                        userId = userId,
-//                                        degreeId = degreeId,
-//                                        major = major,
-//                                        gpa = gpaValue,
-//                                        startDate = startDate,
-//                                        endDate = endDate,
-//                                        institutionName = schoolName
-//                                    )
-//                                }
-                                //else {
-                                    // Updating existing education record
-//                                    profileController.updateEducation(
-//                                        userId = userId,
-//                                        educationId = education.id,
-//                                        //degreeId = degreeId,
-//                                        major = major,
-//                                        gpa = gpaValue,
-//                                        startDate = startDate,
-//                                        endDate = endDate,
-//                                        institutionName = schoolName
-//                                    )
-                               //}
-
-//                                result.onSuccess {
-//                                    onEducationAdded()
-//                                    onDismiss()
-//                                }.onFailure { error ->
-//                                    errorMessage = error.message ?: "Failed to save education record."
-//                                }
+                                val result = if (education == null) {
+                                    // Adding new education record
+                                    profileController.addEducation(
+                                        userId = userId,
+                                        degreeId = degreeId,
+                                        major = major,
+                                        gpa = gpaValue,
+                                        startDate = startDate,
+                                        endDate = endDate,
+                                        institutionName = schoolName
+                                    )
+                                } else {
+                                    profileController.updateEducation(
+                                        userId = userId,
+                                        educationId = education.id.toString(),
+                                        degreeId = 1,
+                                        major = major,
+                                        gpa = gpaValue,
+                                        startDate = startDate,
+                                        endDate = endDate,
+                                        institutionName = schoolName
+                                    )
+                               }
+                                result.onSuccess {
+                                    onEducationEdited()
+                                    onDismiss()
+                                }.onFailure { error ->
+                                    errorMessage = error.message ?: "Failed to save education record."
+                                }
                             }
                         },
                         colors = ButtonDefaults.buttonColors(
@@ -1306,39 +1305,39 @@ fun EditExperienceDialog(
                             runBlocking {
                                 try {
                                     val startDate = LocalDate(startYear.toInt(), startMonth.toInt(), 1)
-                                    val endDate = if (isCurrentlyWorking) null else LocalDate(endYear.toInt(), endMonth.toInt(), 1)
-
-//                                    val result = if (experience == null) {
-//                                        // Adding new work experience
-//                                        profileController.addWorkExperience(
-//                                            userId = userId,
-//                                            companyName = company,
-//                                            title = positionTitle,
-//                                            currentlyWorking = isCurrentlyWorking,
-//                                            startDate = startDate,
-//                                            endDate = endDate,
-//                                            description = description.takeIf { it.isNotEmpty() }
-//                                        )
-//                                    } else {
-//                                        // Updating existing work experience
-//                                        profileController.updateWorkExperience(
-//                                            userId = userId,
-//                                            experienceId = experience.id,
-//                                            companyName = company,
-//                                            title = positionTitle,
-//                                            currentlyWorking = isCurrentlyWorking,
-//                                            startDate = startDate,
-//                                            endDate = endDate,
-//                                            description = description.takeIf { it.isNotEmpty() }
-//                                        )
-//                                    }
-//
-//                                    result.onSuccess {
-//                                        onWorkExperienceAdded()
-//                                        onDismiss()
-//                                    }.onFailure { error ->
-//                                        errorMessage = error.message ?: "Failed to save work experience."
-//                                    }
+                                    //val endDate = if (isCurrentlyWorking) null else LocalDate(endYear.toInt(), endMonth.toInt(), 1)
+                                    //val endDate = if (isCurrentlyWorking) LocalDate.now() else LocalDate(endYear.toInt(), endMonth.toInt(), 1)
+                                    val endDate = if (isCurrentlyWorking) Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date else LocalDate(endYear.toInt(), endMonth.toInt(), 1)
+                                    val result = if (experience == null) {
+                                        // Adding new work experience
+                                        profileController.addWorkExperience(
+                                            userId = userId,
+                                            companyName = company,
+                                            title = positionTitle,
+                                            currentlyWorking = isCurrentlyWorking,
+                                            startDate = startDate,
+                                            endDate = endDate,
+                                            description = description.takeIf { it.isNotEmpty() }
+                                        )
+                                    } else {
+                                        // Updating existing work experience
+                                        profileController.updateWorkExperience(
+                                            userId = userId,
+                                            workExperienceID = experience.id.toString(),
+                                            companyName = company,
+                                            currentlyWorking = isCurrentlyWorking,
+                                            title = positionTitle,
+                                            startDate = startDate,
+                                            endDate = endDate,
+                                            description = description.takeIf { it.isNotEmpty() }
+                                        )
+                                    }
+                                    result.onSuccess {
+                                        onWorkExperienceEdited()
+                                        onDismiss()
+                                    }.onFailure { error ->
+                                        errorMessage = error.message ?: "Failed to save work experience."
+                                    }
                                 } catch (e: Exception) {
                                     errorMessage = "Invalid date format"
                                 }

@@ -138,6 +138,29 @@ class ProfileController(private val userProfileRepository: IUserProfileRepositor
         )
     }
 
+    //update work exp record in db
+    suspend fun updateWorkExperience(
+        userId: String,
+        workExperienceID: String,
+        companyName: String,
+        currentlyWorking: Boolean,
+        title: String,
+        startDate: LocalDate,
+        endDate: LocalDate,
+        description: String?
+    ): Result<Boolean> {
+        return userProfileRepository.updateWorkExperience(
+            userId = userId,
+            workExperienceID = workExperienceID,
+            companyName = companyName,
+            currentlyWorking = currentlyWorking,
+            title = title,
+            startDate = startDate,
+            endDate = endDate,
+            description = description
+        )
+    }
+
     // delete work exp record from db
     suspend fun deleteWorkExperience(workExperienceID: String): Result<Boolean> {
         return userProfileRepository.deleteWorkExperience(workExperienceID)

@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.foundation.text.ClickableText
 import kotlinx.datetime.LocalDate
+import androidx.compose.material.icons.filled.Delete
 
 
 import ca.uwaterloo.controller.ProfileController
@@ -433,87 +434,20 @@ fun ProfilePage(userId: String,
                             userId = userId,
                             profileController = profileController,
                             education = selectedEducation, // Pass the selected education record, or null for new
-                            onEducationAdded = {
+                            onEducationEdited = {
                                 refreshEducationList()
                                 selectedEducation = null // Reset after editing
                                 showEducationDialog = false
+                            },
+                            onEducationDeleted = {
+                                refreshEducationList()
+                                selectedEducation = null // Reset after deleting
+                                showEditEducationDialog = false
                             }
                         )
                     }
                 }
 
-//
-//                SectionTitle("Work experience")
-//                Card(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
-//                    if (workExperienceList.isEmpty()) {
-//
-//                        Text(
-//                            text = "No experiences added",
-//                            fontSize = 14.sp,
-//                            color = Color.Gray,
-//                            modifier = Modifier.padding(8.dp)
-//                        )
-//                    } else {
-//
-//                        Column(modifier = Modifier.padding(8.dp)) {
-//                            workExperienceList.forEach { experience ->
-//                                Column(modifier = Modifier.padding(bottom = 8.dp)) {
-//                                    Text(
-//                                        text = "${experience.companyName} - ${experience.title}",
-//                                        fontSize = 14.sp,
-//                                        color = Color.Black
-//                                    )
-//                                    Text(
-//                                        text = "From ${experience.startDate} to ${
-//                                            experience.endDate ?: "Present"
-//                                        }",
-//                                        fontSize = 12.sp,
-//                                        color = Color.Gray
-//                                    )
-//                                    if (!experience.description.isNullOrEmpty()) {
-//                                        Text(
-//                                            text = experience.description,
-//                                            fontSize = 12.sp,
-//                                            color = Color.Gray
-//                                        )
-//                                    }
-//                                }
-//                                Spacer(modifier = Modifier.height(8.dp))
-//                            }
-//                        }
-//                    }
-//
-//                    Row(
-//                        modifier = Modifier.padding(16.dp),
-//                        verticalAlignment = Alignment.CenterVertically
-//                    ) {
-//                        Row(
-//                            modifier = Modifier.fillMaxWidth(),
-//                            horizontalArrangement = Arrangement.End
-//                        ) {
-//                            IconButton(
-//                                onClick = { showExperienceDialog = true },
-//                                modifier = Modifier.size(15.dp) // Adjust size as needed
-//                            ) {
-//                                Icon(
-//                                    imageVector = Icons.Default.Add,
-//                                    contentDescription = "Add",
-//                                    tint = Color(0xFF487896) // Customize icon color
-//                                )
-//                            }
-//                        }
-//
-//
-//                        if (showExperienceDialog) {
-//                            EditExperienceDialog(
-//                                onDismiss = { showExperienceDialog = false },
-//                                userId = userId,  // Pass userId here
-//                                profileController = profileController,  // Pass profileController here
-//                                onWorkExperienceAdded = { refreshWorkExperienceList() }
-//                            )
-//                        }
-//                    }
-//                }
 
                 // Work Experience Section
                 SectionTitle("Work Experience")
@@ -601,9 +535,14 @@ fun ProfilePage(userId: String,
                             userId = userId,
                             profileController = profileController,
                             experience = selectedExperience, // Pass the selected work experience, or null for new
-                            onWorkExperienceAdded = {
+                            onWorkExperienceEdited = {
                                 refreshWorkExperienceList()
                                 selectedExperience = null // Reset after editing
+                                showEditExperienceDialog = false
+                            },
+                            onWorkExperienceDeleted = {
+                                refreshWorkExperienceList()
+                                selectedExperience = null // Reset after deleting
                                 showEditExperienceDialog = false
                             }
                         )
@@ -904,7 +843,8 @@ fun EditEducationDialog(
     onDismiss: () -> Unit,
     userId: String,
     profileController: ProfileController,
-    onEducationAdded: () -> Unit
+    onEducationEdited: () -> Unit,
+    onEducationDeleted: () -> Unit
 ) {
 
     var schoolName by remember { mutableStateOf(education?.institutionName ?: "") }
@@ -937,8 +877,39 @@ fun EditEducationDialog(
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    if (education != null) {
+                        IconButton(
+                            onClick = {
+                                runBlocking {
+                                    // Perform delete operation
+                                    val result = education.id?.let { id ->
+                                        profileController.deleteEducation(id.toString())
+                                    } ?: Result.failure(Exception("Education ID is null"))
+
+                                    result.onSuccess {
+                                        onEducationDeleted()
+                                        onDismiss()
+                                    }.onFailure { error ->
+                                        errorMessage = error.message ?: "Failed to delete education record."
+                                    }
+                                }
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "Delete Education",
+                                tint = Color(0xFFBE0303)
+                            )
+                        }
+                    }
+                }
 
                 Text("Edit Education", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+
 
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -1049,6 +1020,8 @@ fun EditEducationDialog(
                     TextButton(onClick = onDismiss) {
                         Text("Cancel")
                     }
+
+
                     Button(
                         onClick = {
                             runBlocking {
@@ -1218,11 +1191,11 @@ fun EditExperienceDialog(
     onDismiss: () -> Unit,
     userId: String,
     profileController: ProfileController,
-    onWorkExperienceAdded: () -> Unit
+    onWorkExperienceEdited: () -> Unit, // Callback for saving or updating
+    onWorkExperienceDeleted: () -> Unit // Callback for delete action
 ) {
 
     var company by remember { mutableStateOf(experience?.companyName ?: "") }
-    //var location by remember { mutableStateOf(experience?.location ?: "") }
     var positionTitle by remember { mutableStateOf(experience?.title ?: "") }
     var startMonth by remember { mutableStateOf(experience?.startDate?.month?.value?.toString() ?: "") }
     var startYear by remember { mutableStateOf(experience?.startDate?.year.toString() ?: "") }
@@ -1246,6 +1219,36 @@ fun EditExperienceDialog(
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    if (experience != null) {
+                        IconButton(
+                            onClick = {
+                                runBlocking {
+                                    val result = experience.id?.let { id ->
+                                        profileController.deleteWorkExperience(id.toString())
+                                    } ?: Result.failure(Exception("Experience ID is null"))
+
+                                    result.onSuccess {
+                                        onWorkExperienceDeleted()
+                                        onDismiss()
+                                    }.onFailure { error ->
+                                        errorMessage = error.message ?: "Failed to delete work experience."
+                                    }
+                                }
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "Delete Work Experience",
+                                tint = Color(0xFFBE0303)
+                            )
+                        }
+                    }
+                }
+
                 Text("Edit Work Experience", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -1332,8 +1335,11 @@ fun EditExperienceDialog(
                     TextButton(onClick = onDismiss) {
                         Text("Cancel")
                     }
+
+
                     Button(
                         onClick = {
+                            // Handle save or update action
                             runBlocking {
                                 try {
                                     val startDate = LocalDate(startYear.toInt(), startMonth.toInt(), 1)
@@ -1344,7 +1350,6 @@ fun EditExperienceDialog(
 //                                        profileController.addWorkExperience(
 //                                            userId = userId,
 //                                            companyName = company,
-//                                            location = location,
 //                                            title = positionTitle,
 //                                            currentlyWorking = isCurrentlyWorking,
 //                                            startDate = startDate,
@@ -1357,7 +1362,6 @@ fun EditExperienceDialog(
 //                                            userId = userId,
 //                                            experienceId = experience.id,
 //                                            companyName = company,
-//                                            location = location,
 //                                            title = positionTitle,
 //                                            currentlyWorking = isCurrentlyWorking,
 //                                            startDate = startDate,
@@ -1365,7 +1369,7 @@ fun EditExperienceDialog(
 //                                            description = description.takeIf { it.isNotEmpty() }
 //                                        )
 //                                    }
-
+//
 //                                    result.onSuccess {
 //                                        onWorkExperienceAdded()
 //                                        onDismiss()
@@ -1389,7 +1393,6 @@ fun EditExperienceDialog(
         }
     }
 }
-
 
 
 @Composable

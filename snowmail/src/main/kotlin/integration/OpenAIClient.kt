@@ -195,23 +195,28 @@ class OpenAIClient(private val httpClient: HttpClient) {
         }
 
         val responseBody: String = response.bodyAsText()
+        println("OpenAI API response: $responseBody")
+
         val json = Json { ignoreUnknownKeys = true }
-        val parsedResponse = json.decodeFromString(ChatCompletionResponse.serializer(), responseBody)
-        val extractedText = parsedResponse.choices.firstOrNull()?.message?.content ?: "No data extracted"
+        return try {
+            val parsedResponse = json.decodeFromString(ChatCompletionResponse.serializer(), responseBody)
+            val extractedText = parsedResponse.choices.firstOrNull()?.message?.content ?: "No data extracted"
 
-        // Parse the extracted text to create a user profile object
-        val userProfileDetails = mutableMapOf<String, Any>()
-        val lines = extractedText.split("\n")
-        for (line in lines) {
-            val parts = line.split(":")
-            if (parts.size == 2) {
-                userProfileDetails[parts[0].trim()] = parts[1].trim()
+            // Parse the extracted text to create a user profile object
+            val userProfileDetails = mutableMapOf<String, Any>()
+            val lines = extractedText.split("\n")
+            for (line in lines) {
+                val parts = line.split(":")
+                if (parts.size == 2) {
+                    userProfileDetails[parts[0].trim()] = parts[1].trim()
+                }
             }
+            userProfileDetails
+        } catch (e: Exception) {
+            println("Failed to parse response: ${e.message}")
+            throw RuntimeException("Failed to parse response: ${e.message}")
         }
-
-        return userProfileDetails
     }
-
 }
 
 suspend fun main() {

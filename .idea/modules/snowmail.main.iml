@@ -42,7 +42,7 @@
     </facet>
   </component>
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_20">
-    <output url="file://$MODULE_DIR$/../../snowmail/build/classes/kotlin/main" />
+    <output url="file://$MODULE_DIR$/../../snowmail/build/classes/java/main" />
     <exclude-output />
     <content url="file://$MODULE_DIR$/../../snowmail/build/generated/compose/resourceGenerator/kotlin/commonResClass">
       <sourceFolder url="file://$MODULE_DIR$/../../snowmail/build/generated/compose/resourceGenerator/kotlin/commonResClass" isTestSource="false" />
@@ -55,6 +55,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.0.20" level="project" />
+    <orderEntry type="library" name="Gradle: org.apache.pdfbox:pdfbox:2.0.24" level="project" />
     <orderEntry type="library" name="Gradle: javax.mail:javax.mail-api:1.6.2" level="project" />
     <orderEntry type="library" name="Gradle: com.sun.mail:javax.mail:1.6.2" level="project" />
     <orderEntry type="library" name="Gradle: io.github.jan-tennert.supabase:realtime-kt-jvm:3.0.0" level="project" />
@@ -73,6 +74,8 @@
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.9.0" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.0.20" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib:2.0.20" level="project" />
+    <orderEntry type="library" name="Gradle: org.apache.pdfbox:fontbox:2.0.24" level="project" />
+    <orderEntry type="library" name="Gradle: commons-logging:commons-logging:1.2" level="project" />
     <orderEntry type="library" name="Gradle: javax.activation:activation:1.1" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-reflect:2.0.20" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.compose.desktop:desktop-jvm:1.6.11" level="project" />

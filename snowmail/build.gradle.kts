@@ -60,6 +60,8 @@ dependencies {
 
     implementation(kotlin("stdlib-jdk8"))
 
+    implementation(libs.pdfbox)
+
     // for javamail
     implementation("javax.mail:javax.mail-api:1.6.2")
     implementation("com.sun.mail:javax.mail:1.6.2")

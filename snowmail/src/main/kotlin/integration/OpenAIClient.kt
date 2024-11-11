@@ -164,7 +164,6 @@ class OpenAIClient(private val httpClient: HttpClient) {
     }
 
 
-
     suspend fun parseResume(resumeText: String): Map<String, Any> {
         val prompt = """
             Extract the following details from the resume:

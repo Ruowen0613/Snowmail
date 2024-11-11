@@ -162,6 +162,57 @@ class OpenAIClient(private val httpClient: HttpClient) {
             body = responseBody
         )
     }
+
+
+
+    suspend fun parseResume(resumeText: String): Map<String, Any> {
+        val prompt = """
+            Extract the following details from the resume:
+            - Name
+            - Email
+            - Phone
+            - Education
+            - Work Experience
+            - Skills
+    
+            Resume:
+            $resumeText
+        """.trimIndent()
+
+        val message = listOf(
+            mapOf("role" to "user", "content" to prompt)
+        )
+
+        val request = OpenAIRequest(
+            model = "gpt-3.5-turbo",
+            messages = message,
+            max_tokens = 500
+        )
+
+        val response: HttpResponse = httpClient.post("https://api.openai.com/v1/chat/completions") {
+            contentType(ContentType.Application.Json)
+            header("Authorization", "Bearer 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")
+            setBody(Json.encodeToString(OpenAIRequest.serializer(), request))
+        }
+
+        val responseBody: String = response.bodyAsText()
+        val json = Json { ignoreUnknownKeys = true }
+        val parsedResponse = json.decodeFromString(ChatCompletionResponse.serializer(), responseBody)
+        val extractedText = parsedResponse.choices.firstOrNull()?.message?.content ?: "No data extracted"
+
+        // Parse the extracted text to create a user profile object
+        val userProfileDetails = mutableMapOf<String, Any>()
+        val lines = extractedText.split("\n")
+        for (line in lines) {
+            val parts = line.split(":")
+            if (parts.size == 2) {
+                userProfileDetails[parts[0].trim()] = parts[1].trim()
+            }
+        }
+
+        return userProfileDetails
+    }
+
 }
 
 suspend fun main() {

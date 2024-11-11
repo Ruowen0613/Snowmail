@@ -41,6 +41,16 @@ data class Message(
 
 class OpenAIClient(private val httpClient: HttpClient) {
 
+
+    suspend fun generateEmail2(resumeText:String, companyName:String, jobDescription:String, recruiterName:String): GeneratedEmail {
+        val prompt = buildPrompt2(resumeText, companyName, jobDescription, recruiterName)
+        val message = prepareMessage(prompt)
+        val response = sendOpenAIRequest(message)
+        val emailContent = getEmailContent(response)
+        return parseGeneratedText(emailContent)
+    }
+
+
     suspend fun generateEmail(userInput: UserInput, userProfile: UserProfile, education: List<Education>, workExperience: List<WorkExperience>): GeneratedEmail {
         val prompt = buildPrompt(userInput, userProfile, education, workExperience)
         val message = prepareMessage(prompt)
@@ -48,6 +58,19 @@ class OpenAIClient(private val httpClient: HttpClient) {
         val emailContent = getEmailContent(response)
         return parseGeneratedText(emailContent)
     }
+
+    private fun buildPrompt2(resumeText: String, companyName: String, jobDescription: String, recruiterName: String): String {
+        return """
+            The company I am looking to apply to is $companyName, with the following job description: $jobDescription.
+            
+            Here is my resume:
+            $resumeText
+            
+            Send a job application email to the recruiter, $recruiterName, that is personalized, formal, and aligned with my profile, skills, and experience as they relate to the job description provided. 
+        """.trimIndent()
+    }
+
+
 
     private fun buildPrompt(userInput: UserInput, userProfile: UserProfile, education: List<Education>, workExperience: List<WorkExperience>): String {
         val skills = userProfile.skills?.joinToString(", ") ?: "Not provided"
@@ -104,11 +127,10 @@ class OpenAIClient(private val httpClient: HttpClient) {
                     Hi Jane,
 
                     I hope this message finds you well. My name is John Doe, a third-year Computer Science student at the University of Waterloo, and I’m excited about the innovative work happening at Coinbase. With my background in data engineering and software development, I’m confident I can contribute meaningfully to your team.
-
                     Here’s a quick snapshot of my relevant experience:
 
-                    - **Manulife**: As a Data Engineer Intern, I worked on optimizing CI/CD pipelines, automated GitHub  repo access management, and implemented scalable solutions for database migrations and cloud deployment.
-                    - **Baraka (YC ’21)**: As a Software Engineer Intern, I developed backend systems, deployed scalable solutions, and built efficient ETL pipelines for financial data processing.
+                    - Manulife: As a Data Engineer Intern, I worked on optimizing CI/CD pipelines, automated GitHub  repo access management, and implemented scalable solutions for database migrations and cloud deployment.
+                    - Baraka (YC ’21): As a Software Engineer Intern, I developed backend systems, deployed scalable solutions, and built efficient ETL pipelines for financial data processing.
 
                     I would love to discuss your team’s current challenges and explore how I can help solve them. I'm happy to volunteer my time to demonstrate the value I can bring. Would you be available for a brief 15-minute conversation this week?
                     I have attached my resume, looking forward to hearing from you.
@@ -125,7 +147,7 @@ class OpenAIClient(private val httpClient: HttpClient) {
         val request = OpenAIRequest(
             model = "gpt-3.5-turbo",
             messages = message,
-            max_tokens = 150
+            max_tokens = 500
         )
 
         return try {
@@ -185,7 +207,7 @@ class OpenAIClient(private val httpClient: HttpClient) {
         val request = OpenAIRequest(
             model = "gpt-3.5-turbo",
             messages = message,
-            max_tokens = 500
+            max_tokens = 1000
         )
 
         val response: HttpResponse = httpClient.post("https://api.openai.com/v1/chat/completions") {

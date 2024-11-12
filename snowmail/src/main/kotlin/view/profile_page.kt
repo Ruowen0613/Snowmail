@@ -33,6 +33,7 @@ import ca.uwaterloo.controller.ProfileController
 
 import integration.SupabaseClient
 import ca.uwaterloo.model.Education
+import ca.uwaterloo.model.EducationWithDegreeName
 import ca.uwaterloo.model.WorkExperience
 import kotlinx.coroutines.runBlocking
 
@@ -54,7 +55,7 @@ fun ProfilePage(userId: String,
     var EditContactDialog by remember { mutableStateOf(false) }
 
     var userName by remember { mutableStateOf("") }
-    var educationList by remember { mutableStateOf<List<Education>>(emptyList()) }
+    var educationList by remember { mutableStateOf<List<EducationWithDegreeName>>(emptyList()) }
     var errorMessage by remember { mutableStateOf("") }
     var userEmail by remember { mutableStateOf("") }
 
@@ -309,7 +310,7 @@ fun ProfilePage(userId: String,
                         Column(modifier = Modifier.padding(8.dp)) {
                             educationList.forEach { education ->
                                 Text(
-                                    text = "${education.institutionName}, ${education.degreeId} in ${education.major}",
+                                    text = "${education.institutionName}, ${education.degreeName} in ${education.major}",
                                     fontSize = 14.sp,
                                     color = Color.Black
                                 )

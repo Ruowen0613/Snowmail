@@ -1,6 +1,7 @@
 package ca.uwaterloo.controller
 
 import ca.uwaterloo.model.Education
+import ca.uwaterloo.model.EducationWithDegreeName
 import model.UserProfile
 // import ca.uwaterloo.persistence.DBStorage
 
@@ -81,7 +82,7 @@ class ProfileController(private val userProfileRepository: IUserProfileRepositor
     //
 
     // get education exp by user id
-    suspend fun getEducation(userId: String): Result<List<Education>> {
+    suspend fun getEducation(userId: String): Result<List<EducationWithDegreeName>> {
         return userProfileRepository.getEducation(userId)
     }
 
@@ -189,6 +190,16 @@ class ProfileController(private val userProfileRepository: IUserProfileRepositor
     // delete work exp record from db
     suspend fun deleteWorkExperience(workExperienceID: String): Result<Boolean> {
         return userProfileRepository.deleteWorkExperience(workExperienceID)
+    }
+
+    // get degree name by id
+    suspend fun getDegreeNameById(degreeId: Int): Result<String> {
+        return userProfileRepository.getDegreeNameById(degreeId)
+    }
+
+    // get degree id by name
+    suspend fun getDegreeIdByName(degreeName: String): Result<Int> {
+        return userProfileRepository.getDegreeIdByName(degreeName)
     }
 }
 
@@ -380,5 +391,22 @@ fun main() = runBlocking<Unit> {
 //        println("Error updating user links: ${error.message}")
 //    }
 
+    // test getting degree name by id
+//    val degreeId = 4
+//    val result = profileController.getDegreeNameById(degreeId)
+//    result.onSuccess { degreeName ->
+//        println("Degree name: $degreeName")
+//    }.onFailure { error ->
+//        println("Error fetching degree name: ${error.message}")
+//    }
+
+    // test getting degree id by name
+//    val degreeName = "Master's Degree"
+//    val result = profileController.getDegreeIdByName(degreeName)
+//    result.onSuccess { degreeId ->
+//        println("Degree ID: $degreeId")
+//    }.onFailure { error ->
+//        println("Error fetching degree ID: ${error.message}")
+//    }
 
 }

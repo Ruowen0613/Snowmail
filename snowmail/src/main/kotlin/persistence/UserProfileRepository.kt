@@ -1,6 +1,7 @@
 package ca.uwaterloo.persistence
 
 import ca.uwaterloo.model.Education
+import ca.uwaterloo.model.EducationWithDegreeName
 import ca.uwaterloo.model.WorkExperience
 import model.UserProfile
 import io.github.jan.supabase.SupabaseClient
@@ -204,9 +205,9 @@ class UserProfileRepository(private val supabase: SupabaseClient) : IUserProfile
                         eq("user_id", userId)
                     }
                 }
-                .decodeSingle<Map<String, String>>()
+                .decodeSingle<Map<String, String?>>()
 
-            val linkedinUrl = linkedinResult["linkedin"] ?: throw Exception("LinkedIn URL not found")
+            val linkedinUrl = linkedinResult["linkedin"] ?: ""
             Result.success(linkedinUrl)
         } catch (e: Exception) {
             Result.failure(Exception("Failed to fetch linkedin URL: ${e.message}"))
@@ -222,9 +223,9 @@ class UserProfileRepository(private val supabase: SupabaseClient) : IUserProfile
                         eq("user_id", userId)
                     }
                 }
-                .decodeSingle<Map<String, String>>()
+                .decodeSingle<Map<String, String?>>()
 
-            val githubUrl = githubResult["github"] ?: throw Exception("Github URL not found")
+            val githubUrl = githubResult["github"] ?: ""
             Result.success(githubUrl)
         } catch (e: Exception) {
             Result.failure(Exception("Failed to fetch github URL: ${e.message}"))
@@ -240,9 +241,9 @@ class UserProfileRepository(private val supabase: SupabaseClient) : IUserProfile
                         eq("user_id", userId)
                     }
                 }
-                .decodeSingle<Map<String, String>>()
+                .decodeSingle<Map<String, String?>>()
 
-            val personalWebsiteUrl = personalWebsiteResult["personal_web"] ?: throw Exception("Personal website URL not found")
+            val personalWebsiteUrl = personalWebsiteResult["personal_web"] ?: ""
             Result.success(personalWebsiteUrl)
         } catch (e: Exception) {
             Result.failure(Exception("Failed to fetch personal website URL: ${e.message}"))
@@ -271,20 +272,42 @@ class UserProfileRepository(private val supabase: SupabaseClient) : IUserProfile
     }
 
 
-    override suspend fun getEducation(userId: String): Result<List<Education>> {
+    override suspend fun getEducation(userId: String): Result<List<EducationWithDegreeName>> {
         return try {
-            val education = supabase.from("education")
+            // fetch education records from db based on userid
+            val educationList = supabase.from("education")
                 .select {
                     filter {
                         eq("user_id", userId)
                     }
                 }
                 .decodeList<Education>()
-            Result.success(education)
+
+            // map education records to EducationWithDegreeName objects
+            val educationWithNames = educationList.map { education ->
+                val degreeNameResult = getDegreeNameById(education.degreeId)
+                val degreeName = degreeNameResult.getOrElse {
+                    return Result.failure(Exception("Failed to fetch degree name for degree ID ${education.degreeId}: ${it.message}"))
+                }
+
+                // return EducationWithDegreeName object
+                EducationWithDegreeName(
+                    id = education.id,
+                    userId = education.userId,
+                    degreeName = degreeName,
+                    institutionName = education.institutionName,
+                    major = education.major,
+                    gpa = education.gpa,
+                    startDate = education.startDate,
+                    endDate = education.endDate
+                )
+            }
+            Result.success(educationWithNames)
         } catch (e: Exception) {
             Result.failure(Exception("Failed to fetch education: ${e.message}"))
         }
     }
+
 
     override suspend fun addEducation(
         userId: String,
@@ -504,43 +527,42 @@ class UserProfileRepository(private val supabase: SupabaseClient) : IUserProfile
         }
     }
 
-//    override suspend fun getDegreeNameById(degreeId: String): Result<String> {
-//        return try {
-//            // fetch degree name from db based on degreeId
-//            val degreeResult = supabase.from("degree")
-//                .select(columns = Columns.list("degree_name")) {
-//                    filter {
-//                        eq("degree_id", degreeId)
-//                    }
-//                }
-//                .decodeSingle<Map<String, String>>()
-//            println("Query result: $degreeResult")
-//
-//            val degreeName = degreeResult?.get("degree_name") ?: throw Exception("Degree name not found")
-//            Result.success(degreeName)
-//        } catch (e: Exception) {
-//            Result.failure(Exception("Failed to map degree ID to name: ${e.message}"))
-//        }
-//    }
-//
-//
-//    override suspend fun getDegreeIdByName(degreeName: String): Result<String> {
-//        return try {
-//            // fetch degree id from db based on degreeName
-//            val degreeResult = supabase.from("degree")
-//                .select(columns = Columns.list("degree_id")) {
-//                    filter {
-//                        eq("degree_name", degreeName)
-//                    }
-//                }
-//                .decodeSingleOrNull<Map<String, String>>()
-//
-//            val degreeId = degreeResult?.get("degree_id") ?: throw Exception("Degree ID not found")
-//            Result.success(degreeId)
-//        } catch (e: Exception) {
-//            Result.failure(Exception("Failed to map degree name to ID: ${e.message}"))
-//        }
-//    }
+    override suspend fun getDegreeNameById(degreeId: Int): Result<String> {
+        return try {
+            // fetch degree name from db based on degreeId
+            val degreeResult = supabase.from("degree")
+                .select(columns = Columns.list("degree_name")) {
+                    filter {
+                        eq("degree_id", degreeId)
+                    }
+                }
+                .decodeSingleOrNull<Map<String, String>>() ?: throw Exception("Degree not found")
+
+            val degreeName = degreeResult["degree_name"] ?: throw Exception("Degree name not found")
+            Result.success(degreeName)
+        } catch (e: Exception) {
+            Result.failure(Exception("Failed to map degree ID to name: ${e.message}"))
+        }
+    }
+
+
+    override suspend fun getDegreeIdByName(degreeName: String): Result<Int> {
+        return try {
+            // fetch degree id from db based on degreeName
+            val degreeResult = supabase.from("degree")
+                .select(columns = Columns.list("degree_id")) {
+                    filter {
+                        eq("degree_name", degreeName)
+                    }
+                }
+                .decodeSingleOrNull<Map<String, Int>>()
+
+            val degreeId = degreeResult?.get("degree_id") ?: throw Exception("Degree ID not found")
+            Result.success(degreeId)
+        } catch (e: Exception) {
+            Result.failure(Exception("Failed to map degree name to ID: ${e.message}"))
+        }
+    }
 
 
 

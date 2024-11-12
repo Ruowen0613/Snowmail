@@ -1,6 +1,7 @@
 package integration
 
 import ca.uwaterloo.model.Education
+import ca.uwaterloo.model.EducationWithDegreeName
 import ca.uwaterloo.model.WorkExperience
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -41,7 +42,7 @@ data class Message(
 
 class OpenAIClient(private val httpClient: HttpClient) {
 
-    suspend fun generateEmail(userInput: UserInput, userProfile: UserProfile, education: List<Education>, workExperience: List<WorkExperience>, skills: List<String>): GeneratedEmail {
+    suspend fun generateEmail(userInput: UserInput, userProfile: UserProfile, education: List<EducationWithDegreeName>, workExperience: List<WorkExperience>, skills: List<String>): GeneratedEmail {
         val prompt = buildPrompt(userInput, userProfile, education, workExperience, skills)
         val message = prepareMessage(prompt)
         val response = sendOpenAIRequest(message)
@@ -49,7 +50,7 @@ class OpenAIClient(private val httpClient: HttpClient) {
         return parseGeneratedText(emailContent)
     }
 
-    private fun buildPrompt(userInput: UserInput, userProfile: UserProfile, education: List<Education>, workExperience: List<WorkExperience>, skills: List<String>): String {
+    private fun buildPrompt(userInput: UserInput, userProfile: UserProfile, education: List<EducationWithDegreeName>, workExperience: List<WorkExperience>, skills: List<String>): String {
         //val skills = userProfile.skills?.joinToString(", ") ?: "Not provided"
 
         val educationDetails = education.joinToString("\n") { e ->
@@ -184,10 +185,10 @@ suspend fun main() {
 
     val skills = listOf("Java", "Kotlin", "SQL")
 
-    val education = Education(
+    val education = EducationWithDegreeName(
         id = 12,
         userId = "123",
-        degreeId = 3,
+        degreeName = "Bachelor's Degree",
         institutionName = "University of Waterloo",
         major = "Computer Science",
         gpa = 3.8f,

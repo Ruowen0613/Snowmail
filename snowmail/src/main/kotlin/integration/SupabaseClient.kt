@@ -204,7 +204,7 @@ fun main() = runBlocking<Unit> {
 //    }
 
     //test get degree name by id
-//    val degreeId = "2"
+//    val degreeId = 2
 //    val result = dbStorage.userProfileRepository.getDegreeNameById(degreeId)
 //    result.onSuccess { degreeName ->
 //        println("Degree name: $degreeName")
@@ -231,6 +231,14 @@ fun main() = runBlocking<Unit> {
 //    }.onFailure { error ->
 //        println("Error updating user links: ${error.message}")
 //    }
+
+    // test get education
+    val result = dbStorage.userProfileRepository.getEducation(userId)
+    result.onSuccess { education ->
+        println("Education: $education")
+    }.onFailure { error ->
+        println("Error fetching education: ${error.message}")
+    }
 
 
 

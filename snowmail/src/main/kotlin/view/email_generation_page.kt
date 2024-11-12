@@ -68,7 +68,7 @@ fun EmailGenerationPage(NavigateToDocuments: () -> Unit, NavigateToProfile: () -
 
     //var currentPage by remember { mutableStateOf("ProfilePage") }
 
-    var selectedTabIndex by remember { mutableStateOf(3) }
+    var selectedTabIndex by remember { mutableStateOf(0) }
 
 
     var userInput = UserInput(
@@ -171,60 +171,18 @@ fun EmailGenerationPage(NavigateToDocuments: () -> Unit, NavigateToProfile: () -
                 .padding(16.dp)
                 .background(Color(0xFFF8FAFC))
         ) {
-            TopAppBar(
-                backgroundColor = Color.White,
-                elevation = 4.dp,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // Tabs on the left
-                    TabRow(
-                        selectedTabIndex = selectedTabIndex,
-                        backgroundColor = Color.White, // Set background color to white
-                        contentColor = Color.Black,
-                        indicator = { },
-                        modifier = Modifier.weight(1f) // Take up remaining space
-                    ) {
-                        Tab(
-                            selected = selectedTabIndex == 0,
-                            onClick = { },
-                            text = {
-                                Text(
-                                    "Cold Email Generation",
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-                        )
-                        Tab(
-                            selected = selectedTabIndex == 1,
-                            onClick = { navigateOtherPage(NavigateToProgress) },
-                            text = { Text("Job Application Progress") }
-                        )
-                        Tab(
-                            selected = selectedTabIndex == 2,
-                            onClick = { navigateOtherPage(NavigateToDocuments) },
-                            text = { Text("Documents") }
-                        )
-                        Tab(
-                            selected = selectedTabIndex == 3,
-                            onClick = { navigateOtherPage(NavigateToProfile) },
-                            text = { Text("Profile") }
-                        )
+            TopNavigationBar(
+                selectedTabIndex = selectedTabIndex,
+                onTabSelected = { index ->
+                    selectedTabIndex = index
+                    when (index) {
+                        0 -> {}
+                        1 -> navigateOtherPage(NavigateToProgress)
+                        2 -> navigateOtherPage(NavigateToDocuments)
+                        3 -> navigateOtherPage(NavigateToProfile)
                     }
-
-                    // Profile Image on the right
-                    Box(
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clip(CircleShape)
-                            .background(Color(0xFFE2E2E2))
-                            .border(1.dp, Color.LightGray, CircleShape)
-                    )
                 }
-            }
+            )
 
             Spacer(modifier = Modifier.height(64.dp))
 

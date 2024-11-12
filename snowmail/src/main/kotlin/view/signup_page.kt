@@ -88,6 +88,7 @@ fun RegisterForm(NavigateToLogin: () -> Unit, NavigateToHome: () -> Unit) {
                 var lastName by remember { mutableStateOf("") }
                 var email by remember { mutableStateOf("") }
                 var password by remember { mutableStateOf("") }
+                var passwordConfirm by remember { mutableStateOf("") }
 
                 Row(Modifier.fillMaxWidth()) {
                     // first name input
@@ -122,6 +123,18 @@ fun RegisterForm(NavigateToLogin: () -> Unit, NavigateToHome: () -> Unit) {
                     visualTransformation = PasswordVisualTransformation()
                 ) }
 
+                Row(modifier = Modifier.fillMaxHeight(0.03f)) {}
+                Row { Text("Confirm Password") }
+                Row {
+                    OutlinedTextField(
+                        value = passwordConfirm,
+                        onValueChange = { passwordConfirm = it },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                        visualTransformation = PasswordVisualTransformation()
+                    )
+                }
+
                 val errorInformation = true
                 var errorMessage by remember { mutableStateOf("") }
 
@@ -143,6 +156,9 @@ fun RegisterForm(NavigateToLogin: () -> Unit, NavigateToHome: () -> Unit) {
 
                         // if password is too short
                         else if (password.length < 6) errorMessage = "Password is too short"
+
+                        // if password is not confirmed
+                        else if (password != passwordConfirm) errorMessage = "Passwords do not match"
 
                         else {
                             val result = signInController.signUpUser(email, password, firstName, lastName)

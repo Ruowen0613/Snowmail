@@ -51,6 +51,31 @@ class ProfileController(private val userProfileRepository: IUserProfileRepositor
         return userProfileRepository.deleteSkill(userId, skill)
     }
 
+    // get user's linkedin url
+    suspend fun getUserLinkedIn(userId: String): Result<String> {
+        return userProfileRepository.getUserLinkedIn(userId)
+    }
+
+    // get user's github url
+    suspend fun getUserGithub(userId: String): Result<String> {
+        return userProfileRepository.getUserGithub(userId)
+    }
+
+    // get user's personal website url
+    suspend fun getUserPersonalWebsite(userId: String): Result<String> {
+        return userProfileRepository.getUserPersonalWebsite(userId)
+    }
+
+    // update user's linkedin, github, and personal website urls
+    suspend fun updateUserLinks(
+        userId: String,
+        linkedinUrl: String?,
+        githubUrl: String?,
+        personalWebsiteUrl: String?
+    ): Result<Boolean> {
+        return userProfileRepository.updateUserLinks(userId, linkedinUrl, githubUrl, personalWebsiteUrl)
+    }
+
     //
     //education exp
     //
@@ -319,4 +344,41 @@ fun main() = runBlocking<Unit> {
 //    }.onFailure { error ->
 //        println("Error deleting work experience: ${error.message}")
 //    }
+
+    // test getting linkedin url
+//    val linkedinResult = profileController.getUserLinkedIn(userId)
+//    linkedinResult.onSuccess { linkedinUrl ->
+//        println("Linkedin URL: $linkedinUrl")
+//    }.onFailure { error ->
+//        println("Error fetching linkedin URL: ${error.message}")
+//    }
+
+    // test getting github url
+//    val githubResult = profileController.getUserGithub(userId)
+//    githubResult.onSuccess { githubUrl ->
+//        println("Github URL: $githubUrl")
+//    }.onFailure { error ->
+//        println("Error fetching github URL: ${error.message}")
+//    }
+
+    // test getting personal website url
+//    val personalWebsiteResult = profileController.getUserPersonalWebsite(userId)
+//    personalWebsiteResult.onSuccess { personalWebsiteUrl ->
+//        println("Personal Website URL: $personalWebsiteUrl")
+//    }.onFailure { error ->
+//        println("Error fetching personal website URL: ${error.message}")
+//    }
+
+    // test updating linkedin, github, and personal website urls
+//    val linkedinUrl = "https://www.linkedin.com/in/johndoe"
+//    val githubUrl = "https://uwaterloo.ca/the-centre/quest"
+//    val personalWebsiteUrl = "https://cherry.com"
+//    val result = profileController.updateUserLinks(userId, linkedinUrl, githubUrl, personalWebsiteUrl)
+//    result.onSuccess {
+//        println("User links updated successfully.")
+//    }.onFailure { error ->
+//        println("Error updating user links: ${error.message}")
+//    }
+
+
 }

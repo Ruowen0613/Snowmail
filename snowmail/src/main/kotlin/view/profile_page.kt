@@ -68,7 +68,7 @@ fun ProfilePage(userId: String,
     var userPersonalWebsite by remember { mutableStateOf("") }
 
     var showEditEducationDialog by remember { mutableStateOf(false) }
-    var selectedEducation by remember { mutableStateOf<Education?>(null) }
+    var selectedEducation by remember { mutableStateOf<EducationWithDegreeName?>(null) }
     var showEditExperienceDialog by remember { mutableStateOf(false) }
     var selectedExperience by remember { mutableStateOf<WorkExperience?>(null) }
     var showEditPortfolioDialog by remember { mutableStateOf(false) }
@@ -287,7 +287,6 @@ fun ProfilePage(userId: String,
                     modifier = Modifier.padding(10.dp)
                 )
             } else {
-
                 Text(
                     text = userName.ifEmpty { "Loading..." },
                     fontSize = 24.sp,
@@ -457,7 +456,7 @@ fun ProfilePage(userId: String,
                                 ) {
                                     Column {
                                         Text(
-                                            text = "${education.institutionName}, ${education.degreeId} in ${education.major}",
+                                            text = "${education.institutionName}, ${education.degreeName} in ${education.major}",
                                             fontSize = 14.sp,
                                             color = Color.Black
                                         )
@@ -818,7 +817,7 @@ fun AddEducationDialog(
 
     // Dropdown for degree type
     var expanded by remember { mutableStateOf(false) }
-    val degreeTypes = listOf("Associate's/College Diploma", "Bachelor's", "Doctorate", "High School Diploma/GED", "Master's", "Other")
+    val degreeTypes = listOf("High School Diploma/GED", "Associate's Degree/College Diploma", "Bachelor's Degree", "Master's Degree", "Doctorate Degree", "Other")
 
     Dialog(onDismissRequest = onDismiss) {
         Surface(
@@ -929,7 +928,7 @@ fun AddEducationDialog(
 
 @Composable
 fun EditEducationDialog(
-    education: Education? = null,
+    education: EducationWithDegreeName? = null,
     onDismiss: () -> Unit,
     userId: String,
     profileController: ProfileController,
@@ -939,7 +938,7 @@ fun EditEducationDialog(
 
     var schoolName by remember { mutableStateOf(education?.institutionName ?: "") }
     var major by remember { mutableStateOf(education?.major ?: "") }
-    var degreeType by remember { mutableStateOf(education?.degreeId ?: "") }
+    var degreeName by remember { mutableStateOf(education?.degreeName ?: "") }
     var gpa by remember { mutableStateOf(education?.gpa?.toString() ?: "") }
     //var startMonth by remember { mutableStateOf(education?.startDate?.month.toString() ?: "") }
     var startMonth by remember { mutableStateOf(education?.startDate?.month?.value?.toString() ?: "") }
@@ -951,8 +950,7 @@ fun EditEducationDialog(
 
 
     var expanded by remember { mutableStateOf(false) }
-    val degreeTypes = listOf("Associate's/College Diploma", "Bachelor's", "Doctorate", "High School Diploma/GED", "Master's", "Other")
-
+    val degreeTypes = listOf("High School Diploma/GED", "Associate's Degree/College Diploma", "Bachelor's Degree", "Master's Degree", "Doctorate Degree", "Other")
     Dialog(onDismissRequest = onDismiss) {
         Surface(
             shape = RoundedCornerShape(8.dp),
@@ -1017,6 +1015,34 @@ fun EditEducationDialog(
                     modifier = Modifier.fillMaxWidth()
                 )
 
+                Box(
+                    modifier = Modifier.fillMaxWidth().wrapContentSize(Alignment.TopStart)
+                ) {
+                    OutlinedTextField(
+                        value = degreeName,
+                        onValueChange = {},
+                        label = { Text("Degree Type") },
+                        trailingIcon = {
+                            Icon(
+                                imageVector = Icons.Filled.ArrowDropDown,
+                                contentDescription = "Select Degree Type",
+                                modifier = Modifier.clickable { expanded = true }
+                            )
+                        },
+                        modifier = Modifier.fillMaxWidth().clickable { expanded = true },
+                        readOnly = true
+                    )
+                    DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                        degreeTypes.forEach { type ->
+                            DropdownMenuItem(onClick = {
+                                degreeName = type
+                                expanded = false
+                            }) {
+                                Text(type)
+                            }
+                        }
+                    }
+                }
 
                 OutlinedTextField(
                     value = gpa,
@@ -1024,6 +1050,7 @@ fun EditEducationDialog(
                     label = { Text("GPA") },
                     modifier = Modifier.fillMaxWidth()
                 )
+
 
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -1086,7 +1113,8 @@ fun EditEducationDialog(
                                 val startDate = LocalDate(startYear.toInt(), startMonth.toInt(), 1)
                                 val endDate = LocalDate(endYear.toInt(), endMonth.toInt(), 1)
                                 val gpaValue = gpa.toFloatOrNull()
-                                val degreeId = degreeTypes.indexOf(degreeType) + 1
+                                val degreeN = degreeName
+                                val degreeId = degreeTypes.indexOf(degreeN) + 1
 
                                 val result = if (education == null) {
                                     // Adding new education record
@@ -1103,7 +1131,7 @@ fun EditEducationDialog(
                                     profileController.updateEducation(
                                         userId = userId,
                                         educationId = education.id.toString(),
-                                        degreeId = 1,
+                                        degreeId = degreeId,
                                         major = major,
                                         gpa = gpaValue,
                                         startDate = startDate,

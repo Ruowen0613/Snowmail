@@ -204,9 +204,9 @@ class UserProfileRepository(private val supabase: SupabaseClient) : IUserProfile
                         eq("user_id", userId)
                     }
                 }
-                .decodeSingle<Map<String, String>>()
+                .decodeSingle<Map<String, String?>>()
 
-            val linkedinUrl = linkedinResult["linkedin"] ?: throw Exception("LinkedIn URL not found")
+            val linkedinUrl = linkedinResult["linkedin"] ?: ""
             Result.success(linkedinUrl)
         } catch (e: Exception) {
             Result.failure(Exception("Failed to fetch linkedin URL: ${e.message}"))
@@ -222,9 +222,9 @@ class UserProfileRepository(private val supabase: SupabaseClient) : IUserProfile
                         eq("user_id", userId)
                     }
                 }
-                .decodeSingle<Map<String, String>>()
+                .decodeSingle<Map<String, String?>>()
 
-            val githubUrl = githubResult["github"] ?: throw Exception("Github URL not found")
+            val githubUrl = githubResult["github"] ?: ""
             Result.success(githubUrl)
         } catch (e: Exception) {
             Result.failure(Exception("Failed to fetch github URL: ${e.message}"))
@@ -240,9 +240,9 @@ class UserProfileRepository(private val supabase: SupabaseClient) : IUserProfile
                         eq("user_id", userId)
                     }
                 }
-                .decodeSingle<Map<String, String>>()
+                .decodeSingle<Map<String, String?>>()
 
-            val personalWebsiteUrl = personalWebsiteResult["personal_web"] ?: throw Exception("Personal website URL not found")
+            val personalWebsiteUrl = personalWebsiteResult["personal_web"] ?: ""
             Result.success(personalWebsiteUrl)
         } catch (e: Exception) {
             Result.failure(Exception("Failed to fetch personal website URL: ${e.message}"))

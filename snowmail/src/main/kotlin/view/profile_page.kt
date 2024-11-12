@@ -62,11 +62,15 @@ fun ProfilePage(userId: String,
     var userLocation by remember { mutableStateOf("") }
     var userPhone by remember { mutableStateOf("") }
     var skills by remember { mutableStateOf(listOf<String>()) }
+    var userLinkedIn by remember { mutableStateOf("") }
+    var userGithub by remember { mutableStateOf("") }
+    var userPersonalWebsite by remember { mutableStateOf("") }
 
     var showEditEducationDialog by remember { mutableStateOf(false) }
     var selectedEducation by remember { mutableStateOf<Education?>(null) }
     var showEditExperienceDialog by remember { mutableStateOf(false) }
     var selectedExperience by remember { mutableStateOf<WorkExperience?>(null) }
+    var showEditPortfolioDialog by remember { mutableStateOf(false) }
 
 
     var workExperienceList by remember { mutableStateOf<List<WorkExperience>>(emptyList()) }
@@ -116,6 +120,32 @@ fun ProfilePage(userId: String,
         }
     }
 
+    fun refreshPortfolioInfo() {
+        runBlocking {
+            val linkedInResult = profileController.getUserLinkedIn(userId)
+            val githubResult = profileController.getUserGithub(userId)
+            val websiteResult = profileController.getUserPersonalWebsite(userId)
+
+            linkedInResult.onSuccess { linkedIn ->
+                userLinkedIn = linkedIn
+            }.onFailure { error ->
+                errorMessage = error.message ?: "Failed to retrieve updated LinkedIn URL."
+            }
+
+            githubResult.onSuccess { github ->
+                userGithub = github
+            }.onFailure { error ->
+                errorMessage = error.message ?: "Failed to retrieve updated GitHub URL."
+            }
+
+            websiteResult.onSuccess { website ->
+                userPersonalWebsite = website
+            }.onFailure { error ->
+                errorMessage = error.message ?: "Failed to retrieve updated personal website."
+            }
+        }
+    }
+
     fun refreshSkills() {
         runBlocking {
             val getSkillsResult = profileController.getSkills(userId)
@@ -136,6 +166,9 @@ fun ProfilePage(userId: String,
         val getLocationResult = profileController.getUserCity(userId)
         val getPhoneResult = profileController.getUserPhone(userId)
         val getSkillsResult = profileController.getSkills(userId)
+        val getLinkedInResult = profileController.getUserLinkedIn(userId)
+        val getGithubResult = profileController.getUserGithub(userId)
+        val getWebsiteResult = profileController.getUserPersonalWebsite(userId)
 
         getNameResult.onSuccess { name ->
 
@@ -186,6 +219,23 @@ fun ProfilePage(userId: String,
             errorMessage = error.message ?: "Failed to load skills"
         }
 
+        getLinkedInResult.onSuccess { linkedIn ->
+            userLinkedIn = linkedIn
+        }.onFailure { error ->
+            errorMessage = error.message ?: "Failed to retrieve LinkedIn URL"
+        }
+
+        getGithubResult.onSuccess { github ->
+            userGithub = github
+        }.onFailure { error ->
+            errorMessage = error.message ?: "Failed to retrieve GitHub URL"
+        }
+
+        getWebsiteResult.onSuccess { website ->
+            userPersonalWebsite = website
+        }.onFailure { error ->
+            errorMessage = error.message ?: "Failed to retrieve personal website"
+        }
     }
 
 
@@ -275,27 +325,10 @@ fun ProfilePage(userId: String,
                 }
 
 
-
-                if (EditContactDialog) {
-                    EditContactDialog(
-                        userId = userId,
-                        profileController = profileController,
-                        userLocation = userLocation,
-                        userPhone = userPhone,
-                        onDismiss = { EditContactDialog = false },
-                        onContactUpdated = {
-                            refreshContactInfo()
-                            EditContactDialog = false
-                        }
-                    )
-                }
-
-
                 Spacer(modifier = Modifier.height(4.dp))
 
-                // Profile Details
+                SectionTitle("Contact Information")
                 Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
-                    SectionTitle("Contact Information")
 
                     Card(
                         modifier = Modifier
@@ -335,6 +368,69 @@ fun ProfilePage(userId: String,
                         }
                     }
                 }
+
+                if (EditContactDialog) {
+                    EditContactDialog(
+                        userId = userId,
+                        profileController = profileController,
+                        userLocation = userLocation,
+                        userPhone = userPhone,
+                        onDismiss = { EditContactDialog = false },
+                        onContactUpdated = {
+                            refreshContactInfo()
+                            EditContactDialog = false
+                        }
+                    )
+                }
+
+                SectionTitle("Portfolio")
+                Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        elevation = 4.dp
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                ProfileDetail(label = "LinkedIn URL:", value = userLinkedIn ?: "Not available")
+                                ProfileDetail(label = "GitHub URL:", value = userGithub ?: "Not available")
+                                ProfileDetail(label = "Portfolio URL:", value = userPersonalWebsite ?: "Not available")
+                            }
+
+                            IconButton(onClick = { showEditPortfolioDialog = true }) {
+                                Icon(
+                                    imageVector = Icons.Default.Edit,
+                                    contentDescription = "Edit Portfolio & Socials",
+                                    tint = Color.Gray
+                                )
+                            }
+                        }
+                    }
+                }
+
+                if (showEditPortfolioDialog) {
+                    EditPortfolioDialog(
+                        userId = userId,
+                        profileController = profileController,
+                        linkedInUrl = userLinkedIn,
+                        githubUrl = userGithub,
+                        portfolioUrl = userPersonalWebsite,
+                        onDismiss = { showEditPortfolioDialog = false },
+                        onLinksUpdated = {
+                            refreshPortfolioInfo()
+                            showEditPortfolioDialog = false
+                        }
+                    )
+                }
+
 
                 SectionTitle("Education")
                 Card(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
@@ -1035,6 +1131,112 @@ fun EditEducationDialog(
     }
 }
 
+@Composable
+fun EditPortfolioDialog(
+    userId: String,
+    profileController: ProfileController,
+    linkedInUrl: String?,
+    githubUrl: String?,
+    portfolioUrl: String?,
+    onDismiss: () -> Unit,
+    onLinksUpdated: () -> Unit
+) {
+    var linkedInInput by remember { mutableStateOf(linkedInUrl ?: "") }
+    var githubInput by remember { mutableStateOf(githubUrl ?: "") }
+    var portfolioInput by remember { mutableStateOf(portfolioUrl ?: "") }
+    var errorMessage by remember { mutableStateOf("") }
+    val scope = rememberCoroutineScope()
+
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            shape = RoundedCornerShape(8.dp),
+            color = Color.White,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Text(
+                    text = "Edit Portfolio",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                )
+
+                OutlinedTextField(
+                    value = linkedInInput,
+                    onValueChange = { linkedInInput = it },
+                    label = { Text("LinkedIn URL") },
+                    placeholder = { Text("https://www.linkedin.com/in/...") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                OutlinedTextField(
+                    value = githubInput,
+                    onValueChange = { githubInput = it },
+                    label = { Text("GitHub URL") },
+                    placeholder = { Text("https://github.com/...") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                OutlinedTextField(
+                    value = portfolioInput,
+                    onValueChange = { portfolioInput = it },
+                    label = { Text("Portfolio URL") },
+                    placeholder = { Text("https://...") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                if (errorMessage.isNotEmpty()) {
+                    Text(
+                        text = errorMessage,
+                        color = Color.Red,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(10.dp)
+                    )
+                }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    TextButton(onClick = onDismiss) {
+                        Text("Cancel")
+                    }
+                    Button(
+                        onClick = {
+                            scope.launch {
+                                val result = profileController.updateUserLinks(
+                                    userId = userId,
+                                    linkedinUrl = linkedInInput.ifBlank { null },
+                                    githubUrl = githubInput.ifBlank { null },
+                                    personalWebsiteUrl = portfolioInput.ifBlank { null }
+                                )
+                                result.onSuccess {
+                                    onLinksUpdated()
+                                    onDismiss()
+                                }.onFailure { error ->
+                                    errorMessage = error.message ?: "Failed to update portfolio links."
+                                }
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = Color(0xFF487896),
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Text("Save")
+                    }
+                }
+            }
+        }
+    }
+}
+
+
 
 @Composable
 fun AddExperienceDialog(
@@ -1532,6 +1734,7 @@ fun ProfileDetail(label: String, value: String) {
     Row {
         Text(
             "$label ",
+            fontWeight = FontWeight.Bold,
             style = TextStyle(fontSize = 14.sp, color = Color.Black)
         )
         Text(

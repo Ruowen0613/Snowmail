@@ -9,10 +9,11 @@ data class UserProfile(
     @SerialName("first_name") var firstName: String,
     @SerialName("last_name") var lastName: String,
     @SerialName("email") var email: String? = null,
-    @SerialName("skills") var skills: List<String>? = null,
+    //@SerialName("skills") var skills: List<String>? = null,
     @SerialName("city_name") var cityName: String? = null,
     @SerialName("resume_url") val resumeUrl: String? = null,
     @SerialName("linkedin_url") val linkedinUrl: String? = null,
     @SerialName("github_url") val githubUrl: String? = null,
     @SerialName("personal_website_url") val personalWebsiteUrl: String? = null,
+    @SerialName("phone") var phone: String? = null,
 )

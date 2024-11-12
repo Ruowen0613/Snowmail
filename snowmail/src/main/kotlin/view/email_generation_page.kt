@@ -67,15 +67,16 @@ fun EmailGenerationPage(NavigateToDocuments: () -> Unit, NavigateToProfile: () -
 
     //var currentPage by remember { mutableStateOf("ProfilePage") }
 
-    var selectedTabIndex by remember { mutableStateOf(3) }
+    var selectedTabIndex by remember { mutableStateOf(0) }
 
 
     var userInput = UserInput(
         jobDescription = descriptionInput,
         recruiterEmail = "recruiter@example.com",
         jobTitle = "Software Engineer",
-        company = "Example Corp",
-        recruiterName = "Jane Doe",
+        //company = "Example Corp",
+        company = companyInput,
+        recruiterName = recruiterNameInput,
         fileURLs = listOf("https://example.com/resume.pdf"),
     )
     val dbStorage = SupabaseClient()
@@ -98,29 +99,66 @@ fun EmailGenerationPage(NavigateToDocuments: () -> Unit, NavigateToProfile: () -
         userId = UserSession.userId ?: "DefaultUserId",
         firstName = gotName,
         lastName = "",
-        skills = listOf("Java", "Kotlin", "SQL")
+        //skills = listOf("Java", "Kotlin", "SQL")
     )
 
-    val education = Education(
-        id = 12,
-        userId = "123",
-        degreeId = 3,
-        institutionName = "University of Waterloo",
-        major = "Computer Science",
-        gpa = 3.8f,
-        startDate = LocalDate(2019, 9, 1),
-        endDate = LocalDate(2023, 6, 1)
-    )
+    var gotSkills = listOf<String>()
+    runBlocking {
+        val getSkills = profileController.getSkills(UserSession.userId ?: "DefaultUserId")
+        getSkills.onSuccess { skills ->
+            gotSkills = skills
+        }.onFailure { error ->
+            println("Error retrieving user skills: ${error.message}")
+            gotSkills = emptyList()
+        }
+    }
 
-    val workExperience = WorkExperience(
-        userId = "123",
-        currentlyWorking = false,
-        startDate = LocalDate(2021, 5, 1),
-        endDate = LocalDate(2021, 8, 1),
-        companyName = "Example Corp",
-        title = "Software Engineer",
-        description = "Developed backend systems, deployed scalable solutions, and built efficient ETL pipelines for financial data processing."
-    )
+
+//    val education = Education( //call getEducation
+//        id = 12,
+//        userId = "123",
+//        degreeId = 3,
+//        institutionName = "University of Waterloo",
+//        major = "Computer Science",
+//        gpa = 3.8f,
+//        startDate = LocalDate(2019, 9, 1),
+//        endDate = LocalDate(2023, 6, 1)
+//    )
+
+    var gotEducation = listOf<Education>()
+    runBlocking {
+        val getEducationResult = profileController.getEducation(UserSession.userId ?: "DefaultUserId")
+        getEducationResult.onSuccess { educationList ->
+            gotEducation = educationList
+        }.onFailure { error ->
+            println("Error retrieving user education: ${error.message}")
+            gotEducation = emptyList()
+        }
+    }
+
+
+
+//    val workExperience = WorkExperience( //call getWorkExperience
+//        userId = "123",
+//        currentlyWorking = false,
+//        startDate = LocalDate(2021, 5, 1),
+//        endDate = LocalDate(2021, 8, 1),
+//        companyName = "Example Corp",
+//        title = "Software Engineer",
+//        description = "Developed backend systems, deployed scalable solutions, and built efficient ETL pipelines for financial data processing."
+//    )
+
+    var gotWorkExperience = listOf<WorkExperience>()
+    runBlocking {
+        val getWorkExperienceResult = profileController.getWorkExperience(UserSession.userId ?: "DefaultUserId")
+        getWorkExperienceResult.onSuccess { workExperienceList ->
+            gotWorkExperience = workExperienceList
+        }.onFailure { error ->
+            println("Error retrieving user work experience: ${error.message}")
+            gotWorkExperience = emptyList() // 返回空列表或根据需要处理错误
+        }
+    }
+
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -132,60 +170,18 @@ fun EmailGenerationPage(NavigateToDocuments: () -> Unit, NavigateToProfile: () -
                 .padding(16.dp)
                 .background(Color(0xFFF8FAFC))
         ) {
-            TopAppBar(
-                backgroundColor = Color.White,
-                elevation = 4.dp,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // Tabs on the left
-                    TabRow(
-                        selectedTabIndex = selectedTabIndex,
-                        backgroundColor = Color.White, // Set background color to white
-                        contentColor = Color.Black,
-                        indicator = { },
-                        modifier = Modifier.weight(1f) // Take up remaining space
-                    ) {
-                        Tab(
-                            selected = selectedTabIndex == 0,
-                            onClick = { },
-                            text = {
-                                Text(
-                                    "Cold Email Generation",
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-                        )
-                        Tab(
-                            selected = selectedTabIndex == 1,
-                            onClick = { navigateOtherPage(NavigateToProgress) },
-                            text = { Text("Job Application Progress") }
-                        )
-                        Tab(
-                            selected = selectedTabIndex == 2,
-                            onClick = { navigateOtherPage(NavigateToDocuments) },
-                            text = { Text("Documents") }
-                        )
-                        Tab(
-                            selected = selectedTabIndex == 3,
-                            onClick = { navigateOtherPage(NavigateToProfile) },
-                            text = { Text("Profile") }
-                        )
+            TopNavigationBar(
+                selectedTabIndex = selectedTabIndex,
+                onTabSelected = { index ->
+                    selectedTabIndex = index
+                    when (index) {
+                        0 -> {}
+                        1 -> navigateOtherPage(NavigateToProgress)
+                        2 -> navigateOtherPage(NavigateToDocuments)
+                        3 -> navigateOtherPage(NavigateToProfile)
                     }
-
-                    // Profile Image on the right
-                    Box(
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clip(CircleShape)
-                            .background(Color(0xFFE2E2E2))
-                            .border(1.dp, Color.LightGray, CircleShape)
-                    )
                 }
-            }
+            )
 
             Spacer(modifier = Modifier.height(64.dp))
 
@@ -299,7 +295,7 @@ fun EmailGenerationPage(NavigateToDocuments: () -> Unit, NavigateToProfile: () -
                                 coroutineScope.launch(Dispatchers.IO) {
                                     try {
                                         val generatedEmail =
-                                            emailGenerationService.generateEmail(userInput, userProfile, listOf(education), listOf(workExperience))
+                                            emailGenerationService.generateEmail(userInput, userProfile, gotEducation, gotWorkExperience, gotSkills)
                                         println("Generated Email: ${generatedEmail.body}")
                                         emailContent = generatedEmail.body ?: "Failed to generate email"
                                         showDialog = true
@@ -412,7 +408,7 @@ fun EditableAlertDialog(
             Button(onClick = {
                 onConfirm(text)
                 send_email(
-                    senderEmail = "cs346test@gmail.com",
+                    senderEmail = "cs346test@gmail.com", //call getEmail to get user's email
                     password = "qirk dyef rvbv bkka",
                     recipient = recipientEmailAddy,
                     subject = emailSubject,

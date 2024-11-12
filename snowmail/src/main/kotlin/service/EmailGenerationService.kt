@@ -11,11 +11,11 @@ import model.UserProfile
 
 class EmailGenerationService(private val openAIClient: OpenAIClient) {
 
-     suspend fun generateEmail(userInput: UserInput, userProfile: UserProfile, education: List<Education>, workExperience: List<WorkExperience>): GeneratedEmail {
+     suspend fun generateEmail(userInput: UserInput, userProfile: UserProfile, education: List<Education>, workExperience: List<WorkExperience>, skills: List<String>): GeneratedEmail {
           val cleanedInput = cleanInput(userInput)
 
           return try {
-               openAIClient.generateEmail(cleanedInput, userProfile, education, workExperience)
+               openAIClient.generateEmail(cleanedInput, userProfile, education, workExperience, skills)
           } catch (e: Exception) {
                // Handle exceptions and return a meaningful error response
                throw RuntimeException("Failed to generate email: ${e.message}")

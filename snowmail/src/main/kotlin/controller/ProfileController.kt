@@ -22,8 +22,33 @@ class ProfileController(private val userProfileRepository: IUserProfileRepositor
         return userProfileRepository.getUserEmail(userId)
     }
 
-    suspend fun editUserProfile(userId: String, cityName: String?, phone: String?): Result<Boolean> {
-        return userProfileRepository.updateUserProfile(userId, cityName, phone)
+    // get user's city
+    suspend fun getUserCity(userId: String): Result<String> {
+        return userProfileRepository.getUserCity(userId)
+    }
+
+    // get user's phone
+    suspend fun getUserPhone(userId: String): Result<String> {
+        return userProfileRepository.getUserPhone(userId)
+    }
+
+    suspend fun updateCityPhone(userId: String, cityName: String?, phone: String?): Result<Boolean> {
+        return userProfileRepository.updateCityPhone(userId, cityName, phone)
+    }
+
+    // get user's skills
+    suspend fun getSkills(userId: String): Result<List<String>> {
+        return userProfileRepository.getSkills(userId)
+    }
+
+    // add skill to db
+    suspend fun addSkill(userId: String, skill: String): Result<Boolean> {
+        return userProfileRepository.addSkill(userId, skill)
+    }
+
+    // delete skill from db
+    suspend fun deleteSkill(userId: String, skill: String): Result<Boolean> {
+        return userProfileRepository.deleteSkill(userId, skill)
     }
 
     //
@@ -56,6 +81,34 @@ class ProfileController(private val userProfileRepository: IUserProfileRepositor
         )
     }
 
+    //update education record in db
+    suspend fun updateEducation(
+        userId: String,
+        educationId: String,
+        degreeId: Int,
+        major: String,
+        gpa: Float?,
+        startDate: LocalDate,
+        endDate: LocalDate,
+        institutionName: String
+    ): Result<Boolean> {
+        return userProfileRepository.updateEducation(
+            userId = userId,
+            educationID = educationId,
+            degreeId = degreeId,
+            major = major,
+            gpa = gpa,
+            startDate = startDate,
+            endDate = endDate,
+            institutionName = institutionName
+        )
+    }
+
+    // delete education record from db
+    suspend fun deleteEducation(educationID: String): Result<Boolean> {
+        return userProfileRepository.deleteEducation(educationID)
+    }
+
     //
     //working exp
     //
@@ -84,6 +137,34 @@ class ProfileController(private val userProfileRepository: IUserProfileRepositor
             description = description
         )
     }
+
+    //update work exp record in db
+    suspend fun updateWorkExperience(
+        userId: String,
+        workExperienceID: String,
+        companyName: String,
+        currentlyWorking: Boolean,
+        title: String,
+        startDate: LocalDate,
+        endDate: LocalDate,
+        description: String?
+    ): Result<Boolean> {
+        return userProfileRepository.updateWorkExperience(
+            userId = userId,
+            workExperienceID = workExperienceID,
+            companyName = companyName,
+            currentlyWorking = currentlyWorking,
+            title = title,
+            startDate = startDate,
+            endDate = endDate,
+            description = description
+        )
+    }
+
+    // delete work exp record from db
+    suspend fun deleteWorkExperience(workExperienceID: String): Result<Boolean> {
+        return userProfileRepository.deleteWorkExperience(workExperienceID)
+    }
 }
 
 fun main() = runBlocking<Unit> {
@@ -109,16 +190,60 @@ fun main() = runBlocking<Unit> {
 //        println("Error fetching user profile: ${error.message}")
 //    }
 
+//
+//    //test get user's city
+//    val profileResult = profileController.getUserCity(userId)
+//    profileResult.onSuccess { city ->
+//        println("city: $city")
+//    }.onFailure { error ->
+//        println("Error fetching user profile: ${error.message}")
+//    }
+
+    //test get user's phone
+//    val profileResult = profileController.getUserPhone(userId)
+//    profileResult.onSuccess { phone ->
+//        println("phone: $phone")
+//    }.onFailure { error ->
+//        println("Error fetching user profile: ${error.message}")
+//    }
+
+
     //test editing city and phone
-//    val cityName = "New York"
+//    val cityName = "NYC"
 //    val phone = "+1234567890"
-//    val result = profileController.editUserProfile(userId, cityName, phone)
+//    val result = profileController.updateCityPhone(userId, cityName, phone)
 //    result.onSuccess {
 //        println("User profile updated successfully.")
 //    }.onFailure { error ->
 //        println("Error updating user profile: ${error.message}")
 //    }
 
+
+    //test get skills
+//    val skillsResult = profileController.getSkills(userId)
+//    skillsResult.onSuccess { skills ->
+//        println("Skills: $skills")
+//    }.onFailure { error ->
+//        println("Error fetching skills: ${error.message}")
+//    }
+
+    //test add skill
+//    val skill = "SQL"
+//    val result = profileController.addSkill(userId, skill)
+//    result.onSuccess {
+//        println("Skill added successfully.")
+//    }.onFailure { error ->
+//        println("Error adding skill: ${error.message}")
+//    }
+
+    //test delete skill
+//    val skill = "SQL"
+//    val result = profileController.deleteSkill(userId, skill)
+//    result.onSuccess {
+//        println("Skill deleted successfully.")
+//    }.onFailure { error ->
+//        println("Error deleting skill: ${error.message}")
+//    }
 
     //test add edu exp to db
 //    val educationResult = profileController.addEducation(
@@ -155,6 +280,15 @@ fun main() = runBlocking<Unit> {
 //        println("Error adding work experience record: ${error.message}")
 //    }
 
+    // test deleting education record
+//    val educationId = "100"
+//    val result = profileController.deleteEducation(educationId)
+//    result.onSuccess {
+//        println("Education deleted successfully.")
+//    }.onFailure { error ->
+//        println("Error deleting education: ${error.message}")
+//    }
+
     // test getting edu exp
 //    val educationResult = profileController.getEducation(userId)
 //    educationResult.onSuccess { educationList ->
@@ -175,5 +309,14 @@ fun main() = runBlocking<Unit> {
 //        }
 //    }.onFailure { error ->
 //        println("Error fetching work experience records: ${error.message}")
+//    }
+
+    // test deleting work exp record
+//    val workExperienceId = "11"
+//    val result = profileController.deleteWorkExperience(workExperienceId)
+//    result.onSuccess {
+//        println("Work experience deleted successfully.")
+//    }.onFailure { error ->
+//        println("Error deleting work experience: ${error.message}")
 //    }
 }

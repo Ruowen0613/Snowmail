@@ -42,12 +42,12 @@ data class Message(
 class OpenAIClient(private val httpClient: HttpClient) {
 
 
-    suspend fun generateEmail2(resumeText:String, companyName:String, jobDescription:String, recruiterName:String): GeneratedEmail {
-        val prompt = buildPrompt2(resumeText, companyName, jobDescription, recruiterName)
+    suspend fun generateEmail2(resumeText:String, userInput: UserInput): String? {
+        val prompt = buildPrompt2(resumeText, userInput)
         val message = prepareMessage(prompt)
         val response = sendOpenAIRequest(message)
         val emailContent = getEmailContent(response)
-        return parseGeneratedText(emailContent)
+        return emailContent
     }
 
 
@@ -59,7 +59,11 @@ class OpenAIClient(private val httpClient: HttpClient) {
         return parseGeneratedText(emailContent)
     }
 
-    private fun buildPrompt2(resumeText: String, companyName: String, jobDescription: String, recruiterName: String): String {
+    private fun buildPrompt2(resumeText: String, userInput: UserInput): String {
+        val companyName = userInput.company
+        val jobDescription = userInput.jobDescription
+        val recruiterName = userInput.recruiterName
+
         return """
             The company I am looking to apply to is $companyName, with the following job description: $jobDescription.
             
@@ -118,6 +122,8 @@ class OpenAIClient(private val httpClient: HttpClient) {
                     - A brief introduction of the applicant
                     - Highlights of relevant skills and experiences tailored to the job description
                     - A clear, polite call to action for follow-up
+                    - A welcome with "Hi" or "Hello", followed up the recruiter's name 
+                    - Always specify the subject with "Subject:" followed by the subject of the email
                     - A formal closing with the applicant's name and something like "Best regards" or "Sincerely"
                     Keep the tone professional and succinct, avoiding overly casual language or excessive detail.
                     
@@ -177,12 +183,22 @@ class OpenAIClient(private val httpClient: HttpClient) {
         }
     }
 
-    private fun parseGeneratedText(responseBody: String?): GeneratedEmail {
+    private suspend fun parseGeneratedText(responseBody: String?): GeneratedEmail {
         // This needs to be improved
-        return GeneratedEmail(
-            subject = "Job Application",
-            body = responseBody
-        )
+        val prompt = """
+            This is the generated email:
+            $responseBody
+            
+            Return a tuple with the subject in the first element and the body in the second element.
+        """.trimIndent()
+
+
+
+        val message = prepareMessage(prompt)
+        val response = sendOpenAIRequest(message)
+        val emailContent = getEmailContent(response)
+
+        return GeneratedEmail("Subject", emailContent)
     }
 
 
@@ -242,45 +258,45 @@ class OpenAIClient(private val httpClient: HttpClient) {
 }
 
 suspend fun main() {
-    val openAIClient = OpenAIClient(HttpClient(CIO))
-    val userInput = UserInput(
-        jobDescription = "Software Engineer",
-        recruiterEmail = "recruiter@example.com",
-        jobTitle = "Software Engineer",
-        company = "Example Corp",
-        recruiterName = "Jane Doe",
-        fileURLs = listOf("https://example.com/resume.pdf"),
-    )
-
-    val userProfile = UserProfile(
-        userId = "123",
-        firstName = "John",
-        lastName = "Doe",
-        skills = listOf("Java", "Kotlin", "SQL")
-    )
-
-    val education = Education(
-        id = 12,
-        userId = "123",
-        degreeId = 3,
-        institutionName = "University of Waterloo",
-        major = "Computer Science",
-        gpa = 3.8f,
-        startDate = LocalDate(2019, 9, 1),
-        endDate = LocalDate(2023, 6, 1)
-    )
-
-
-
-    val workExperience = WorkExperience(
-        userId = "123",
-        currentlyWorking = false,
-        startDate = LocalDate(2021, 5, 1),
-        endDate = LocalDate(2021, 8, 1),
-        companyName = "Example Corp",
-        title = "Software Engineer",
-        description = "Developed backend systems, deployed scalable solutions, and built efficient ETL pipelines for financial data processing."
-    )
-
-    println(openAIClient.generateEmail(userInput, userProfile, listOf(education), listOf(workExperience)))
+//    val openAIClient = OpenAIClient(HttpClient(CIO))
+//    val userInput = UserInput(
+//        jobDescription = "Software Engineer",
+//        recruiterEmail = "recruiter@example.com",
+//        jobTitle = "Software Engineer",
+//        company = "Example Corp",
+//        recruiterName = "Jane Doe",
+//        fileURLs = listOf("https://example.com/resume.pdf"),
+//    )
+//
+//    val userProfile = UserProfile(
+//        userId = "123",
+//        firstName = "John",
+//        lastName = "Doe",
+//        skills = listOf("Java", "Kotlin", "SQL")
+//    )
+//
+//    val education = Education(
+//        id = 12,
+//        userId = "123",
+//        degreeId = 3,
+//        institutionName = "University of Waterloo",
+//        major = "Computer Science",
+//        gpa = 3.8f,
+//        startDate = LocalDate(2019, 9, 1),
+//        endDate = LocalDate(2023, 6, 1)
+//    )
+//
+//
+//
+//    val workExperience = WorkExperience(
+//        userId = "123",
+//        currentlyWorking = false,
+//        startDate = LocalDate(2021, 5, 1),
+//        endDate = LocalDate(2021, 8, 1),
+//        companyName = "Example Corp",
+//        title = "Software Engineer",
+//        description = "Developed backend systems, deployed scalable solutions, and built efficient ETL pipelines for financial data processing."
+//    )
+//
+//    println(openAIClient.generateEmail(userInput, userProfile, listOf(education), listOf(workExperience)))
 }

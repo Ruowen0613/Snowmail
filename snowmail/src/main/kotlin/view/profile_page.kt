@@ -36,8 +36,10 @@ import ca.uwaterloo.controller.ProfileController
 
 import integration.SupabaseClient
 import ca.uwaterloo.model.Education
+import ca.uwaterloo.model.EducationWithDegreeName
 import ca.uwaterloo.model.WorkExperience
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -47,9 +49,6 @@ fun ProfilePage(userId: String,
     val dbStorage = SupabaseClient()
     val profileController = ProfileController(dbStorage.userProfileRepository)
 
-    var email by remember { mutableStateOf("user@gmail.com") }
-    var location by remember { mutableStateOf("") }
-    var phone by remember { mutableStateOf("+1 ") }
 
     var showEducationDialog by remember { mutableStateOf(false) }
     var showExperienceDialog by remember { mutableStateOf(false) }
@@ -58,16 +57,21 @@ fun ProfilePage(userId: String,
 
 
     var userName by remember { mutableStateOf("") }
-    var educationList by remember { mutableStateOf<List<Education>>(emptyList()) }
+    var educationList by remember { mutableStateOf<List<EducationWithDegreeName>>(emptyList()) }
     var errorMessage by remember { mutableStateOf("") }
     var userEmail by remember { mutableStateOf("") }
     var userLocation by remember { mutableStateOf("") }
     var userPhone by remember { mutableStateOf("") }
+    var skills by remember { mutableStateOf(listOf<String>()) }
+    var userLinkedIn by remember { mutableStateOf("") }
+    var userGithub by remember { mutableStateOf("") }
+    var userPersonalWebsite by remember { mutableStateOf("") }
 
     var showEditEducationDialog by remember { mutableStateOf(false) }
-    var selectedEducation by remember { mutableStateOf<Education?>(null) }
+    var selectedEducation by remember { mutableStateOf<EducationWithDegreeName?>(null) }
     var showEditExperienceDialog by remember { mutableStateOf(false) }
     var selectedExperience by remember { mutableStateOf<WorkExperience?>(null) }
+    var showEditPortfolioDialog by remember { mutableStateOf(false) }
 
 
     var workExperienceList by remember { mutableStateOf<List<WorkExperience>>(emptyList()) }
@@ -117,6 +121,43 @@ fun ProfilePage(userId: String,
         }
     }
 
+    fun refreshPortfolioInfo() {
+        runBlocking {
+            val linkedInResult = profileController.getUserLinkedIn(userId)
+            val githubResult = profileController.getUserGithub(userId)
+            val websiteResult = profileController.getUserPersonalWebsite(userId)
+
+            linkedInResult.onSuccess { linkedIn ->
+                userLinkedIn = linkedIn
+            }.onFailure { error ->
+                errorMessage = error.message ?: "Failed to retrieve updated LinkedIn URL."
+            }
+
+            githubResult.onSuccess { github ->
+                userGithub = github
+            }.onFailure { error ->
+                errorMessage = error.message ?: "Failed to retrieve updated GitHub URL."
+            }
+
+            websiteResult.onSuccess { website ->
+                userPersonalWebsite = website
+            }.onFailure { error ->
+                errorMessage = error.message ?: "Failed to retrieve updated personal website."
+            }
+        }
+    }
+
+    fun refreshSkills() {
+        runBlocking {
+            val getSkillsResult = profileController.getSkills(userId)
+            getSkillsResult.onSuccess { loadedSkills ->
+                skills = loadedSkills
+            }.onFailure { error ->
+                errorMessage = error.message ?: "Failed to load skills"
+            }
+        }
+    }
+
     LaunchedEffect(userId) {
 
         val getNameResult = profileController.getUserName(userId)
@@ -125,6 +166,10 @@ fun ProfilePage(userId: String,
         val getEmailResult = profileController.getUserEmail(userId)
         val getLocationResult = profileController.getUserCity(userId)
         val getPhoneResult = profileController.getUserPhone(userId)
+        val getSkillsResult = profileController.getSkills(userId)
+        val getLinkedInResult = profileController.getUserLinkedIn(userId)
+        val getGithubResult = profileController.getUserGithub(userId)
+        val getWebsiteResult = profileController.getUserPersonalWebsite(userId)
 
         getNameResult.onSuccess { name ->
 
@@ -162,13 +207,36 @@ fun ProfilePage(userId: String,
             errorMessage = error.message ?: "Failed to retrieve user location"
         }
 
-        // Fetch and handle user phone
+
         getPhoneResult.onSuccess { phone ->
             userPhone = phone
         }.onFailure { error ->
             errorMessage = error.message ?: "Failed to retrieve user phone"
         }
 
+        getSkillsResult.onSuccess { fetchedSkills ->
+            skills = fetchedSkills
+        }.onFailure { error ->
+            errorMessage = error.message ?: "Failed to load skills"
+        }
+
+        getLinkedInResult.onSuccess { linkedIn ->
+            userLinkedIn = linkedIn
+        }.onFailure { error ->
+            errorMessage = error.message ?: "Failed to retrieve LinkedIn URL"
+        }
+
+        getGithubResult.onSuccess { github ->
+            userGithub = github
+        }.onFailure { error ->
+            errorMessage = error.message ?: "Failed to retrieve GitHub URL"
+        }
+
+        getWebsiteResult.onSuccess { website ->
+            userPersonalWebsite = website
+        }.onFailure { error ->
+            errorMessage = error.message ?: "Failed to retrieve personal website"
+        }
     }
 
 
@@ -219,7 +287,6 @@ fun ProfilePage(userId: String,
                     modifier = Modifier.padding(10.dp)
                 )
             } else {
-
                 Text(
                     text = userName.ifEmpty { "Loading..." },
                     fontSize = 24.sp,
@@ -258,27 +325,10 @@ fun ProfilePage(userId: String,
                 }
 
 
-
-                if (EditContactDialog) {
-                    EditContactDialog(
-                        userId = userId,
-                        profileController = profileController,
-                        userLocation = userLocation, // Add userLocation as a parameter
-                        userPhone = userPhone,
-                        onDismiss = { EditContactDialog = false },
-                        onContactUpdated = {
-                            refreshContactInfo() // Call to refresh contact info after update
-                            EditContactDialog = false // Close dialog after update
-                        }
-                    )
-                }
-
-
                 Spacer(modifier = Modifier.height(4.dp))
 
-                // Profile Details
+                SectionTitle("Contact Information")
                 Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
-                    SectionTitle("Contact Information")
 
                     Card(
                         modifier = Modifier
@@ -319,6 +369,69 @@ fun ProfilePage(userId: String,
                     }
                 }
 
+                if (EditContactDialog) {
+                    EditContactDialog(
+                        userId = userId,
+                        profileController = profileController,
+                        userLocation = userLocation,
+                        userPhone = userPhone,
+                        onDismiss = { EditContactDialog = false },
+                        onContactUpdated = {
+                            refreshContactInfo()
+                            EditContactDialog = false
+                        }
+                    )
+                }
+
+                SectionTitle("Portfolio")
+                Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        elevation = 4.dp
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                ProfileDetail(label = "LinkedIn URL:", value = userLinkedIn ?: "Not available")
+                                ProfileDetail(label = "GitHub URL:", value = userGithub ?: "Not available")
+                                ProfileDetail(label = "Portfolio URL:", value = userPersonalWebsite ?: "Not available")
+                            }
+
+                            IconButton(onClick = { showEditPortfolioDialog = true }) {
+                                Icon(
+                                    imageVector = Icons.Default.Edit,
+                                    contentDescription = "Edit Portfolio & Socials",
+                                    tint = Color.Gray
+                                )
+                            }
+                        }
+                    }
+                }
+
+                if (showEditPortfolioDialog) {
+                    EditPortfolioDialog(
+                        userId = userId,
+                        profileController = profileController,
+                        linkedInUrl = userLinkedIn,
+                        githubUrl = userGithub,
+                        portfolioUrl = userPersonalWebsite,
+                        onDismiss = { showEditPortfolioDialog = false },
+                        onLinksUpdated = {
+                            refreshPortfolioInfo()
+                            showEditPortfolioDialog = false
+                        }
+                    )
+                }
+
+
                 SectionTitle("Education")
                 Card(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
                     if (educationList.isEmpty()) {
@@ -343,7 +456,7 @@ fun ProfilePage(userId: String,
                                 ) {
                                     Column {
                                         Text(
-                                            text = "${education.institutionName}, ${education.degreeId} in ${education.major}",
+                                            text = "${education.institutionName}, ${education.degreeName} in ${education.major}",
                                             fontSize = 14.sp,
                                             color = Color.Black
                                         )
@@ -371,7 +484,7 @@ fun ProfilePage(userId: String,
                     ) {
                         IconButton(
                             onClick = {
-                                selectedEducation = null // Set to null for adding a new record
+                                selectedEducation = null
                                 showEducationDialog = true
                             },
                             modifier = Modifier.size(15.dp)
@@ -392,21 +505,21 @@ fun ProfilePage(userId: String,
                             onEducationAdded = { refreshEducationList() }
                         )
                     }
-                    // Show Edit or Add Education Dialog
+
                     if (showEditEducationDialog) {
                         EditEducationDialog(
                             onDismiss = { showEditEducationDialog = false },
                             userId = userId,
                             profileController = profileController,
-                            education = selectedEducation, // Pass the selected education record, or null for new
+                            education = selectedEducation,
                             onEducationEdited = {
                                 refreshEducationList()
-                                selectedEducation = null // Reset after editing
+                                selectedEducation = null
                                 showEducationDialog = false
                             },
                             onEducationDeleted = {
                                 refreshEducationList()
-                                selectedEducation = null // Reset after deleting
+                                selectedEducation = null
                                 showEditEducationDialog = false
                             }
                         )
@@ -414,7 +527,7 @@ fun ProfilePage(userId: String,
                 }
 
 
-                // Work Experience Section
+
                 SectionTitle("Work Experience")
 
                 Card(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
@@ -428,7 +541,7 @@ fun ProfilePage(userId: String,
                     } else {
                         Column(modifier = Modifier.padding(8.dp)) {
                             workExperienceList.forEach { experience ->
-                                // Clickable Box for each work experience record
+
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -470,10 +583,10 @@ fun ProfilePage(userId: String,
                     ) {
                         IconButton(
                             onClick = {
-                                selectedExperience = null // Set to null for adding a new record
+                                selectedExperience = null
                                 showExperienceDialog = true
                             },
-                            modifier = Modifier.size(15.dp) // Adjust size as needed
+                            modifier = Modifier.size(15.dp)
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Add,
@@ -483,7 +596,6 @@ fun ProfilePage(userId: String,
                         }
                     }
 
-                    // Show Add Experience Dialog
                     if (showExperienceDialog) {
                         AddExperienceDialog(
                             onDismiss = { showExperienceDialog = false },
@@ -499,15 +611,15 @@ fun ProfilePage(userId: String,
                             onDismiss = { showEditExperienceDialog = false },
                             userId = userId,
                             profileController = profileController,
-                            experience = selectedExperience, // Pass the selected work experience, or null for new
+                            experience = selectedExperience,
                             onWorkExperienceEdited = {
                                 refreshWorkExperienceList()
-                                selectedExperience = null // Reset after editing
+                                selectedExperience = null
                                 showEditExperienceDialog = false
                             },
                             onWorkExperienceDeleted = {
                                 refreshWorkExperienceList()
-                                selectedExperience = null // Reset after deleting
+                                selectedExperience = null
                                 showEditExperienceDialog = false
                             }
                         )
@@ -515,38 +627,54 @@ fun ProfilePage(userId: String,
                 }
 
                 SectionTitle("Skills")
-                Card(modifier = Modifier.fillMaxWidth().padding(8.dp).height(80.dp)) {
-                    Text(
-                        text = "No items added",
-                        fontSize = 14.sp,
-                        color = Color.Gray
-                    )
-                    Row(
-                        modifier = Modifier.padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
+
+                Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+                    IconButton(
+                        onClick = { showSkillsDialog = true },
+                        modifier = Modifier.size(24.dp)
                     ) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = "Add Skill",
+                            tint = Color(0xFF487896)
+                        )
+                    }
+
+                    if (skills.isEmpty()) {
+                        Text("No items added", fontSize = 14.sp, color = Color.Gray)
+                    } else {
                         Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.End
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            IconButton(
-                                onClick = { showSkillsDialog = true },
-                                modifier = Modifier.size(15.dp) // Adjust size as needed
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Add,
-                                    contentDescription = "Add",
-                                    tint = Color(0xFF487896) // Edit icon color
-                                )
+                            skills.forEach { skill ->
+                                SkillChip(skill = skill, onDelete = {
+                                    runBlocking {
+                                        profileController.deleteSkill(userId, skill)
+                                        refreshSkills()
+                                    }
+                                })
                             }
                         }
+                    }
 
-                        if (showSkillsDialog) {
-                            EditSkillsDialog(onDismiss = { showSkillsDialog = false })
-                        }
+                    if (showSkillsDialog) {
+                        EditSkillsDialog(
+                            onDismiss = { showSkillsDialog = false },
+                            onSave = {
+                                refreshSkills()
+                                showSkillsDialog = false
+                            },
+                            userId = userId,
+                            profileController = profileController,
+                            initialSkills = skills
+                        )
+                    }
+
+                    if (errorMessage.isNotEmpty()) {
+                        Text(text = errorMessage, color = Color.Red)
                     }
                 }
-
 
             }
         }
@@ -557,8 +685,8 @@ fun ProfilePage(userId: String,
 fun EditContactDialog(
     userId: String,
     profileController: ProfileController,
-    userLocation: String?, // Add userLocation as a parameter
-    userPhone: String?, // Add userPhone as a parameter
+    userLocation: String?,
+    userPhone: String?,
     onDismiss: () -> Unit,
     onContactUpdated: () -> Unit
 ) {
@@ -578,7 +706,7 @@ fun EditContactDialog(
                 modifier = Modifier.padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                // Header
+
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -601,7 +729,6 @@ fun EditContactDialog(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Location Input
                 OutlinedTextField(
                     value = location,
                     onValueChange = { location = it },
@@ -610,7 +737,6 @@ fun EditContactDialog(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                // Phone Input
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text("+1", modifier = Modifier.padding(end = 8.dp))
                     OutlinedTextField(
@@ -621,7 +747,6 @@ fun EditContactDialog(
                     )
                 }
 
-                // Error message display
                 if (errorMessage.isNotEmpty()) {
                     Text(
                         text = errorMessage,
@@ -633,7 +758,6 @@ fun EditContactDialog(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Action Buttons
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
@@ -651,7 +775,7 @@ fun EditContactDialog(
                                 )
 
                                 result.onSuccess {
-                                    onContactUpdated()    // Trigger any additional actions needed on update
+                                    onContactUpdated()
                                     onDismiss()
                                 }.onFailure { error ->
                                     errorMessage = error.message ?: "Failed to update contact information."
@@ -693,7 +817,7 @@ fun AddEducationDialog(
 
     // Dropdown for degree type
     var expanded by remember { mutableStateOf(false) }
-    val degreeTypes = listOf("Associate's/College Diploma", "Bachelor's", "Doctorate", "High School Diploma/GED", "Master's", "Other")
+    val degreeTypes = listOf("High School Diploma/GED", "Associate's Degree/College Diploma", "Bachelor's Degree", "Master's Degree", "Doctorate Degree", "Other")
 
     Dialog(onDismissRequest = onDismiss) {
         Surface(
@@ -772,7 +896,7 @@ fun AddEducationDialog(
                             val startDate = LocalDate(startYear.toInt(), startMonth.toInt(), 1)
                             val endDate = LocalDate(endYear.toInt(), endMonth.toInt(), 1)
                             val gpaValue = gpa.toFloatOrNull()
-                            val degreeId = degreeTypes.indexOf(degreeType) + 1 // Example for degreeId
+                            val degreeId = degreeTypes.indexOf(degreeType) + 1
 
                             val result = profileController.addEducation(
                                 userId = userId,
@@ -804,7 +928,7 @@ fun AddEducationDialog(
 
 @Composable
 fun EditEducationDialog(
-    education: Education? = null, // Optional parameter for editing
+    education: EducationWithDegreeName? = null,
     onDismiss: () -> Unit,
     userId: String,
     profileController: ProfileController,
@@ -814,7 +938,7 @@ fun EditEducationDialog(
 
     var schoolName by remember { mutableStateOf(education?.institutionName ?: "") }
     var major by remember { mutableStateOf(education?.major ?: "") }
-    var degreeType by remember { mutableStateOf(education?.degreeId ?: "") }
+    var degreeName by remember { mutableStateOf(education?.degreeName ?: "") }
     var gpa by remember { mutableStateOf(education?.gpa?.toString() ?: "") }
     //var startMonth by remember { mutableStateOf(education?.startDate?.month.toString() ?: "") }
     var startMonth by remember { mutableStateOf(education?.startDate?.month?.value?.toString() ?: "") }
@@ -824,10 +948,9 @@ fun EditEducationDialog(
     var endYear by remember { mutableStateOf(education?.endDate?.year.toString() ?: "") }
     var errorMessage by remember { mutableStateOf("") }
 
-    // Dropdown for degree type
-    var expanded by remember { mutableStateOf(false) }
-    val degreeTypes = listOf("Associate's/College Diploma", "Bachelor's", "Doctorate", "High School Diploma/GED", "Master's", "Other")
 
+    var expanded by remember { mutableStateOf(false) }
+    val degreeTypes = listOf("High School Diploma/GED", "Associate's Degree/College Diploma", "Bachelor's Degree", "Master's Degree", "Doctorate Degree", "Other")
     Dialog(onDismissRequest = onDismiss) {
         Surface(
             shape = RoundedCornerShape(8.dp),
@@ -850,7 +973,7 @@ fun EditEducationDialog(
                         IconButton(
                             onClick = {
                                 runBlocking {
-                                    // Perform delete operation
+
                                     val result = education.id?.let { id ->
                                         profileController.deleteEducation(id.toString())
                                     } ?: Result.failure(Exception("Education ID is null"))
@@ -892,38 +1015,34 @@ fun EditEducationDialog(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-//                Box(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .wrapContentSize(Alignment.TopStart)
-//                ) {
-//                    OutlinedTextField(
-//                        value = degreeType,
-//                        onValueChange = {},
-//                        label = { Text("Degree Type") },
-//                        trailingIcon = {
-//                            Icon(
-//                                imageVector = Icons.Filled.ArrowDropDown,
-//                                contentDescription = "Select Degree Type",
-//                                modifier = Modifier.clickable { expanded = true }
-//                            )
-//                        },
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .clickable { expanded = true },
-//                        readOnly = true
-//                    )
-//                    DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-//                        degreeTypes.forEach { type ->
-//                            DropdownMenuItem(onClick = {
-//                                degreeType = type
-//                                expanded = false
-//                            }) {
-//                                Text(type)
-//                            }
-//                        }
-//                    }
-//                }
+                Box(
+                    modifier = Modifier.fillMaxWidth().wrapContentSize(Alignment.TopStart)
+                ) {
+                    OutlinedTextField(
+                        value = degreeName,
+                        onValueChange = {},
+                        label = { Text("Degree Type") },
+                        trailingIcon = {
+                            Icon(
+                                imageVector = Icons.Filled.ArrowDropDown,
+                                contentDescription = "Select Degree Type",
+                                modifier = Modifier.clickable { expanded = true }
+                            )
+                        },
+                        modifier = Modifier.fillMaxWidth().clickable { expanded = true },
+                        readOnly = true
+                    )
+                    DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                        degreeTypes.forEach { type ->
+                            DropdownMenuItem(onClick = {
+                                degreeName = type
+                                expanded = false
+                            }) {
+                                Text(type)
+                            }
+                        }
+                    }
+                }
 
                 OutlinedTextField(
                     value = gpa,
@@ -931,6 +1050,7 @@ fun EditEducationDialog(
                     label = { Text("GPA") },
                     modifier = Modifier.fillMaxWidth()
                 )
+
 
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -993,7 +1113,8 @@ fun EditEducationDialog(
                                 val startDate = LocalDate(startYear.toInt(), startMonth.toInt(), 1)
                                 val endDate = LocalDate(endYear.toInt(), endMonth.toInt(), 1)
                                 val gpaValue = gpa.toFloatOrNull()
-                                val degreeId = degreeTypes.indexOf(degreeType) + 1
+                                val degreeN = degreeName
+                                val degreeId = degreeTypes.indexOf(degreeN) + 1
 
                                 val result = if (education == null) {
                                     // Adding new education record
@@ -1010,7 +1131,7 @@ fun EditEducationDialog(
                                     profileController.updateEducation(
                                         userId = userId,
                                         educationId = education.id.toString(),
-                                        degreeId = 1,
+                                        degreeId = degreeId,
                                         major = major,
                                         gpa = gpaValue,
                                         startDate = startDate,
@@ -1038,6 +1159,112 @@ fun EditEducationDialog(
         }
     }
 }
+
+@Composable
+fun EditPortfolioDialog(
+    userId: String,
+    profileController: ProfileController,
+    linkedInUrl: String?,
+    githubUrl: String?,
+    portfolioUrl: String?,
+    onDismiss: () -> Unit,
+    onLinksUpdated: () -> Unit
+) {
+    var linkedInInput by remember { mutableStateOf(linkedInUrl ?: "") }
+    var githubInput by remember { mutableStateOf(githubUrl ?: "") }
+    var portfolioInput by remember { mutableStateOf(portfolioUrl ?: "") }
+    var errorMessage by remember { mutableStateOf("") }
+    val scope = rememberCoroutineScope()
+
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            shape = RoundedCornerShape(8.dp),
+            color = Color.White,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Text(
+                    text = "Edit Portfolio",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                )
+
+                OutlinedTextField(
+                    value = linkedInInput,
+                    onValueChange = { linkedInInput = it },
+                    label = { Text("LinkedIn URL") },
+                    placeholder = { Text("https://www.linkedin.com/in/...") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                OutlinedTextField(
+                    value = githubInput,
+                    onValueChange = { githubInput = it },
+                    label = { Text("GitHub URL") },
+                    placeholder = { Text("https://github.com/...") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                OutlinedTextField(
+                    value = portfolioInput,
+                    onValueChange = { portfolioInput = it },
+                    label = { Text("Portfolio URL") },
+                    placeholder = { Text("https://...") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                if (errorMessage.isNotEmpty()) {
+                    Text(
+                        text = errorMessage,
+                        color = Color.Red,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(10.dp)
+                    )
+                }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    TextButton(onClick = onDismiss) {
+                        Text("Cancel")
+                    }
+                    Button(
+                        onClick = {
+                            scope.launch {
+                                val result = profileController.updateUserLinks(
+                                    userId = userId,
+                                    linkedinUrl = linkedInInput.ifBlank { null },
+                                    githubUrl = githubInput.ifBlank { null },
+                                    personalWebsiteUrl = portfolioInput.ifBlank { null }
+                                )
+                                result.onSuccess {
+                                    onLinksUpdated()
+                                    onDismiss()
+                                }.onFailure { error ->
+                                    errorMessage = error.message ?: "Failed to update portfolio links."
+                                }
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = Color(0xFF487896),
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Text("Save")
+                    }
+                }
+            }
+        }
+    }
+}
+
 
 
 @Composable
@@ -1149,12 +1376,12 @@ fun AddExperienceDialog(
 
 @Composable
 fun EditExperienceDialog(
-    experience: WorkExperience? = null, // Optional parameter for editing
+    experience: WorkExperience? = null,
     onDismiss: () -> Unit,
     userId: String,
     profileController: ProfileController,
-    onWorkExperienceEdited: () -> Unit, // Callback for saving or updating
-    onWorkExperienceDeleted: () -> Unit // Callback for delete action
+    onWorkExperienceEdited: () -> Unit,
+    onWorkExperienceDeleted: () -> Unit
 ) {
 
     var company by remember { mutableStateOf(experience?.companyName ?: "") }
@@ -1305,11 +1532,9 @@ fun EditExperienceDialog(
                             runBlocking {
                                 try {
                                     val startDate = LocalDate(startYear.toInt(), startMonth.toInt(), 1)
-                                    //val endDate = if (isCurrentlyWorking) null else LocalDate(endYear.toInt(), endMonth.toInt(), 1)
-                                    //val endDate = if (isCurrentlyWorking) LocalDate.now() else LocalDate(endYear.toInt(), endMonth.toInt(), 1)
                                     val endDate = if (isCurrentlyWorking) Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date else LocalDate(endYear.toInt(), endMonth.toInt(), 1)
                                     val result = if (experience == null) {
-                                        // Adding new work experience
+
                                         profileController.addWorkExperience(
                                             userId = userId,
                                             companyName = company,
@@ -1320,7 +1545,6 @@ fun EditExperienceDialog(
                                             description = description.takeIf { it.isNotEmpty() }
                                         )
                                     } else {
-                                        // Updating existing work experience
                                         profileController.updateWorkExperience(
                                             userId = userId,
                                             workExperienceID = experience.id.toString(),
@@ -1356,13 +1580,48 @@ fun EditExperienceDialog(
     }
 }
 
+@Composable
+fun SkillChip(skill: String, onDelete: () -> Unit) {
+    Surface(
+        shape = RoundedCornerShape(16.dp),
+        color = Color(0xFFE0E0E0),
+        modifier = Modifier
+            .padding(4.dp)
+            .height(32.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(horizontal = 8.dp)
+        ) {
+            Text(text = skill, fontSize = 14.sp)
+            Spacer(modifier = Modifier.width(4.dp))
+            IconButton(
+                onClick = onDelete,
+                modifier = Modifier.size(16.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "Delete Skill",
+                    tint = Color.Red
+                )
+            }
+        }
+    }
+}
 
 @Composable
-fun EditSkillsDialog(onDismiss: () -> Unit) {
-
-    var skillSearchText by remember { mutableStateOf("") }
-    var expanded by remember { mutableStateOf(false) }
-    val skillsList = listOf("Kotlin", "Java", "Python", "Swift", "JavaScript") // Example skill options
+fun EditSkillsDialog(
+    onDismiss: () -> Unit,
+    onSave: () -> Unit,
+    userId: String,
+    profileController: ProfileController,
+    initialSkills: List<String>
+) {
+    var skillInput by remember { mutableStateOf("") }
+    var isDuplicateSkill by remember { mutableStateOf(false) }
+    var selectedSkills = remember { mutableStateListOf<String>().apply { addAll(initialSkills) } }
+    var errorMessage by remember { mutableStateOf("") }
+    val scope = rememberCoroutineScope()
 
     Dialog(onDismissRequest = onDismiss) {
         Surface(
@@ -1376,43 +1635,68 @@ fun EditSkillsDialog(onDismiss: () -> Unit) {
                 modifier = Modifier.padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
+                Text("Edit Skills", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
 
                 Text(
-                    text = "Edit Skills",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black
+                    text = "Click a skill to delete it from your list.",
+                    fontSize = 14.sp,
+                    color = Color.Gray,
+                    modifier = Modifier.padding(bottom = 8.dp)
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = skillInput,
+                    onValueChange = { skillInput = it },
+                    label = { Text("Add a new skill") },
+                    modifier = Modifier.fillMaxWidth()
+                )
 
 
+                Button(
+                    onClick = {
+                        if (skillInput.isNotBlank()) {
+                            if (skillInput in selectedSkills) {
+                                isDuplicateSkill = true
+                            } else {
 
-                Box {
-                    OutlinedTextField(
-                        value = skillSearchText,
-                        onValueChange = { skillSearchText = it },
-                        label = { Text("Skill (ex: Project Management)") },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { expanded = true },
-                        readOnly = true
-                    )
-                    DropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = { expanded = false }
-                    ) {
-                        skillsList.forEach { skill ->
-                            DropdownMenuItem(onClick = {
-                                skillSearchText = skill
-                                expanded = false
-                            }) {
-                                Text(skill)
+                                selectedSkills.add(skillInput)
+                                skillInput = ""
+                                isDuplicateSkill = false
                             }
+                        }
+                    },
+                    modifier = Modifier.align(Alignment.End),
+                    enabled = skillInput.isNotBlank()
+                ) {
+                    Text("Add")
+                }
+
+                if (isDuplicateSkill) {
+                    Text(
+                        text = "This skill has already been added.",
+                        color = Color.Red,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .padding(vertical = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    selectedSkills.forEach { skill ->
+                        SkillChip(skill = skill) {
+                            selectedSkills.remove(skill)
                         }
                     }
                 }
 
+                if (errorMessage.isNotEmpty()) {
+                    Text(text = errorMessage, color = Color.Red)
+                }
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -1423,8 +1707,21 @@ fun EditSkillsDialog(onDismiss: () -> Unit) {
                     }
                     Button(
                         onClick = {
+                            scope.launch {
 
-                            onDismiss()
+                                selectedSkills.forEach { skill ->
+                                    if (skill !in initialSkills) {
+                                        profileController.addSkill(userId, skill)
+                                    }
+                                }
+
+                                initialSkills.forEach { skill ->
+                                    if (skill !in selectedSkills) {
+                                        profileController.deleteSkill(userId, skill)
+                                    }
+                                }
+                                onSave()
+                            }
                         },
                         colors = ButtonDefaults.buttonColors(
                             backgroundColor = Color(0xFF487896),
@@ -1466,6 +1763,7 @@ fun ProfileDetail(label: String, value: String) {
     Row {
         Text(
             "$label ",
+            fontWeight = FontWeight.Bold,
             style = TextStyle(fontSize = 14.sp, color = Color.Black)
         )
         Text(

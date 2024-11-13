@@ -1,6 +1,7 @@
 package ca.uwaterloo.persistence
 
 import ca.uwaterloo.model.Education
+import ca.uwaterloo.model.EducationWithDegreeName
 import ca.uwaterloo.model.WorkExperience
 import model.UserProfile
 import kotlinx.datetime.LocalDate
@@ -15,7 +16,16 @@ interface IUserProfileRepository {
     suspend fun getSkills(userId: String): Result<List<String>>
     suspend fun addSkill(userId: String, skill: String): Result<Boolean>
     suspend fun deleteSkill(userId: String, skill: String): Result<Boolean>
-    suspend fun getEducation(userId: String): Result<List<Education>>
+    suspend fun getUserLinkedIn(userId: String): Result<String>
+    suspend fun getUserGithub(userId: String): Result<String>
+    suspend fun getUserPersonalWebsite(userId: String): Result<String>
+    suspend fun updateUserLinks(
+        userId: String,
+        linkedinUrl: String?,
+        githubUrl: String?,
+        personalWebsiteUrl: String?
+    ): Result<Boolean>
+    suspend fun getEducation(userId: String): Result<List<EducationWithDegreeName>>
     suspend fun addEducation(
         userId: String,
         degreeId: Int,
@@ -57,4 +67,6 @@ interface IUserProfileRepository {
         description: String?
     ): Result<Boolean>
     suspend fun deleteWorkExperience(workExperienceID: String): Result<Boolean>
+    suspend fun getDegreeNameById(degreeId: Int): Result<String>
+    suspend fun getDegreeIdByName(degreeName: String): Result<Int>
 }

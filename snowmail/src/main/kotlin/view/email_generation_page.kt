@@ -33,6 +33,7 @@ import androidx.compose.ui.text.style.TextAlign
 
 import ca.uwaterloo.controller.ProfileController
 import ca.uwaterloo.model.Education
+import ca.uwaterloo.model.EducationWithDegreeName
 import ca.uwaterloo.model.WorkExperience
 import controller.send_email
 import integration.SupabaseClient
@@ -125,7 +126,7 @@ fun EmailGenerationPage(NavigateToDocuments: () -> Unit, NavigateToProfile: () -
 //        endDate = LocalDate(2023, 6, 1)
 //    )
 
-    var gotEducation = listOf<Education>()
+    var gotEducation = listOf<EducationWithDegreeName>()
     runBlocking {
         val getEducationResult = profileController.getEducation(UserSession.userId ?: "DefaultUserId")
         getEducationResult.onSuccess { educationList ->

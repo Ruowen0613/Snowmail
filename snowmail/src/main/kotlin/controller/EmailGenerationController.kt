@@ -1,6 +1,7 @@
 package controller
 
 import ca.uwaterloo.model.Education
+import ca.uwaterloo.model.EducationWithDegreeName
 import ca.uwaterloo.model.WorkExperience
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -18,7 +19,7 @@ fun Route.emailRoutes(emailGenerationService: EmailGenerationService) {
         try {
             val userInput = call.receive<UserInput>()
             val userProfile = call.receive<UserProfile>()
-            val education = call.receive<List<Education>>()
+            val education = call.receive<List<EducationWithDegreeName>>()
             val workExperience = call.receive<List<WorkExperience>>()
             val skills = call.receive<List<String>>()
 

@@ -1,6 +1,7 @@
 package integration
 
 import ca.uwaterloo.model.Education
+import ca.uwaterloo.model.EducationWithDegreeName
 import ca.uwaterloo.model.WorkExperience
 import io.ktor.client.*
 import io.ktor.client.call.*

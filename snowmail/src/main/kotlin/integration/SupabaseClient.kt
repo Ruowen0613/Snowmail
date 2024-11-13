@@ -180,28 +180,67 @@ fun main() = runBlocking<Unit> {
 //    }
 
     //test update work experience
-    val workExperienceId = "1"
-    val companyName = "Google"
-    val currentlyWorking = false
-    val title = "Software Engineer"
-    val startDate = LocalDate(2019, 9, 1)
-    val endDate = LocalDate(2023, 6, 1)
-    val description = "Worked on Android development."
-    val result = dbStorage.userProfileRepository.updateWorkExperience(
-        userId,
-        workExperienceId,
-        companyName,
-        currentlyWorking,
-        title,
-        startDate,
-        endDate,
-        description
-    )
-    result.onSuccess {
-        println("Work experience updated successfully.")
+//    val workExperienceId = "1"
+//    val companyName = "Google"
+//    val currentlyWorking = false
+//    val title = "Software Engineer"
+//    val startDate = LocalDate(2019, 9, 1)
+//    val endDate = LocalDate(2023, 6, 1)
+//    val description = "Worked on Android development."
+//    val result = dbStorage.userProfileRepository.updateWorkExperience(
+//        userId,
+//        workExperienceId,
+//        companyName,
+//        currentlyWorking,
+//        title,
+//        startDate,
+//        endDate,
+//        description
+//    )
+//    result.onSuccess {
+//        println("Work experience updated successfully.")
+//    }.onFailure { error ->
+//        println("Error updating work experience: ${error.message}")
+//    }
+
+    //test get degree name by id
+//    val degreeId = 2
+//    val result = dbStorage.userProfileRepository.getDegreeNameById(degreeId)
+//    result.onSuccess { degreeName ->
+//        println("Degree name: $degreeName")
+//    }.onFailure { error ->
+//        println("Error fetching degree name: ${error.message}")
+//    }
+
+    //test get degree id by name
+//    val degreeName = "Bachelor's Degree"
+//    val result = dbStorage.userProfileRepository.getDegreeIdByName(degreeName)
+//    result.onSuccess { degreeId ->
+//        println("Degree ID: $degreeId")
+//    }.onFailure { error ->
+//        println("Error fetching degree ID: ${error.message}")
+//    }
+
+    //test update user links
+//    val linkedinUrl = "https://www.linkedin.com/in/janedoe"
+//    val githubUrl = "https://uwaterloo.ca/the-centre/quest"
+//    val personalWebsiteUrl = "https://janedoe.com"
+//    val result = dbStorage.userProfileRepository.updateUserLinks(userId, linkedinUrl, githubUrl, personalWebsiteUrl)
+//    result.onSuccess {
+//        println("User links updated successfully.")
+//    }.onFailure { error ->
+//        println("Error updating user links: ${error.message}")
+//    }
+
+    // test get education
+    val result = dbStorage.userProfileRepository.getEducation(userId)
+    result.onSuccess { education ->
+        println("Education: $education")
     }.onFailure { error ->
-        println("Error updating work experience: ${error.message}")
+        println("Error fetching education: ${error.message}")
     }
+
+
 
 }
 

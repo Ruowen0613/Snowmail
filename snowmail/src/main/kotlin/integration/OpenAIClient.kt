@@ -52,7 +52,7 @@ class OpenAIClient(private val httpClient: HttpClient) {
     }
 
 
-    suspend fun generateEmail(userInput: UserInput, userProfile: UserProfile, education: List<Education>, workExperience: List<WorkExperience>): GeneratedEmail {
+    suspend fun generateEmail(userInput: UserInput, userProfile: UserProfile, education: List<Education>, workExperience: List<WorkExperience>, skills: List<String>): GeneratedEmail {
         val prompt = buildPrompt(userInput, userProfile, education, workExperience)
         val message = prepareMessage(prompt)
         val response = sendOpenAIRequest(message)

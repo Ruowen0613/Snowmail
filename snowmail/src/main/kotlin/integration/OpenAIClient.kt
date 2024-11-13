@@ -52,7 +52,7 @@ class OpenAIClient(private val httpClient: HttpClient) {
     }
 
 
-    suspend fun generateEmail(userInput: UserInput, userProfile: UserProfile, education: List<Education>, workExperience: List<WorkExperience>, skills: List<String>): GeneratedEmail {
+    suspend fun generateEmail(userInput: UserInput, userProfile: UserProfile, education: List<EducationWithDegreeName>, workExperience: List<WorkExperience>, skills: List<String>): GeneratedEmail {
         val prompt = buildPrompt(userInput, userProfile, education, workExperience)
         val message = prepareMessage(prompt)
         val response = sendOpenAIRequest(message)
@@ -77,7 +77,7 @@ class OpenAIClient(private val httpClient: HttpClient) {
 
 
 
-    private fun buildPrompt(userInput: UserInput, userProfile: UserProfile, education: List<Education>, workExperience: List<WorkExperience>): String {
+    private fun buildPrompt(userInput: UserInput, userProfile: UserProfile, education: List<EducationWithDegreeName>, workExperience: List<WorkExperience>): String {
         val skills = userProfile.skills?.joinToString(", ") ?: "Not provided"
 
         val educationDetails = education.joinToString("\n") { e ->

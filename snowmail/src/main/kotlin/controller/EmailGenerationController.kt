@@ -14,28 +14,28 @@ import model.UserInput
 import model.UserProfile
 
 
-fun Route.emailRoutes(emailGenerationService: EmailGenerationService) {
-    post("/generate-email") {
-        try {
-            val userInput = call.receive<UserInput>()
-            val userProfile = call.receive<UserProfile>()
-            val education = call.receive<List<EducationWithDegreeName>>()
-            val workExperience = call.receive<List<WorkExperience>>()
-            val skills = call.receive<List<String>>()
-
-            val generatedEmail = emailGenerationService.generateEmail(userInput, userProfile, education, workExperience, skills)
-            call.respond(HttpStatusCode.OK, generatedEmail)
-        } catch (e: Exception) {
-            call.respond(HttpStatusCode.InternalServerError, "Failed to generate email: ${e.message}")
-        }
-    }
-}
-
-fun Application.configureRouting(emailGenerationService: EmailGenerationService) {
-    routing {
-        emailRoutes(emailGenerationService)
-        get("/status") {
-            call.respond(HttpStatusCode.OK, "Service is running")
-        }
-    }
-}
+//fun Route.emailRoutes(emailGenerationService: EmailGenerationService) {
+//    post("/generate-email") {
+//        try {
+//            val userInput = call.receive<UserInput>()
+//            val userProfile = call.receive<UserProfile>()
+//            val education = call.receive<List<EducationWithDegreeName>>()
+//            val workExperience = call.receive<List<WorkExperience>>()
+//            val skills = call.receive<List<String>>()
+//
+//            val generatedEmail = emailGenerationService.generateEmail(userInput, userProfile, education, workExperience, skills)
+//            call.respond(HttpStatusCode.OK, generatedEmail)
+//        } catch (e: Exception) {
+//            call.respond(HttpStatusCode.InternalServerError, "Failed to generate email: ${e.message}")
+//        }
+//    }
+//}
+//
+//fun Application.configureRouting(emailGenerationService: EmailGenerationService) {
+//    routing {
+//        emailRoutes(emailGenerationService)
+//        get("/status") {
+//            call.respond(HttpStatusCode.OK, "Service is running")
+//        }
+//    }
+//}

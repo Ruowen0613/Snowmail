@@ -4,19 +4,22 @@ package service
 import ca.uwaterloo.model.Education
 import ca.uwaterloo.model.EducationWithDegreeName
 import ca.uwaterloo.model.WorkExperience
+import ca.uwaterloo.service.ParserService
 import integration.OpenAIClient
 
 import model.UserInput
 import model.GeneratedEmail
 import model.UserProfile
+import java.io.File
 
-class EmailGenerationService(private val openAIClient: OpenAIClient) {
+class EmailGenerationService(private val openAIClient: OpenAIClient, private val parserService: ParserService) {
 
-     suspend fun generateEmail(userInput: UserInput, userProfile: UserProfile, education: List<EducationWithDegreeName>, workExperience: List<WorkExperience>, skills: List<String>): GeneratedEmail {
+     suspend fun generateEmail(userInput: UserInput, userProfile: UserProfile, userResume: File, skills: List<String>): GeneratedEmail? {
           val cleanedInput = cleanInput(userInput)
+          val resumeText = parserService.extractTextFromPDF(userResume)
 
           return try {
-               openAIClient.generateEmail(cleanedInput, userProfile, education, workExperience, skills)
+               parserService.parseEmailContent(openAIClient.generateEmail(resumeText, userInput, skills))
           } catch (e: Exception) {
                // Handle exceptions and return a meaningful error response
                throw RuntimeException("Failed to generate email: ${e.message}")

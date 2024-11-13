@@ -43,7 +43,7 @@ data class Message(
 class OpenAIClient(private val httpClient: HttpClient) {
 
 
-    suspend fun generateEmail2(resumeText:String, userInput: UserInput): String? {
+    suspend fun generateEmail(resumeText:String, userInput: UserInput, skills: List<String>): String? {
         val prompt = buildPrompt2(resumeText, userInput)
         val message = prepareMessage(prompt)
         val response = sendOpenAIRequest(message)
@@ -52,13 +52,13 @@ class OpenAIClient(private val httpClient: HttpClient) {
     }
 
 
-    suspend fun generateEmail(userInput: UserInput, userProfile: UserProfile, education: List<EducationWithDegreeName>, workExperience: List<WorkExperience>, skills: List<String>): GeneratedEmail {
-        val prompt = buildPrompt(userInput, userProfile, education, workExperience)
-        val message = prepareMessage(prompt)
-        val response = sendOpenAIRequest(message)
-        val emailContent = getEmailContent(response)
-        return parseGeneratedText(emailContent)
-    }
+//    suspend fun generateEmail(userInput: UserInput, userProfile: UserProfile, education: List<EducationWithDegreeName>, workExperience: List<WorkExperience>, skills: List<String>): GeneratedEmail {
+//        val prompt = buildPrompt(userInput, userProfile, education, workExperience, skills)
+//        val message = prepareMessage(prompt)
+//        val response = sendOpenAIRequest(message)
+//        val emailContent = getEmailContent(response)
+//        return parseGeneratedText(emailContent)
+//    }
 
     private fun buildPrompt2(resumeText: String, userInput: UserInput): String {
         val companyName = userInput.company
@@ -77,8 +77,8 @@ class OpenAIClient(private val httpClient: HttpClient) {
 
 
 
-    private fun buildPrompt(userInput: UserInput, userProfile: UserProfile, education: List<EducationWithDegreeName>, workExperience: List<WorkExperience>): String {
-        val skills = userProfile.skills?.joinToString(", ") ?: "Not provided"
+    private fun buildPrompt(userInput: UserInput, userProfile: UserProfile, education: List<EducationWithDegreeName>, workExperience: List<WorkExperience>, skills: List<String>): String {
+        val skills = skills?.joinToString(", ") ?: "Not provided"
 
         val educationDetails = education.joinToString("\n") { e ->
             """

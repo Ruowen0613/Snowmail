@@ -62,9 +62,12 @@ suspend fun main() {
     )
 
     runBlocking {
-        val generatedEmail = openAIClient.generateEmail2(resumeText, userInput)
+        val generatedEmail = openAIClient.generateEmail(resumeText, userInput, listOf("Python", "Java", "C++"))
 
-        print(resumeParserController.parseEmailContent(generatedEmail))
+        println(generatedEmail)
+        // print(resumeParserController.parseEmailContent(generatedEmail))
+
+        println()
     }
 
 }

@@ -35,6 +35,7 @@ import ca.uwaterloo.controller.ProfileController
 import ca.uwaterloo.model.Education
 import ca.uwaterloo.model.EducationWithDegreeName
 import ca.uwaterloo.model.WorkExperience
+import ca.uwaterloo.service.ParserService
 import controller.send_email
 import integration.SupabaseClient
 import kotlinx.coroutines.runBlocking
@@ -59,7 +60,8 @@ fun EmailGenerationPage(NavigateToDocuments: () -> Unit, NavigateToProfile: () -
     val openAIClient = OpenAIClient(httpClient)
 
     // Create an instance of EmailGenerationService
-    val emailGenerationService = EmailGenerationService(openAIClient)
+    val parserService = ParserService(openAIClient)
+    val emailGenerationService = EmailGenerationService(openAIClient, parserService)
 
     // user input values
     var companyInput by remember { mutableStateOf("company name") }
@@ -292,19 +294,20 @@ fun EmailGenerationPage(NavigateToDocuments: () -> Unit, NavigateToProfile: () -
                         Spacer(modifier = Modifier.weight(0.1f))
 
                         Button(
-                            onClick = {
-                                coroutineScope.launch(Dispatchers.IO) {
-                                    try {
-                                        val generatedEmail =
-                                            emailGenerationService.generateEmail(userInput, userProfile, gotEducation, gotWorkExperience, gotSkills)
-                                        println("Generated Email: ${generatedEmail.body}")
-                                        emailContent = generatedEmail.body ?: "Failed to generate email"
-                                        showDialog = true
-                                    } catch (e: Exception) {
-                                        println("Error: ${e.message}")
-                                    }
-                                }
-                            },
+                            onClick = {},
+//                            onClick = {
+//                                coroutineScope.launch(Dispatchers.IO) {
+//                                    try {
+//                                        val generatedEmail =
+//                                            emailGenerationService.generateEmail(userInput, userProfile, gotEducation, gotWorkExperience, gotSkills)
+//                                        println("Generated Email: ${generatedEmail.body}")
+//                                        emailContent = generatedEmail.body ?: "Failed to generate email"
+//                                        showDialog = true
+//                                    } catch (e: Exception) {
+//                                        println("Error: ${e.message}")
+//                                    }
+//                                }
+//                            },
                             modifier = Modifier.fillMaxWidth(),
                             colors = ButtonDefaults.buttonColors(
                                 backgroundColor = Color(0xFF487B96),

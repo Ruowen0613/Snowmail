@@ -16,6 +16,10 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import ca.uwaterloo.controller.SignUpController
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Clear
 
 
 // import ca.uwaterloo.persistence.DBStorage
@@ -73,6 +77,9 @@ fun SignUpPage(NavigateToLogin: () -> Unit, NavigateToHome: () -> Unit) {
 fun RegisterForm(NavigateToLogin: () -> Unit, NavigateToHome: () -> Unit) {
     val dbStorage = SupabaseClient()
     val signInController = SignUpController(dbStorage.authRepository)
+    var passwordVisible by remember { mutableStateOf(false) }
+    var confirmPasswordVisible by remember { mutableStateOf(false) }
+
     Box (Modifier.fillMaxWidth(0.7f).fillMaxHeight().background(Color(formColor))) {
         Row {
             Column(Modifier.fillMaxWidth(0.1f)) { Box {} }
@@ -88,6 +95,7 @@ fun RegisterForm(NavigateToLogin: () -> Unit, NavigateToHome: () -> Unit) {
                 var lastName by remember { mutableStateOf("") }
                 var email by remember { mutableStateOf("") }
                 var password by remember { mutableStateOf("") }
+                var passwordConfirm by remember { mutableStateOf("") }
 
                 Row(Modifier.fillMaxWidth()) {
                     // first name input
@@ -118,9 +126,46 @@ fun RegisterForm(NavigateToLogin: () -> Unit, NavigateToHome: () -> Unit) {
                 Row(modifier = Modifier.fillMaxHeight(0.03f)) {}
                 // password input
                 Row { Text("Password") }
-                Row { OutlinedTextField(value = password, onValueChange = { password = it }, singleLine = true, modifier = Modifier.fillMaxWidth(),
-                    visualTransformation = PasswordVisualTransformation()
-                ) }
+                Row {
+                    OutlinedTextField(
+                        value = password,
+                        onValueChange = { password = it },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                        trailingIcon = {
+                            TextButton(onClick = { passwordVisible = !passwordVisible }) {
+                                Text(if (passwordVisible) "Hide" else "Show",
+                                    color = Color.Gray)
+                            }
+                        }
+                    )
+                }
+
+                Row(modifier = Modifier.fillMaxHeight(0.03f)) {}
+                Row { Text("Confirm Password") }
+                Row {
+                    OutlinedTextField(
+                        value = passwordConfirm,
+                        onValueChange = { passwordConfirm = it },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                        visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                        trailingIcon = {
+                            if (password == passwordConfirm && password.isNotEmpty()) {
+                                Icon(
+                                    imageVector = Icons.Filled.Check,
+                                    contentDescription = "Passwords match"
+                                )
+                            } else {
+                                TextButton(onClick = { confirmPasswordVisible = !confirmPasswordVisible }) {
+                                    Text(if (confirmPasswordVisible) "Hide" else "Show",
+                                    color = Color.Gray)
+                                }
+                            }
+                        }
+                    )
+                }
 
                 val errorInformation = true
                 var errorMessage by remember { mutableStateOf("") }
@@ -143,6 +188,9 @@ fun RegisterForm(NavigateToLogin: () -> Unit, NavigateToHome: () -> Unit) {
 
                         // if password is too short
                         else if (password.length < 6) errorMessage = "Password is too short"
+
+                        // if password is not confirmed
+                        else if (password != passwordConfirm) errorMessage = "Passwords do not match"
 
                         else {
                             val result = signInController.signUpUser(email, password, firstName, lastName)

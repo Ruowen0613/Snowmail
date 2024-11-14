@@ -50,6 +50,8 @@ dependencies {
 
     testImplementation(kotlin("test"))
 
+    implementation("org.slf4j:slf4j-simple:2.0.0")
+
 
     // implementation(platform("io.github.jan-tennert.supabase:bom:0.9.0"))
     implementation(platform(libs.supabase.bom))
@@ -59,6 +61,8 @@ dependencies {
     implementation(libs.supabase.storage)
 
     implementation(kotlin("stdlib-jdk8"))
+
+    implementation(libs.pdfbox)
 
     // for javamail
     implementation("javax.mail:javax.mail-api:1.6.2")

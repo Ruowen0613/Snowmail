@@ -2,43 +2,35 @@ package ca.uwaterloo.view
 
 
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
 //import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import io.ktor.client.*
-import io.ktor.client.engine.cio.*
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.Dispatchers
-import model.UserInput
-import model.UserProfile
 //import kotlinx.serialization.Serializable
 
-import androidx.compose.ui.window.application
-import androidx.compose.ui.window.Window
-import service.EmailGenerationService
-import integration.OpenAIClient
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.ui.graphics.Color
-import androidx.compose.foundation.background
+import androidx.compose.material.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.border
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
-
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.application
 import ca.uwaterloo.controller.ProfileController
-import ca.uwaterloo.model.Education
 import ca.uwaterloo.model.EducationWithDegreeName
 import ca.uwaterloo.model.WorkExperience
+import ca.uwaterloo.service.ParserService
 import controller.send_email
 import integration.SupabaseClient
+import io.ktor.client.*
+import io.ktor.client.engine.cio.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.datetime.LocalDate
+import model.UserInput
+import model.UserProfile
+import service.EmailGenerationService
 
 
 @Composable
@@ -59,7 +51,8 @@ fun EmailGenerationPage(NavigateToDocuments: () -> Unit, NavigateToProfile: () -
     val openAIClient = OpenAIClient(httpClient)
 
     // Create an instance of EmailGenerationService
-    val emailGenerationService = EmailGenerationService(openAIClient)
+    val parserService = ParserService(openAIClient)
+    val emailGenerationService = EmailGenerationService(openAIClient, parserService)
 
     // user input values
     var companyInput by remember { mutableStateOf("company name") }
@@ -292,19 +285,20 @@ fun EmailGenerationPage(NavigateToDocuments: () -> Unit, NavigateToProfile: () -
                         Spacer(modifier = Modifier.weight(0.1f))
 
                         Button(
-                            onClick = {
-                                coroutineScope.launch(Dispatchers.IO) {
-                                    try {
-                                        val generatedEmail =
-                                            emailGenerationService.generateEmail(userInput, userProfile, gotEducation, gotWorkExperience, gotSkills)
-                                        println("Generated Email: ${generatedEmail.body}")
-                                        emailContent = generatedEmail.body ?: "Failed to generate email"
-                                        showDialog = true
-                                    } catch (e: Exception) {
-                                        println("Error: ${e.message}")
-                                    }
-                                }
-                            },
+                            onClick = {},
+//                            onClick = {
+//                                coroutineScope.launch(Dispatchers.IO) {
+//                                    try {
+//                                        val generatedEmail =
+//                                            emailGenerationService.generateEmail(userInput, userProfile, gotEducation, gotWorkExperience, gotSkills)
+//                                        println("Generated Email: ${generatedEmail.body}")
+//                                        emailContent = generatedEmail.body ?: "Failed to generate email"
+//                                        showDialog = true
+//                                    } catch (e: Exception) {
+//                                        println("Error: ${e.message}")
+//                                    }
+//                                }
+//                            },
                             modifier = Modifier.fillMaxWidth(),
                             colors = ButtonDefaults.buttonColors(
                                 backgroundColor = Color(0xFF487B96),
@@ -405,9 +399,11 @@ fun EditableAlertDialog(
                 )
             }
         },
+
         confirmButton = {
             Button(onClick = {
                 onConfirm(text)
+                /*
                 send_email(
                     senderEmail = "cs346test@gmail.com", //call getEmail to get user's email
                     password = "qirk dyef rvbv bkka",
@@ -416,7 +412,7 @@ fun EditableAlertDialog(
                     text = text,
                     fileURLs = listOf(),
                     fileNames = listOf()
-                )},
+                )*/},
                     colors = ButtonDefaults.buttonColors(
                     backgroundColor = Color(0xFF487B96),
                 contentColor = MaterialTheme.colors.onPrimary

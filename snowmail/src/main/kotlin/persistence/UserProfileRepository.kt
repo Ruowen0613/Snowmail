@@ -95,7 +95,7 @@ class UserProfileRepository(private val supabase: SupabaseClient) : IUserProfile
                         eq("user_id", userId)
                     }
                 }
-                .decodeSingle<Map<String, String>>()
+                .decodeSingle<Map<String, String?>>()
 
             val phone = phoneResult["phone"] ?: ""
             Result.success(phone)

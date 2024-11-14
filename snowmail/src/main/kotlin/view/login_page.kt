@@ -20,6 +20,10 @@ import kotlinx.coroutines.runBlocking
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Search
 
 import integration.SupabaseClient
 
@@ -113,6 +117,7 @@ fun loginForm(NavigateToSignup: () -> Unit, NavigateToHome: () -> Unit) {
 fun loginWithAccount(NavigateToSignup: () -> Unit, NavigateToHome: () -> Unit) {
     val dbStorage = SupabaseClient()
     val signInController = SignInController(dbStorage.authRepository)
+    var passwordVisible by remember { mutableStateOf(false) }
     Column (
         modifier = Modifier.fillMaxWidth().padding(horizontal = 160.dp).padding(vertical = 15.dp)){
 
@@ -127,12 +132,28 @@ fun loginWithAccount(NavigateToSignup: () -> Unit, NavigateToHome: () -> Unit) {
         Row { Text("Password") }
         Row(modifier = Modifier.fillMaxHeight(0.03f)) { Box{} }
         var password by remember { mutableStateOf("") }
+//        Row {
+//            OutlinedTextField(
+//                value = password,
+//                onValueChange =  {password = it}, modifier = Modifier.fillMaxWidth(), singleLine = true,
+//                visualTransformation = PasswordVisualTransformation()) }
         Row {
             OutlinedTextField(
                 value = password,
-                onValueChange =  {password = it}, modifier = Modifier.fillMaxWidth(), singleLine = true,
-                visualTransformation = PasswordVisualTransformation()) }
-
+                onValueChange = { password = it },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                trailingIcon = {
+                    TextButton(onClick = { passwordVisible = !passwordVisible }) {
+                        Text(
+                            text = if (passwordVisible) "Hide" else "Show",
+                            color = Color.Gray // Set text color to grey
+                        )
+                    }
+                }
+            )
+        }
 
         Row(modifier = Modifier.fillMaxHeight(0.07f)) { Box{} }
         // potential error message shown

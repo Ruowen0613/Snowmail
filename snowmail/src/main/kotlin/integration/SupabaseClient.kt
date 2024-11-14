@@ -4,16 +4,12 @@ import ca.uwaterloo.persistence.AuthRepository
 import ca.uwaterloo.persistence.DocumentRepository
 import ca.uwaterloo.persistence.UserProfileRepository
 import io.github.jan.supabase.auth.Auth
-import io.github.jan.supabase.auth.status.SessionSource
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.storage.Bucket
 import io.github.jan.supabase.storage.Storage
 import io.github.jan.supabase.storage.storage
-import io.ktor.http.ContentDisposition.Companion.File
 import kotlinx.coroutines.runBlocking
-import kotlinx.datetime.LocalDate
-import java.io.File
 
 class SupabaseClient {
     private val supabase = createSupabaseClient(

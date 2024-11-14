@@ -1,45 +1,73 @@
 package controller
 
+import ca.uwaterloo.persistence.IJobApplicationRepository
+import io.github.jan.supabase.auth.Auth
+import io.github.jan.supabase.createSupabaseClient
+import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.storage.Storage
 import model.email
+import persistence.JobApplicationRepository
 import service.sendEmail
 
-
 // functions to send email
-fun send_email(
+suspend fun send_email(
     senderEmail: String,
     password: String,
     recipient: String,
     subject: String,
     text: String,
     fileURLs: List<String>,
-    fileNames: List<String>) {
+    fileNames: List<String>,
+    // new parameters from Sprint 2:
+    jobApplicationRepository: IJobApplicationRepository,
+    userID: String,
+    jobTitle: String,
+    companyName: String
+
+) {
+
         val Email = email(senderEmail, password, recipient, subject, text, fileURLs, fileNames)
         sendEmail(Email)
+
+        // update last refresh time if necessary
+        jobApplicationRepository.updateRefreshTime(userID)
+
+        // save job application
+        jobApplicationRepository.createJobApplication(
+            userID,
+            jobTitle,
+            companyName,
+            recipient
+        )
+
+}
+
+
+suspend fun main() {
+    val senderEmail = "cs346test@gmail.com"
+    val password = "qirk dyef rvbv bkka"
+    val recipient = "irishuang1105@gmail.com"
+    val subject = "subject"
+    val text = "text"
+    val userID = "ed52b6c4-2ae8-4b58-bacd-adc00082a505"
+    val jobTitle = "Software Developer"
+    val companyName = "Google"
+    val supabase = createSupabaseClient(
+        supabaseUrl = "https://gwnlngyvkxdpodenpyyj.supabase.co",
+        supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd3bmxuZ3l2a3hkcG9kZW5weXlqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjc5MTAxNTEsImV4cCI6MjA0MzQ4NjE1MX0.olncAUMxSOjcr0YjssWXThtXDXC3q4zasdNYdwavt8g"
+    ) {
+        install(Postgrest)
+        install(Auth)
+        install(Storage)
+    }
+    val JobApplicationRepository = JobApplicationRepository(supabase)
+    send_email(senderEmail, password, recipient, subject, text, listOf(), listOf(), JobApplicationRepository, userID, jobTitle, companyName)
 }
 
 
 
 
 
-fun main() {
-
-    // examples
-   send_email(senderEmail = "cs346test@gmail.com",
-       password = "qirk dyef rvbv bkka",
-       recipient = "irishuang1105@gmail.com",
-       subject = "Test Email",
-       text = "This is a test email",
-       fileURLs = listOf("https://gwnlngyvkxdpodenpyyj.supabase.co/storage/v1/object/sign/testEmailSending/CS341%20lec%2013.pdf?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJ0ZXN0RW1haWxTZW5kaW5nL0NTMzQxIGxlYyAxMy5wZGYiLCJpYXQiOjE3MzAzNTczNjUsImV4cCI6MTc2MTg5MzM2NX0.g03s4yqS5LP5EAtAPdNbsiPEBjsfvTs86M97vFj9XcE&t=2024-10-31T06%3A49%3A24.915Z"),
-       fileNames = listOf("CS341 lec 13.pdf"))
-
-    send_email(senderEmail = "cs346test@gmail.com",
-        password = "qirk dyef rvbv bkka",
-        recipient = "irishuang1105@gmail.com",
-        subject = "Test Email",
-        text = "This is a test email",
-        fileURLs = listOf(),
-        fileNames = listOf())
-}
 
 
 

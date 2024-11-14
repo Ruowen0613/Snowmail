@@ -6,6 +6,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.application
+import ca.uwaterloo.service.ParserService
 import ca.uwaterloo.view.*
 import integration.OpenAIClient
 import io.ktor.client.*
@@ -17,8 +18,10 @@ fun main() {
     val httpClient = HttpClient(CIO)
     val openAIClient = OpenAIClient(httpClient)
 
+    val parserService = ParserService(openAIClient)
+
     // Initialize the EmailGenerationService
-    val emailGenerationService = EmailGenerationService(openAIClient)
+    val emailGenerationService = EmailGenerationService(openAIClient, parserService)
 
     // Start the Ktor server in a separate thread
 //    thread {
@@ -29,7 +32,7 @@ fun main() {
 
 
     application {
-        Window(onCloseRequest = ::exitApplication, state = WindowState(size = DpSize(1200.dp, 800.dp))) {
+        Window(onCloseRequest = ::exitApplication, title = "Snowmail", state = WindowState(size = DpSize(1200.dp, 800.dp))) {
             websitePage()
         }
     }
@@ -50,7 +53,7 @@ fun websitePage() {
         "welcome3" -> WelcomePage3 ({ currentPage = "signup"}, {currentPage = "login"}, {currentPage = "welcome4"})
         "welcome4" -> WelcomePage4 ({ currentPage = "signup"}, {currentPage = "login"})
         "profilePage" -> ProfilePage(UserSession.userId ?: "DefaultUserId", { currentPage = "profilePage"}, { currentPage = "emailgeneration"}, { currentPage = "progressPage"})
-        "emailgeneration" -> EmailGenerationPage({ currentPage = "profilePage"}, { currentPage = "profilePage"}, { currentPage = "profilePage"})
+        "emailgeneration" -> EmailGenerationPage({ currentPage = "profilePage"}, { currentPage = "profilePage"}, { currentPage = "progressPage"})
         "progressPage" -> JobProgressPage({ currentPage = "profilePage"}, { currentPage = "profilePage"}, { currentPage = "emailgeneration"})
     }
 }

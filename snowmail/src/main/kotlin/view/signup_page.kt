@@ -16,6 +16,10 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import ca.uwaterloo.controller.SignUpController
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Clear
 
 
 // import ca.uwaterloo.persistence.DBStorage
@@ -73,6 +77,9 @@ fun SignUpPage(NavigateToLogin: () -> Unit, NavigateToHome: () -> Unit) {
 fun RegisterForm(NavigateToLogin: () -> Unit, NavigateToHome: () -> Unit) {
     val dbStorage = SupabaseClient()
     val signInController = SignUpController(dbStorage.authRepository)
+    var passwordVisible by remember { mutableStateOf(false) }
+    var confirmPasswordVisible by remember { mutableStateOf(false) }
+
     Box (Modifier.fillMaxWidth(0.7f).fillMaxHeight().background(Color(formColor))) {
         Row {
             Column(Modifier.fillMaxWidth(0.1f)) { Box {} }
@@ -119,9 +126,21 @@ fun RegisterForm(NavigateToLogin: () -> Unit, NavigateToHome: () -> Unit) {
                 Row(modifier = Modifier.fillMaxHeight(0.03f)) {}
                 // password input
                 Row { Text("Password") }
-                Row { OutlinedTextField(value = password, onValueChange = { password = it }, singleLine = true, modifier = Modifier.fillMaxWidth(),
-                    visualTransformation = PasswordVisualTransformation()
-                ) }
+                Row {
+                    OutlinedTextField(
+                        value = password,
+                        onValueChange = { password = it },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                        trailingIcon = {
+                            TextButton(onClick = { passwordVisible = !passwordVisible }) {
+                                Text(if (passwordVisible) "Hide" else "Show",
+                                    color = Color.Gray)
+                            }
+                        }
+                    )
+                }
 
                 Row(modifier = Modifier.fillMaxHeight(0.03f)) {}
                 Row { Text("Confirm Password") }
@@ -131,7 +150,20 @@ fun RegisterForm(NavigateToLogin: () -> Unit, NavigateToHome: () -> Unit) {
                         onValueChange = { passwordConfirm = it },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth(),
-                        visualTransformation = PasswordVisualTransformation()
+                        visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                        trailingIcon = {
+                            if (password == passwordConfirm && password.isNotEmpty()) {
+                                Icon(
+                                    imageVector = Icons.Filled.Check,
+                                    contentDescription = "Passwords match"
+                                )
+                            } else {
+                                TextButton(onClick = { confirmPasswordVisible = !confirmPasswordVisible }) {
+                                    Text(if (confirmPasswordVisible) "Hide" else "Show",
+                                    color = Color.Gray)
+                                }
+                            }
+                        }
                     )
                 }
 

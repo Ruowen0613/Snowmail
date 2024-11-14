@@ -29,7 +29,7 @@ fun main() {
 
 
     application {
-        Window(onCloseRequest = ::exitApplication, state = WindowState(size = DpSize(1200.dp, 800.dp))) {
+        Window(onCloseRequest = ::exitApplication, title = "Snowmail", state = WindowState(size = DpSize(1200.dp, 800.dp))) {
             websitePage()
         }
     }
@@ -50,7 +50,7 @@ fun websitePage() {
         "welcome3" -> WelcomePage3 ({ currentPage = "signup"}, {currentPage = "login"}, {currentPage = "welcome4"})
         "welcome4" -> WelcomePage4 ({ currentPage = "signup"}, {currentPage = "login"})
         "profilePage" -> ProfilePage(UserSession.userId ?: "DefaultUserId", { currentPage = "profilePage"}, { currentPage = "emailgeneration"}, { currentPage = "progressPage"})
-        "emailgeneration" -> EmailGenerationPage({ currentPage = "profilePage"}, { currentPage = "profilePage"}, { currentPage = "profilePage"})
+        "emailgeneration" -> EmailGenerationPage({ currentPage = "profilePage"}, { currentPage = "profilePage"}, { currentPage = "progressPage"})
         "progressPage" -> JobProgressPage({ currentPage = "profilePage"}, { currentPage = "profilePage"}, { currentPage = "emailgeneration"})
     }
 }

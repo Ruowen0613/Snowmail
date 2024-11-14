@@ -14,7 +14,19 @@ import java.io.File
 
 class EmailGenerationService(private val openAIClient: OpenAIClient, private val parserService: ParserService) {
 
-     suspend fun generateEmail(userInput: UserInput, userProfile: UserProfile, userResume: File, skills: List<String>): GeneratedEmail? {
+     suspend fun generateEmailFromResume(userInput: UserInput, userProfile: UserProfile, userResume: File, skills: List<String>): GeneratedEmail? {
+          val cleanedInput = cleanInput(userInput)
+          val resumeText = parserService.extractTextFromPDF(userResume)
+
+          return try {
+               parserService.parseEmailContent(openAIClient.generateEmail(resumeText, userInput, skills))
+          } catch (e: Exception) {
+               // Handle exceptions and return a meaningful error response
+               throw RuntimeException("Failed to generate email: ${e.message}")
+          }
+     }
+
+     suspend fun generateEmailFromProfile(userInput: UserInput, userProfile: UserProfile, education: List<EducationWithDegreeName>, workExperience: List<WorkExperience>, skills: List<String>): GeneratedEmail? {
           val cleanedInput = cleanInput(userInput)
           val resumeText = parserService.extractTextFromPDF(userResume)
 

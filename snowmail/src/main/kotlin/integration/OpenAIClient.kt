@@ -2,6 +2,7 @@ package integration
 
 import ca.uwaterloo.model.Education
 import ca.uwaterloo.model.EducationWithDegreeName
+import ca.uwaterloo.model.PersonalProject
 import ca.uwaterloo.model.WorkExperience
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -42,25 +43,23 @@ data class Message(
 
 class OpenAIClient(private val httpClient: HttpClient) {
 
-
-    suspend fun generateEmail(resumeText:String, userInput: UserInput, skills: List<String>): String? {
-        val prompt = buildPrompt2(resumeText, userInput)
+    suspend fun generateEmailFromResume(userInput: UserInput, userProfile: UserProfile, resumeText:String): String? {
+        val prompt = buildPromptFromResume(userInput, userProfile, resumeText)
         val message = prepareMessage(prompt)
         val response = sendOpenAIRequest(message)
         val emailContent = getEmailContent(response)
         return emailContent
     }
 
+    suspend fun generateEmailFromProfile(userInput: UserInput, userProfile: UserProfile, education: List<EducationWithDegreeName>, workExperience: List<WorkExperience>, projects: List<PersonalProject>, skills: List<String>): String? {
+        val prompt = buildPromptFromProfile(userInput, userProfile, education, workExperience, projects, skills)
+        val message = prepareMessage(prompt)
+        val response = sendOpenAIRequest(message)
+        val emailContent = getEmailContent(response)
+        return emailContent
+    }
 
-//    suspend fun generateEmail(userInput: UserInput, userProfile: UserProfile, education: List<EducationWithDegreeName>, workExperience: List<WorkExperience>, skills: List<String>): GeneratedEmail {
-//        val prompt = buildPrompt(userInput, userProfile, education, workExperience, skills)
-//        val message = prepareMessage(prompt)
-//        val response = sendOpenAIRequest(message)
-//        val emailContent = getEmailContent(response)
-//        return parseGeneratedText(emailContent)
-//    }
-
-    private fun buildPrompt2(resumeText: String, userInput: UserInput): String {
+    private fun buildPromptFromResume(userInput: UserInput, userProfile: UserProfile, resumeText: String, ): String {
         val companyName = userInput.company
         val jobDescription = userInput.jobDescription
         val recruiterName = userInput.recruiterName
@@ -75,10 +74,12 @@ class OpenAIClient(private val httpClient: HttpClient) {
         """.trimIndent()
     }
 
+    private fun buildPromptFromProfile(userInput: UserInput, userProfile: UserProfile, education: List<EducationWithDegreeName>, workExperience: List<WorkExperience>, projects: List<PersonalProject>, skills: List<String>): String {
+        val companyName = userInput.company
+        val jobDescription = userInput.jobDescription
+        val recruiterName = userInput.recruiterName
 
-
-    private fun buildPrompt(userInput: UserInput, userProfile: UserProfile, education: List<EducationWithDegreeName>, workExperience: List<WorkExperience>, skills: List<String>): String {
-        val skills = skills?.joinToString(", ") ?: "Not provided"
+        val userSkills = skills?.joinToString(", ") ?: "Not provided"
 
         val educationDetails = education.joinToString("\n") { e ->
             """
@@ -97,18 +98,29 @@ class OpenAIClient(private val httpClient: HttpClient) {
             """.trimIndent()
         }
 
+        val projectDetails = projects.joinToString("\n") { p ->
+            """
+            - Project Name: ${p.projectName}
+            - Description: ${p.description}
+            """.trimIndent()
+        }
 
         return """
-            Job Description: ${userInput.jobDescription}
-            User Profile:
-            - First Name: ${userProfile.firstName}
-            - Last Name: ${userProfile.lastName}
-            - Skills: $skills
+            The company I am looking to apply to is $companyName, with the following job description: $jobDescription.
+            
+            Here is my resume overview:
+            First Name: ${userProfile.firstName}
+            Last Name: ${userProfile.lastName}
+            Skills: $userSkills
             Education:
             $educationDetails
             Work Experience:
             $workExperienceDetails
-            """.trimIndent()
+            Personal Projects:
+            $projectDetails
+            
+            Send a job application email to the recruiter, $recruiterName, that is personalized, formal, and aligned with my profile, skills, and experience as they relate to the job description provided. 
+        """.trimIndent()
     }
 
     private fun prepareMessage(prompt: String): List<Map<String, String>> {
@@ -183,25 +195,6 @@ class OpenAIClient(private val httpClient: HttpClient) {
             null
         }
     }
-
-    private suspend fun parseGeneratedText(responseBody: String?): GeneratedEmail {
-        // This needs to be improved
-        val prompt = """
-            This is the generated email:
-            $responseBody
-            
-            Return a tuple with the subject in the first element and the body in the second element.
-        """.trimIndent()
-
-
-
-        val message = prepareMessage(prompt)
-        val response = sendOpenAIRequest(message)
-        val emailContent = getEmailContent(response)
-
-        return GeneratedEmail("Subject", emailContent)
-    }
-
 
     suspend fun parseResume(resumeText: String): Map<String, Any> {
         val prompt = """

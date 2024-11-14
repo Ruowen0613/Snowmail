@@ -38,6 +38,7 @@ class ProgressController(private val jobApplicationRepository: IJobApplicationRe
     //     recruiterEmail = job.recruiterEmail
 
     suspend fun getProgress(userId: String): Progress {
+        jobApplicationRepository.updateRefreshTime(userId)
         return jobApplicationRepository.getProgress(userId).getOrNull()!!
     }
 

@@ -50,6 +50,8 @@ dependencies {
 
     testImplementation(kotlin("test"))
 
+    implementation("org.slf4j:slf4j-simple:2.0.0")
+
 
     // implementation(platform("io.github.jan-tennert.supabase:bom:0.9.0"))
     implementation(platform(libs.supabase.bom))
@@ -77,16 +79,6 @@ tasks.test {
 }
 kotlin {
     jvmToolchain(20)
-}
-
-sourceSets {
-    main {
-        kotlin.srcDir("src/main/kotlin")
-    }
-    test {
-        kotlin.srcDir("src/test/kotlin")
-        resources.srcDir("src/test/resources")
-    }
 }
 
 compose.desktop {

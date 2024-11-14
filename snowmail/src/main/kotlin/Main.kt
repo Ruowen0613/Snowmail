@@ -6,6 +6,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.application
+import ca.uwaterloo.service.ParserService
 import ca.uwaterloo.view.*
 import integration.OpenAIClient
 import io.ktor.client.*
@@ -17,8 +18,10 @@ fun main() {
     val httpClient = HttpClient(CIO)
     val openAIClient = OpenAIClient(httpClient)
 
+    val parserService = ParserService(openAIClient)
+
     // Initialize the EmailGenerationService
-    val emailGenerationService = EmailGenerationService(openAIClient)
+    val emailGenerationService = EmailGenerationService(openAIClient, parserService)
 
     // Start the Ktor server in a separate thread
 //    thread {

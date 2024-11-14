@@ -2,7 +2,7 @@
 <module external.linked.project.id="snowmail:test" external.linked.project.path="$MODULE_DIR$/../../snowmail" external.root.project.path="$MODULE_DIR$/../../snowmail" external.system.id="GRADLE" external.system.module.group="ca.uwaterloo" external.system.module.type="sourceSet" external.system.module.version="0.10" type="JAVA_MODULE" version="4">
   <component name="FacetManager">
     <facet external-system-id="GRADLE" type="kotlin-language" name="Kotlin">
-      <configuration version="5" platform="JVM 20" allPlatforms="JVM [20]" useProjectSettings="false" pureKotlinSourceFolders="$MODULE_DIR$/../../snowmail/src/test/kotlin;/Users/wangruowen/Desktop/cs346/5/team-101-11/snowmail/src/main/kotlin;/Users/wangruowen/Desktop/cs346/5/team-101-11/snowmail/build/generated/compose/resourceGenerator/kotlin/testResourceAccessors;/Users/wangruowen/Desktop/cs346/5/team-101-11/snowmail/build/generated/compose/resourceGenerator/kotlin/commonResClass;/Users/wangruowen/Desktop/cs346/5/team-101-11/snowmail/build/generated/compose/resourceGenerator/kotlin/mainResourceAccessors">
+      <configuration version="5" platform="JVM 20" allPlatforms="JVM [20]" useProjectSettings="false" pureKotlinSourceFolders="$MODULE_DIR$/../../snowmail/src/test/kotlin;/Users/sourishdas/Desktop/team-101-11/snowmail/src/main/kotlin;/Users/sourishdas/Desktop/team-101-11/snowmail/build/generated/compose/resourceGenerator/kotlin/commonResClass;/Users/sourishdas/Desktop/team-101-11/snowmail/build/generated/compose/resourceGenerator/kotlin/testResourceAccessors;/Users/sourishdas/Desktop/team-101-11/snowmail/build/generated/compose/resourceGenerator/kotlin/mainResourceAccessors">
         <additionalVisibleModuleNames>snowmail:main</additionalVisibleModuleNames>
         <compilerSettings />
         <compilerArguments>
@@ -43,21 +43,28 @@
     </facet>
   </component>
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_20">
-    <output-test url="file://$MODULE_DIR$/../../snowmail/build/classes/java/test" />
+    <output-test url="file://$MODULE_DIR$/../../snowmail/build/classes/kotlin/test" />
     <exclude-output />
     <content url="file://$MODULE_DIR$/../../snowmail/build/generated/compose/resourceGenerator/kotlin/testResourceAccessors" />
     <content url="file://$MODULE_DIR$/../../snowmail/build/generated/compose/resourceGenerator/preparedResources/test/composeResources" />
     <content url="file://$MODULE_DIR$/../../snowmail/src/test">
       <sourceFolder url="file://$MODULE_DIR$/../../snowmail/src/test/kotlin" isTestSource="true" />
     </content>
-    <orderEntry type="jdk" jdkName="21" jdkType="JavaSDK" />
+    <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="snowmail.main" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-test-junit:1.8.0" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-test:2.0.20" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.0.20" level="project" />
+    <orderEntry type="library" name="Gradle: org.apache.pdfbox:pdfbox:2.0.24" level="project" />
+    <orderEntry type="library" name="Gradle: javax.mail:javax.mail-api:1.6.2" level="project" />
+    <orderEntry type="library" name="Gradle: com.sun.mail:javax.mail:1.6.2" level="project" />
+    <orderEntry type="library" name="Gradle: org.mockito.kotlin:mockito-kotlin:4.1.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.mockito:mockito-core:4.6.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.junit.jupiter:junit-jupiter:5.7.0" level="project" />
     <orderEntry type="library" name="Gradle: io.github.jan-tennert.supabase:realtime-kt-jvm:3.0.0" level="project" />
     <orderEntry type="library" name="Gradle: io.github.jan-tennert.supabase:postgrest-kt-jvm:3.0.0" level="project" />
+    <orderEntry type="library" name="Gradle: io.github.jan-tennert.supabase:storage-kt-jvm:3.0.0" level="project" />
     <orderEntry type="library" name="Gradle: io.github.jan-tennert.supabase:auth-kt-jvm:3.0.0" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlinx:kotlinx-datetime-jvm:0.6.1" level="project" />
     <orderEntry type="library" name="Gradle: io.ktor:ktor-client-serialization-jvm:2.3.4" level="project" />
@@ -69,10 +76,18 @@
     <orderEntry type="library" name="Gradle: io.ktor:ktor-client-core-jvm:3.0.0-rc-1" level="project" />
     <orderEntry type="library" name="Gradle: io.ktor:ktor-server-netty-jvm:2.3.4" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.7.2" level="project" />
+    <orderEntry type="library" name="Gradle: org.jetbrains.kotlinx:kotlinx-coroutines-test-jvm:1.9.0" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.9.0" level="project" />
     <orderEntry type="library" name="Gradle: junit:junit:4.13.2" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib:2.0.20" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.0.20" level="project" />
+    <orderEntry type="library" name="Gradle: org.apache.pdfbox:fontbox:2.0.24" level="project" />
+    <orderEntry type="library" name="Gradle: commons-logging:commons-logging:1.2" level="project" />
+    <orderEntry type="library" name="Gradle: javax.activation:activation:1.1" level="project" />
+    <orderEntry type="library" name="Gradle: net.bytebuddy:byte-buddy:1.12.10" level="project" />
+    <orderEntry type="library" name="Gradle: net.bytebuddy:byte-buddy-agent:1.12.10" level="project" />
+    <orderEntry type="library" name="Gradle: org.junit.jupiter:junit-jupiter-params:5.7.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.junit.jupiter:junit-jupiter-api:5.7.0" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-reflect:2.0.20" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.compose.desktop:desktop-jvm:1.6.11" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.9.0" level="project" />
@@ -83,12 +98,15 @@
     <orderEntry type="library" name="Gradle: io.netty:netty-transport-native-epoll:4.1.92.Final" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains:annotations:23.0.0" level="project" />
     <orderEntry type="library" name="Gradle: org.hamcrest:hamcrest-core:1.3" level="project" />
+    <orderEntry type="library" name="Gradle: org.apiguardian:apiguardian-api:1.1.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.junit.platform:junit-platform-commons:1.7.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.opentest4j:opentest4j:1.2.0" level="project" />
     <orderEntry type="library" name="Gradle: io.ktor:ktor-client-websockets-jvm:3.0.0-rc-1" level="project" />
+    <orderEntry type="library" name="Gradle: com.russhwolf:multiplatform-settings-no-arg-jvm:1.2.0" level="project" />
+    <orderEntry type="library" name="Gradle: com.russhwolf:multiplatform-settings-coroutines-jvm:1.2.0" level="project" />
     <orderEntry type="library" name="Gradle: io.github.jan-tennert.supabase:supabase-kt-jvm:3.0.0" level="project" />
     <orderEntry type="library" name="Gradle: io.ktor:ktor-server-cio-jvm:3.0.0-rc-1" level="project" />
     <orderEntry type="library" name="Gradle: io.ktor:ktor-server-core-jvm:3.0.0-rc-1" level="project" />
-    <orderEntry type="library" name="Gradle: com.russhwolf:multiplatform-settings-no-arg-jvm:1.2.0" level="project" />
-    <orderEntry type="library" name="Gradle: com.russhwolf:multiplatform-settings-coroutines-jvm:1.2.0" level="project" />
     <orderEntry type="library" name="Gradle: io.ktor:ktor-client-json-jvm:2.3.4" level="project" />
     <orderEntry type="library" name="Gradle: io.ktor:ktor-server-jvm:2.3.4" level="project" />
     <orderEntry type="library" name="Gradle: io.ktor:ktor-server-test-host-jvm:2.3.4" level="project" />
@@ -119,12 +137,12 @@
     <orderEntry type="library" name="Gradle: org.jetbrains.compose.ui:ui-desktop:1.6.11" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.compose.runtime:runtime-desktop:1.6.11" level="project" />
     <orderEntry type="library" name="Gradle: io.netty:netty-resolver:4.1.92.Final" level="project" />
+    <orderEntry type="library" name="Gradle: com.russhwolf:multiplatform-settings-jvm:1.2.0" level="project" />
     <orderEntry type="library" name="Gradle: io.ktor:ktor-serialization-kotlinx-json-jvm:3.0.0-rc-1" level="project" />
     <orderEntry type="library" name="Gradle: co.touchlab:kermit-jvm:2.0.4" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlinx:atomicfu-jvm:0.25.0" level="project" />
     <orderEntry type="library" name="Gradle: io.ktor:ktor-network-jvm:3.0.0-rc-1" level="project" />
     <orderEntry type="library" name="Gradle: io.ktor:ktor-utils-jvm:3.0.0-rc-1" level="project" />
-    <orderEntry type="library" name="Gradle: com.russhwolf:multiplatform-settings-jvm:1.2.0" level="project" />
     <orderEntry type="library" name="Gradle: io.ktor:ktor-server-sessions-jvm:2.3.4" level="project" />
     <orderEntry type="library" name="Gradle: io.ktor:ktor-server-call-id-jvm:2.3.4" level="project" />
     <orderEntry type="library" name="Gradle: io.ktor:ktor-server-call-logging-jvm:2.3.4" level="project" />
@@ -162,23 +180,23 @@
     <orderEntry type="library" name="Gradle: io.ktor:ktor-serialization-kotlinx-jvm:3.0.0-rc-1" level="project" />
     <orderEntry type="library" name="Gradle: co.touchlab:kermit-core-jvm:2.0.4" level="project" />
     <orderEntry type="library" name="Gradle: io.ktor:ktor-io-jvm:3.0.0-rc-1" level="project" />
-    <orderEntry type="library" name="Gradle: org.apache.httpcomponents:httpcore-nio:4.4.15" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.httpcomponents:httpclient:4.5.13" level="project" />
+    <orderEntry type="library" name="Gradle: org.apache.httpcomponents:httpcore-nio:4.4.15" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.httpcomponents:httpcore:4.4.15" level="project" />
-    <orderEntry type="library" name="Gradle: commons-logging:commons-logging:1.2" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.compose.foundation:foundation-layout-desktop:1.6.11" level="project" />
     <orderEntry type="library" name="Gradle: commons-codec:commons-codec:1.11" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlinx:kotlinx-io-core-jvm:0.5.3" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlinx:kotlinx-io-bytestring-jvm:0.5.3" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: org.jetbrains.skiko:skiko-awt-runtime-macos-arm64:0.8.4" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: org.objenesis:objenesis:3.2" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: org.junit.jupiter:junit-jupiter-engine:5.7.0" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:1.9.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: org.junit.platform:junit-platform-engine:1.7.0" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: com.soywiz.korlibs.krypto:krypto-jvm:4.0.10" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: org.fusesource.jansi:jansi:2.4.1" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: org.jetbrains.kotlinx:kotlinx-coroutines-debug:1.9.0" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: net.java.dev.jna:jna-platform:5.9.0" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: net.java.dev.jna:jna:5.9.0" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Gradle: net.bytebuddy:byte-buddy:1.10.9" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Gradle: net.bytebuddy:byte-buddy-agent:1.10.9" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose-desktop:2.8.0" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: androidx.annotation:annotation-jvm:1.8.0" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: androidx.collection:collection-jvm:1.4.0" level="project" />

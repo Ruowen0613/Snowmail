@@ -77,9 +77,9 @@ class UserProfileRepository(private val supabase: SupabaseClient) : IUserProfile
                         eq("user_id", userId)
                     }
                 }
-                .decodeSingle<Map<String, String>>()
+                .decodeSingle<Map<String, String?>>()
 
-            val city = cityResult["city_name"] ?: throw Exception("City not found")
+            val city = cityResult["city_name"] ?: ""
             Result.success(city)
         } catch (e: Exception) {
             Result.failure(Exception("Failed to fetch profile: ${e.message}"))
@@ -97,7 +97,7 @@ class UserProfileRepository(private val supabase: SupabaseClient) : IUserProfile
                 }
                 .decodeSingle<Map<String, String>>()
 
-            val phone = phoneResult["phone"] ?: throw Exception("Phone not found")
+            val phone = phoneResult["phone"] ?: ""
             Result.success(phone)
         } catch (e: Exception) {
             Result.failure(Exception("Failed to fetch profile: ${e.message}"))

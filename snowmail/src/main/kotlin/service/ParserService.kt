@@ -48,18 +48,28 @@ suspend fun main() {
     val file = path.toFile()
 
     // Extract text from the PDF
-    val resumeText = resumeParserController.extractTextFromPDF(file)
+//    val resumeText = resumeParserController.extractTextFromPDF(file)
+//
+//    println(resumeText)
+//
+//    val userInput = UserInput(
+//        jobDescription = "Software Engineer",
+//        recruiterEmail = "recruiter@example.com",
+//        jobTitle = "Software Engineer",
+//        company = "Example Corp",
+//        recruiterName = "Jane Doe",
+//        fileURLs = listOf("https://example.com/resume.pdf"),
+//    )
 
-    println(resumeText)
 
-    val userInput = UserInput(
-        jobDescription = "Software Engineer",
-        recruiterEmail = "recruiter@example.com",
-        jobTitle = "Software Engineer",
-        company = "Example Corp",
-        recruiterName = "Jane Doe",
-        fileURLs = listOf("https://example.com/resume.pdf"),
-    )
+    fun getResourceFilePath(resourceName: String): String {
+        val resource = ParserService::class.java.classLoader.getResource(resourceName)
+        requireNotNull(resource) { "Resource not found: $resourceName" }
+        return Paths.get(resource.toURI()).toString()
+    }
 
+    // Usage example
+    val filePath = getResourceFilePath("test-resume.pdf")
+    println("Resource file path: $filePath")
 
 }

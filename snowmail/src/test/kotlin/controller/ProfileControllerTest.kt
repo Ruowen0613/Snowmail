@@ -1,6 +1,7 @@
 package ca.uwaterloo.controller
 
 import ca.uwaterloo.model.Education
+import ca.uwaterloo.model.EducationWithDegreeName
 import ca.uwaterloo.model.WorkExperience
 import ca.uwaterloo.persistence.IUserProfileRepository
 import kotlinx.coroutines.test.runTest
@@ -68,7 +69,7 @@ class ProfileControllerTest {
     fun `getEducation should return list of education records`() = runTest {
         val userId = "c9498eec-ac17-4a3f-8d91-61efba3f7277"
         val educationList = listOf(
-            Education(1, userId, 3, "university of Waterloo","Computer Science", 3.8f, LocalDate(2019, 9, 1), LocalDate(2023, 6, 1))
+            EducationWithDegreeName(1, userId, "Bachelors", "university of Waterloo","Computer Science", 3.8f, LocalDate(2019, 9, 1), LocalDate(2023, 6, 1))
         )
         whenever(userProfileRepository.getEducation(userId)).thenReturn(Result.success(educationList))
 

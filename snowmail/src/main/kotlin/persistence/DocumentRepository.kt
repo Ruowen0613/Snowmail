@@ -4,6 +4,7 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.storage.storage
 import java.io.File
 import java.io.InputStream
+import kotlin.time.Duration.Companion.minutes
 
 class DocumentRepository(private val supabase: SupabaseClient) : IDocumentRepository {
 
@@ -39,4 +40,15 @@ class DocumentRepository(private val supabase: SupabaseClient) : IDocumentReposi
             Result.failure(Exception("Error deleting document: ${e.message}"))
         }
     }
+
+    override suspend fun createSignedUrl(bucket: String, path: String): Result<String> {
+        return try {
+            val url = storage.from(bucket).createSignedUrl(path, 5.minutes)
+            Result.success(url)
+        } catch (e: Exception) {
+            Result.failure(Exception("Error creating signed URL: ${e.message}"))
+        }
+    }
+
+
 }

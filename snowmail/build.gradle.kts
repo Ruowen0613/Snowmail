@@ -79,6 +79,16 @@ kotlin {
     jvmToolchain(20)
 }
 
+sourceSets {
+    main {
+        kotlin.srcDir("src/main/kotlin")
+    }
+    test {
+        kotlin.srcDir("src/test/kotlin")
+        resources.srcDir("src/test/resources")
+    }
+}
+
 compose.desktop {
     application {
         mainClass = "ca.uwaterloo.MainKt"

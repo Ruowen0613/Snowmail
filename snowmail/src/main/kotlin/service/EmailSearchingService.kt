@@ -1,4 +1,4 @@
-package ca.uwaterloo.service
+package service
 
 import java.io.InputStream
 import java.util.*
@@ -6,8 +6,8 @@ import javax.mail.*
 
 
 // constants
-val host = "imap.gmail.com"
-val port = 993
+val this_host = "imap.gmail.com"
+val this_port = 993
 
 data class email (
     val senderEmail: String,
@@ -20,8 +20,8 @@ fun searchEmails(userAccount: String, userPassword: String,
                  recruiterEmails: List<String>): List<email> {
 
     val properties = Properties().apply {
-        put("mail.imap.host", host)
-        put("mail.imap.port", port)
+        put("mail.imap.host", this_host)
+        put("mail.imap.port", this_port)
         put("mail.imap.ssl.enable", "true")
     }
 
@@ -65,7 +65,13 @@ fun searchEmails(userAccount: String, userPassword: String,
                         }
                     }
                 }
-                val item = email(emailAddress, message.subject, text)
+                var subject: String
+                if (message.subject == null) {
+                    subject = ""
+                } else {
+                    subject = message.subject
+                }
+                val item = email(emailAddress, subject, text)
                 result.add(item)
             }
         }
@@ -89,12 +95,3 @@ fun createSpecificDateTime(year: Int, month: Int, day: Int, hour: Int, minute: I
     return calendar.time
 }
 
-
-fun main() {
-    val username = "amy20041105@gmail.com"
-    val password = "payy hcof nwom kqnr"
-    val time = createSpecificDateTime(2024, 10, 15, 2, 3, 0)
-    val recruiters = listOf("services@51job.com", "heretohelp.ca@custhelp.com")
-    val result = searchEmails(username, password, time, recruiters)
-    println(result)
-}

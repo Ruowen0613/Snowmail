@@ -3,13 +3,13 @@ package  controller
 import ca.uwaterloo.persistence.IJobApplicationRepository
 import ca.uwaterloo.persistence.IJobApplicationRepository.JobProgress
 import ca.uwaterloo.persistence.IJobApplicationRepository.Progress
-import ca.uwaterloo.service.searchEmails
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.storage.Storage
 import persistence.JobApplicationRepository
-
+import service.email
+import service.searchEmails
 
 class ProgressController(private val jobApplicationRepository: IJobApplicationRepository) {
 
@@ -43,7 +43,8 @@ class ProgressController(private val jobApplicationRepository: IJobApplicationRe
 
 
     // return all new emails from last refresh time to now
-    suspend fun getNewEmails(userId: String) {
+    // return value is List<Email>
+    suspend fun getNewEmails(userId: String): List<email> {
         // get all recruiter emails
         val recruiterEmails = jobApplicationRepository.getAllRecruiterEmailAddress(userId)
         // get last refresh time
@@ -51,6 +52,7 @@ class ProgressController(private val jobApplicationRepository: IJobApplicationRe
         // TO BE ADDED: REMOVE HARDCODE EMAIL AND GMAIL PASSWORD
         // search emails
         val emails = searchEmails("cs346test@gmail.com", "qirk dyef rvbv bkka", lastRefreshTime, recruiterEmails)
+        return emails
     }
 
 
@@ -80,10 +82,23 @@ suspend fun main() {
     }
     val JobApplicationRepository = JobApplicationRepository(supabase)
 
+    // getProgress
     val progressController = ProgressController(JobApplicationRepository)
     val result: Progress = progressController.getProgress("ed52b6c4-2ae8-4b58-bacd-adc00082a505")
     println(result)
     println(result.appliedItemCount)
     print(result.appliedJobs)
+
+    // modifyStatus
+    val result2 = progressController.modifyStatus("788db112-76bd-4cb1-95ff-93a0e1d7e078", 3)
+    println(result2)
+
+    // getAllAppliedJobs
+    val result3 = progressController.getAllAppliedJobs("ed52b6c4-2ae8-4b58-bacd-adc00082a505")
+    println(result3)
+
+    val result4 = progressController.getNewEmails("ed52b6c4-2ae8-4b58-bacd-adc00082a505")
+    println(result4)
+
 }
 

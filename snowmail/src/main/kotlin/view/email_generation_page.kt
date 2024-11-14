@@ -2,43 +2,34 @@ package ca.uwaterloo.view
 
 
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
 //import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import io.ktor.client.*
-import io.ktor.client.engine.cio.*
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.Dispatchers
-import model.UserInput
-import model.UserProfile
 //import kotlinx.serialization.Serializable
 
-import androidx.compose.ui.window.application
-import androidx.compose.ui.window.Window
-import service.EmailGenerationService
-import integration.OpenAIClient
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.ui.graphics.Color
-import androidx.compose.foundation.background
+import androidx.compose.material.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.border
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
-
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.application
 import ca.uwaterloo.controller.ProfileController
-import ca.uwaterloo.model.Education
 import ca.uwaterloo.model.EducationWithDegreeName
 import ca.uwaterloo.model.WorkExperience
-import controller.send_email
+import integration.OpenAIClient
 import integration.SupabaseClient
+import io.ktor.client.*
+import io.ktor.client.engine.cio.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.datetime.LocalDate
+import model.UserInput
+import model.UserProfile
+import service.EmailGenerationService
 
 
 @Composable
@@ -405,9 +396,11 @@ fun EditableAlertDialog(
                 )
             }
         },
+
         confirmButton = {
             Button(onClick = {
                 onConfirm(text)
+                /*
                 send_email(
                     senderEmail = "cs346test@gmail.com", //call getEmail to get user's email
                     password = "qirk dyef rvbv bkka",
@@ -416,7 +409,7 @@ fun EditableAlertDialog(
                     text = text,
                     fileURLs = listOf(),
                     fileNames = listOf()
-                )},
+                )*/},
                     colors = ButtonDefaults.buttonColors(
                     backgroundColor = Color(0xFF487B96),
                 contentColor = MaterialTheme.colors.onPrimary

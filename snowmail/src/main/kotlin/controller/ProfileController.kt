@@ -2,6 +2,7 @@ package ca.uwaterloo.controller
 
 import ca.uwaterloo.model.Education
 import ca.uwaterloo.model.EducationWithDegreeName
+import ca.uwaterloo.model.PersonalProject
 import model.UserProfile
 // import ca.uwaterloo.persistence.DBStorage
 
@@ -238,6 +239,31 @@ class ProfileController(private val userProfileRepository: IUserProfileRepositor
     // get degree id by name
     suspend fun getDegreeIdByName(degreeName: String): Result<Int> {
         return userProfileRepository.getDegreeIdByName(degreeName)
+    }
+
+    // get projects by userid
+    suspend fun getProjects(userId: String): Result<List<PersonalProject>> {
+        return userProfileRepository.getProjects(userId)
+    }
+
+    // add project to db
+    suspend fun addProject(userId: String, projectName: String, description: String?): Result<Boolean> {
+        return userProfileRepository.addProject(userId, projectName, description)
+    }
+
+    // update project in db
+    suspend fun updateProject(
+        userId: String,
+        projectID: String,
+        projectName: String,
+        description: String?
+    ): Result<Boolean> {
+        return userProfileRepository.updateProject(userId, projectID, projectName, description)
+    }
+
+    // delete project from db
+    suspend fun deleteProject(projectID: String): Result<Boolean> {
+        return userProfileRepository.deleteProject(projectID)
     }
 }
 
@@ -479,6 +505,45 @@ fun main() = runBlocking<Unit> {
 //        println("Gmail App Password updated successfully.")
 //    }.onFailure { error ->
 //        println("Error updating gmail app password: ${error.message}")
+//    }
+
+    // test getting projects
+//    val result = profileController.getProjects(userId)
+//    result.onSuccess { projects ->
+//        println("Projects: $projects")
+//    }.onFailure { error ->
+//        println("Error fetching projects: ${error.message}")
+//    }
+
+    // test adding project
+//    val projectName = "Project 2"
+//    val description = "This is project 2."
+//    val result = profileController.addProject(userId, projectName, description)
+//    result.onSuccess {
+//        println("Project added successfully.")
+//    }.onFailure { error ->
+//        println("Error adding project: ${error.message}")
+//    }
+
+    // test updating project
+//    val projectID = "1"
+//    val projectName = "Project 1"
+//    val description = "This is project 1."
+//
+//    val result = profileController.updateProject(userId, projectID, projectName, description)
+//    result.onSuccess {
+//        println("Project updated successfully.")
+//    }.onFailure { error ->
+//        println("Error updating project: ${error.message}")
+//    }
+
+    // test deleting project
+//    val projectID = "3"
+//    val result = profileController.deleteProject(projectID)
+//    result.onSuccess {
+//        println("Project deleted successfully.")
+//    }.onFailure { error ->
+//        println("Error deleting project: ${error.message}")
 //    }
 
 }

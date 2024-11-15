@@ -2,6 +2,7 @@ package ca.uwaterloo.persistence
 
 import ca.uwaterloo.model.Education
 import ca.uwaterloo.model.EducationWithDegreeName
+import ca.uwaterloo.model.PersonalProject
 import ca.uwaterloo.model.WorkExperience
 import model.UserProfile
 import kotlinx.datetime.LocalDate
@@ -73,4 +74,13 @@ interface IUserProfileRepository {
     suspend fun deleteWorkExperience(workExperienceID: String): Result<Boolean>
     suspend fun getDegreeNameById(degreeId: Int): Result<String>
     suspend fun getDegreeIdByName(degreeName: String): Result<Int>
+    suspend fun getProjects(userId: String): Result<List<PersonalProject>>
+    suspend fun addProject(userId: String, projectName: String, description: String?): Result<Boolean>
+    suspend fun updateProject(
+        userId: String,
+        projectID: String,
+        projectName: String,
+        description: String?
+    ): Result<Boolean>
+    suspend fun deleteProject(projectID: String): Result<Boolean>
 }

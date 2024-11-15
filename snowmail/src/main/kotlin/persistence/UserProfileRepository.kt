@@ -2,6 +2,7 @@ package ca.uwaterloo.persistence
 
 import ca.uwaterloo.model.Education
 import ca.uwaterloo.model.EducationWithDegreeName
+import ca.uwaterloo.model.PersonalProject
 import ca.uwaterloo.model.WorkExperience
 import model.UserProfile
 import io.github.jan.supabase.SupabaseClient
@@ -641,9 +642,104 @@ class UserProfileRepository(private val supabase: SupabaseClient) : IUserProfile
         }
     }
 
+    //get user's projects
+    override suspend fun getProjects(userId: String): Result<List<PersonalProject>> {
+        return try {
+            // fetch user's projects from db based on userid
+            val projects = supabase.from("personal_project")
+                .select {
+                    filter {
+                        eq("user_id", userId)
+                    }
+                }
+                .decodeList<PersonalProject>()
+            Result.success(projects)
+        } catch (e: Exception) {
+            Result.failure(Exception("Failed to fetch projects: ${e.message}"))
+        }
+    }
 
+    override suspend fun addProject(userId: String, projectName: String, description: String?): Result<Boolean> {
+        return try {
+            val project = PersonalProject(
+                userId = userId,
+                projectName = projectName,
+                description = description
+            )
+            supabase.from("personal_project").insert(project)
+            Result.success(true)
+        } catch (e: Exception) {
+            Result.failure(Exception("Failed to add project: ${e.message}"))
+        }
+    }
 
+    //update user's project
+    override suspend fun updateProject(
+        userId: String,
+        projectID: String,
+        projectName: String,
+        description: String?
+    ): Result<Boolean> {
+        return try {
+            // check if project exists
+            val existingProject = supabase.from("personal_project")
+                .select {
+                    filter {
+                        eq("id", projectID)
+                    }
+                }
+                .decodeSingleOrNull<PersonalProject>()
 
+            if (existingProject != null) {
+                // if exists, update it
+                supabase.from("personal_project")
+                    .update(mapOf(
+                        "project_name" to projectName,
+                        "description" to description
+                    )) {
+                        filter {
+                            eq("id", projectID)
+                        }
+                    }
+                Result.success(true)
+            } else {
+                // if not exists, return failure
+                Result.failure(Exception("Project with ID $projectID not found"))
+            }
+        } catch (e: Exception) {
+            Result.failure(Exception("Failed to update project: ${e.message}"))
+        }
+    }
+
+    //delete user's project
+    override suspend fun deleteProject(projectID: String): Result<Boolean> {
+        return try {
+            // check if project exists
+            val existingProject = supabase.from("personal_project")
+                .select {
+                    filter {
+                        eq("id", projectID)
+                    }
+                }
+                .decodeSingleOrNull<PersonalProject>()
+
+            if (existingProject != null) {
+                // if exists, delete it
+                supabase.from("personal_project")
+                    .delete {
+                        filter {
+                            eq("id", projectID)
+                        }
+                    }
+                Result.success(true)
+            } else {
+                // if not exists, return failure
+                Result.failure(Exception("Project with ID $projectID not found"))
+            }
+        } catch (e: Exception) {
+            Result.failure(Exception("Failed to delete project: ${e.message}"))
+        }
+    }
 
 
 }

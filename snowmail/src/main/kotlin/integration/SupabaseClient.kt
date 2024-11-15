@@ -10,6 +10,7 @@ import io.github.jan.supabase.storage.Bucket
 import io.github.jan.supabase.storage.Storage
 import io.github.jan.supabase.storage.storage
 import kotlinx.coroutines.runBlocking
+import persistence.JobApplicationRepository
 
 class SupabaseClient {
     private val supabase = createSupabaseClient(
@@ -23,6 +24,7 @@ class SupabaseClient {
     val authRepository = AuthRepository(supabase)
     val userProfileRepository = UserProfileRepository(supabase)
     val documentRepository = DocumentRepository(supabase)
+    val jobApplicationRepository = JobApplicationRepository(supabase)
 
     suspend fun retrieveBuckets(): Result<List<Bucket>> {
         return try {

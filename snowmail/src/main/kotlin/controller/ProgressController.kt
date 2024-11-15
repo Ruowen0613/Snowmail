@@ -1,4 +1,4 @@
-package  controller
+package  ca.uwaterloo.controller
 
 import ca.uwaterloo.persistence.IJobApplicationRepository
 import ca.uwaterloo.persistence.IJobApplicationRepository.JobProgress
@@ -52,7 +52,7 @@ class ProgressController(private val jobApplicationRepository: IJobApplicationRe
         val lastRefreshTime = jobApplicationRepository.getRefreshTime(userId).getOrNull()!!
         // TO BE ADDED: REMOVE HARDCODE EMAIL AND GMAIL PASSWORD
         // search emails
-        val emails = searchEmails("cs346test@gmail.com", "qirk dyef rvbv bkka", lastRefreshTime, recruiterEmails)
+        val emails = searchEmails("eonyeonz77@gmail.com", "wqgz flgy ejus otjr", lastRefreshTime, recruiterEmails)
         return emails
     }
 

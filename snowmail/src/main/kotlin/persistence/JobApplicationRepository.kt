@@ -159,26 +159,30 @@ class JobApplicationRepository(private val supabase: SupabaseClient) : IJobAppli
         // interviewed
         val interviewedJobs = getJobWithStatus(userId, 2)
         val interviewedCount = interviewedJobs.getOrNull()?.size ?: 0
-        val interviewedProgress = listOf<IJobApplicationRepository.JobProgress>()
+        val interviewedProgress = mutableListOf<IJobApplicationRepository.JobProgress>()
         for (job in interviewedJobs.getOrNull() ?: listOf()) {
-            interviewedProgress.plus(IJobApplicationRepository.JobProgress(job.jobTitle, job.companyName, getRecruiterEmail(job.recruiterEmailID).toString()))
+            val item = IJobApplicationRepository.JobProgress(job.jobTitle, job.companyName, getRecruiterEmail(job.recruiterEmailID).getOrNull()!!)
+            interviewedProgress.add(item)
         }
 
         // offer
         val offerJobs = getJobWithStatus(userId, 3)
         val offerCount = offerJobs.getOrNull()?.size ?: 0
-        val offerProgress = listOf<IJobApplicationRepository.JobProgress>()
+        val offerProgress = mutableListOf<IJobApplicationRepository.JobProgress>() // Change to mutableListOf
         for (job in offerJobs.getOrNull() ?: listOf()) {
-            offerProgress.plus(IJobApplicationRepository.JobProgress(job.jobTitle, job.companyName, getRecruiterEmail(job.recruiterEmailID).toString()))
+            val item = IJobApplicationRepository.JobProgress(job.jobTitle, job.companyName, getRecruiterEmail(job.recruiterEmailID).getOrNull()!!)
+            offerProgress.add(item)
         }
 
         // other
         val otherJobs = getJobWithStatus(userId, 4)
         val otherCount = otherJobs.getOrNull()?.size ?: 0
-        val otherProgress = listOf<IJobApplicationRepository.JobProgress>()
+        val otherProgress = mutableListOf<IJobApplicationRepository.JobProgress>() // Change to mutableListOf
         for (job in otherJobs.getOrNull() ?: listOf()) {
-            otherProgress.plus(IJobApplicationRepository.JobProgress(job.jobTitle, job.companyName, getRecruiterEmail(job.recruiterEmailID).toString()))
+            val item = IJobApplicationRepository.JobProgress(job.jobTitle, job.companyName, getRecruiterEmail(job.recruiterEmailID).getOrNull()!!)
+            otherProgress.add(item)
         }
+
 
         return Result.success(IJobApplicationRepository.Progress(
             appliedItemCount = appliedCount,
@@ -194,10 +198,13 @@ class JobApplicationRepository(private val supabase: SupabaseClient) : IJobAppli
 
 
     override suspend fun getAppliedJobs(userId: String): Result<List<Pair<IJobApplicationRepository.JobProgress, String>>> {
-        // applied
-        val appliedJobs = getJobWithStatus(userId, 1)
+        val AllJobs = supabase.from("job_application_detail").select() {
+            filter {
+                eq("user_id", userId)
+            }
+        }.decodeList<JobApplication>()
         var result = mutableListOf<Pair<IJobApplicationRepository.JobProgress, String>>()
-        for (job in appliedJobs.getOrNull() ?: listOf()) {
+        for (job in AllJobs) {
             val item = IJobApplicationRepository.JobProgress(job.jobTitle, job.companyName, getRecruiterEmail(job.recruiterEmailID).getOrNull()!!)
             result.add(Pair(item, job.appID!!))
         }

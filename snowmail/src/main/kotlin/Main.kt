@@ -54,7 +54,7 @@ fun websitePage() {
         "welcome4" -> WelcomePage4 ({ currentPage = "signup"}, {currentPage = "login"})
         "profilePage" -> ProfilePage(UserSession.userId ?: "DefaultUserId", { currentPage = "profilePage"}, { currentPage = "emailgeneration"}, { currentPage = "progressPage"})
         "emailgeneration" -> EmailGenerationPage({ currentPage = "profilePage"}, { currentPage = "profilePage"}, { currentPage = "progressPage"})
-        "progressPage" -> JobProgressPage({ currentPage = "profilePage"}, { currentPage = "profilePage"}, { currentPage = "emailgeneration"})
+        "progressPage" -> JobProgressPage(UserSession.userId ?: "DefaultUserId", {currentPage = "profilePage"}, { currentPage = "profilePage"}, { currentPage = "emailgeneration"})
     }
 }
 

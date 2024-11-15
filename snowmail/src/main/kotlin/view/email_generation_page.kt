@@ -22,6 +22,7 @@ import ca.uwaterloo.model.EducationWithDegreeName
 import ca.uwaterloo.model.WorkExperience
 import ca.uwaterloo.service.ParserService
 import controller.send_email
+import integration.OpenAIClient
 import integration.SupabaseClient
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*

@@ -40,6 +40,9 @@ import ca.uwaterloo.model.EducationWithDegreeName
 import ca.uwaterloo.model.WorkExperience
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.launch
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 
 
 @Composable
@@ -804,7 +807,6 @@ fun AddEducationDialog(
     profileController: ProfileController,
     onEducationAdded: () -> Unit
 ) {
-
     var schoolName by remember { mutableStateOf("") }
     var major by remember { mutableStateOf("") }
     var degreeType by remember { mutableStateOf("") }
@@ -815,7 +817,15 @@ fun AddEducationDialog(
     var endYear by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
 
-    // Dropdown for degree type
+    var startMonthError by remember { mutableStateOf(false) }
+    var startYearError by remember { mutableStateOf(false) }
+    var endMonthError by remember { mutableStateOf(false) }
+    var endYearError by remember { mutableStateOf(false) }
+    var schoolNameError by remember { mutableStateOf(false) }
+    var majorError by remember { mutableStateOf(false) }
+    var degreeTypeError by remember { mutableStateOf(false) }
+    var gpaError by remember { mutableStateOf(false) }
+
     var expanded by remember { mutableStateOf(false) }
     val degreeTypes = listOf("High School Diploma/GED", "Associate's Degree/College Diploma", "Bachelor's Degree", "Master's Degree", "Doctorate Degree", "Other")
 
@@ -829,15 +839,30 @@ fun AddEducationDialog(
                 modifier = Modifier.padding(16.dp).verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-
                 Text("Add Education", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
-
                 Spacer(modifier = Modifier.height(8.dp))
 
+                OutlinedTextField(
+                    value = schoolName,
+                    onValueChange = {
+                        schoolName = it
+                        schoolNameError = it.isEmpty()
+                    },
+                    label = { Text("School Name") },
+                    isError = schoolNameError,
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-                OutlinedTextField(value = schoolName, onValueChange = { schoolName = it }, label = { Text("School Name") }, modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(value = major, onValueChange = { major = it }, label = { Text("Major") }, modifier = Modifier.fillMaxWidth())
-
+                OutlinedTextField(
+                    value = major,
+                    onValueChange = {
+                        major = it
+                        majorError = it.isEmpty()
+                    },
+                    label = { Text("Major") },
+                    isError = majorError,
+                    modifier = Modifier.fillMaxWidth()
+                )
 
                 Box(
                     modifier = Modifier.fillMaxWidth().wrapContentSize(Alignment.TopStart)
@@ -854,12 +879,14 @@ fun AddEducationDialog(
                             )
                         },
                         modifier = Modifier.fillMaxWidth().clickable { expanded = true },
+                        isError = degreeTypeError,
                         readOnly = true
                     )
                     DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                         degreeTypes.forEach { type ->
                             DropdownMenuItem(onClick = {
                                 degreeType = type
+                                degreeTypeError = false
                                 expanded = false
                             }) {
                                 Text(type)
@@ -868,56 +895,116 @@ fun AddEducationDialog(
                     }
                 }
 
-
-                OutlinedTextField(value = gpa, onValueChange = { gpa = it }, label = { Text("GPA") }, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(
+                    value = gpa,
+                    onValueChange = {
+                        gpa = it
+                        gpaError = it.toFloatOrNull() == null && it.isNotEmpty()
+                    },
+                    label = { Text("GPA") },
+                    isError = gpaError,
+                    modifier = Modifier.fillMaxWidth()
+                )
 
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                    OutlinedTextField(value = startMonth, onValueChange = { startMonth = it }, label = { Text("Start Month") }, modifier = Modifier.weight(1f), placeholder = { Text("(ex: 7 for July)") })
-                    OutlinedTextField(value = startYear, onValueChange = { startYear = it }, label = { Text("Start Year") }, modifier = Modifier.weight(1f))
+                    OutlinedTextField(
+                        value = startMonth,
+                        onValueChange = {
+                            startMonth = it
+                            startMonthError = it.toIntOrNull() !in 1..12 || it.startsWith("0") || it.isEmpty()
+                        },
+                        label = { Text("Start Month") },
+                        isError = startMonthError,
+                        modifier = Modifier.weight(1f),
+                        placeholder = { Text("(ex: 7 for July)") }
+                    )
+                    OutlinedTextField(
+                        value = startYear,
+                        onValueChange = {
+                            startYear = it
+                            startYearError = it.length != 4 || it.toIntOrNull() == null
+                        },
+                        label = { Text("Start Year") },
+                        isError = startYearError,
+                        modifier = Modifier.weight(1f)
+                    )
                 }
 
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                    OutlinedTextField(value = endMonth, onValueChange = { endMonth = it }, label = { Text("End Month") }, modifier = Modifier.weight(1f))
-                    OutlinedTextField(value = endYear, onValueChange = { endYear = it }, label = { Text("End Year") }, modifier = Modifier.weight(1f))
+                    OutlinedTextField(
+                        value = endMonth,
+                        onValueChange = {
+                            endMonth = it
+                            endMonthError = it.toIntOrNull() !in 1..12 || it.startsWith("0") || it.isEmpty()
+                        },
+                        label = { Text("End Month") },
+                        isError = endMonthError,
+                        modifier = Modifier.weight(1f)
+                    )
+                    OutlinedTextField(
+                        value = endYear,
+                        onValueChange = {
+                            endYear = it
+                            endYearError = it.length != 4 || it.toIntOrNull() == null
+                        },
+                        label = { Text("End Year") },
+                        isError = endYearError,
+                        modifier = Modifier.weight(1f)
+                    )
                 }
 
                 if (errorMessage.isNotEmpty()) {
-                    Text(text = errorMessage, color = Color.Red, textAlign = TextAlign.Center, modifier = Modifier.padding(10.dp))
+                    Text(
+                        text = errorMessage,
+                        color = Color.Red,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(10.dp)
+                    )
                 }
-
 
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     TextButton(onClick = onDismiss) {
                         Text("Cancel")
                     }
-                    Button(onClick = {
+                    Button(
+                        onClick = {
+                            if (
+                                schoolNameError || majorError || degreeType.isEmpty() ||
+                                startMonthError || startYearError || endMonthError || endYearError
+                            ) {
+                                errorMessage = "Please enter all fields correctly."
+                            } else {
+                                runBlocking {
+                                    try {
+                                        val startDate = LocalDate(startYear.toInt(), startMonth.toInt(), 1)
+                                        val endDate = LocalDate(endYear.toInt(), endMonth.toInt(), 1)
+                                        val gpaValue = gpa.toFloatOrNull()
+                                        val degreeId = degreeTypes.indexOf(degreeType) + 1
 
-                        runBlocking {
-                            val startDate = LocalDate(startYear.toInt(), startMonth.toInt(), 1)
-                            val endDate = LocalDate(endYear.toInt(), endMonth.toInt(), 1)
-                            val gpaValue = gpa.toFloatOrNull()
-                            val degreeId = degreeTypes.indexOf(degreeType) + 1
+                                        val result = profileController.addEducation(
+                                            userId = userId,
+                                            degreeId = degreeId,
+                                            major = major,
+                                            gpa = gpaValue,
+                                            startDate = startDate,
+                                            endDate = endDate,
+                                            institutionName = schoolName
+                                        )
 
-                            val result = profileController.addEducation(
-                                userId = userId,
-                                degreeId = degreeId,
-                                major = major,
-                                gpa = gpaValue,
-                                startDate = startDate,
-                                endDate = endDate,
-                                institutionName = schoolName
-                            )
-
-                            result.onSuccess {
-
-                                onEducationAdded()
-                                onDismiss()
-                            }.onFailure { error ->
-
-                                errorMessage = error.message ?: "Failed to add education record."
+                                        result.onSuccess {
+                                            onEducationAdded()
+                                            onDismiss()
+                                        }.onFailure { error ->
+                                            errorMessage = error.message ?: "Failed to add education record."
+                                        }
+                                    } catch (e: Exception) {
+                                        errorMessage = "An unexpected error occurred. Please check your inputs."
+                                    }
+                                }
                             }
-                        }
-                    }, colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF487896), contentColor = Color.White)) {
+                        },
+                        colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF487896), contentColor = Color.White)
+                    ) {
                         Text("Save")
                     }
                 }
@@ -925,6 +1012,7 @@ fun AddEducationDialog(
         }
     }
 }
+
 
 @Composable
 fun EditEducationDialog(
@@ -935,22 +1023,29 @@ fun EditEducationDialog(
     onEducationEdited: () -> Unit,
     onEducationDeleted: () -> Unit
 ) {
-
     var schoolName by remember { mutableStateOf(education?.institutionName ?: "") }
     var major by remember { mutableStateOf(education?.major ?: "") }
     var degreeName by remember { mutableStateOf(education?.degreeName ?: "") }
     var gpa by remember { mutableStateOf(education?.gpa?.toString() ?: "") }
-    //var startMonth by remember { mutableStateOf(education?.startDate?.month.toString() ?: "") }
     var startMonth by remember { mutableStateOf(education?.startDate?.month?.value?.toString() ?: "") }
     var startYear by remember { mutableStateOf(education?.startDate?.year.toString() ?: "") }
-    //var endMonth by remember { mutableStateOf(education?.endDate?.month.toString() ?: "") }
     var endMonth by remember { mutableStateOf(education?.endDate?.month?.value?.toString() ?: "") }
     var endYear by remember { mutableStateOf(education?.endDate?.year.toString() ?: "") }
     var errorMessage by remember { mutableStateOf("") }
 
+    // Validation error states
+    var schoolNameError by remember { mutableStateOf(false) }
+    var majorError by remember { mutableStateOf(false) }
+    var degreeNameError by remember { mutableStateOf(false) }
+    var startMonthError by remember { mutableStateOf(false) }
+    var startYearError by remember { mutableStateOf(false) }
+    var endMonthError by remember { mutableStateOf(false) }
+    var endYearError by remember { mutableStateOf(false) }
+    var gpaError by remember { mutableStateOf(false) }
 
     var expanded by remember { mutableStateOf(false) }
     val degreeTypes = listOf("High School Diploma/GED", "Associate's Degree/College Diploma", "Bachelor's Degree", "Master's Degree", "Doctorate Degree", "Other")
+
     Dialog(onDismissRequest = onDismiss) {
         Surface(
             shape = RoundedCornerShape(8.dp),
@@ -965,6 +1060,7 @@ fun EditEducationDialog(
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
+                // Delete icon
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
@@ -973,7 +1069,6 @@ fun EditEducationDialog(
                         IconButton(
                             onClick = {
                                 runBlocking {
-
                                     val result = education.id?.let { id ->
                                         profileController.deleteEducation(id.toString())
                                     } ?: Result.failure(Exception("Education ID is null"))
@@ -997,24 +1092,33 @@ fun EditEducationDialog(
                 }
 
                 Text("Edit Education", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
-
-
                 Spacer(modifier = Modifier.height(8.dp))
 
+                // School Name
                 OutlinedTextField(
                     value = schoolName,
-                    onValueChange = { schoolName = it },
+                    onValueChange = {
+                        schoolName = it
+                        schoolNameError = it.isEmpty()
+                    },
                     label = { Text("School Name") },
+                    isError = schoolNameError,
                     modifier = Modifier.fillMaxWidth()
                 )
 
+                // Major
                 OutlinedTextField(
                     value = major,
-                    onValueChange = { major = it },
+                    onValueChange = {
+                        major = it
+                        majorError = it.isEmpty()
+                    },
                     label = { Text("Major") },
+                    isError = majorError,
                     modifier = Modifier.fillMaxWidth()
                 )
 
+                // Degree Type Dropdown
                 Box(
                     modifier = Modifier.fillMaxWidth().wrapContentSize(Alignment.TopStart)
                 ) {
@@ -1030,12 +1134,14 @@ fun EditEducationDialog(
                             )
                         },
                         modifier = Modifier.fillMaxWidth().clickable { expanded = true },
+                        isError = degreeNameError,
                         readOnly = true
                     )
                     DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                         degreeTypes.forEach { type ->
                             DropdownMenuItem(onClick = {
                                 degreeName = type
+                                degreeNameError = false
                                 expanded = false
                             }) {
                                 Text(type)
@@ -1044,113 +1150,125 @@ fun EditEducationDialog(
                     }
                 }
 
+                // GPA
                 OutlinedTextField(
                     value = gpa,
-                    onValueChange = { gpa = it },
+                    onValueChange = {
+                        gpa = it
+                        gpaError = it.toFloatOrNull() == null && it.isNotEmpty()
+                    },
                     label = { Text("GPA") },
+                    isError = gpaError,
                     modifier = Modifier.fillMaxWidth()
                 )
 
-
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
+                // Start Month and Year
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
                     OutlinedTextField(
                         value = startMonth,
-                        onValueChange = { startMonth = it },
+                        onValueChange = {
+                            startMonth = it
+                            startMonthError = it.toIntOrNull() !in 1..12 || it.startsWith("0") || it.isEmpty()
+                        },
                         label = { Text("Start Month") },
+                        isError = startMonthError,
                         modifier = Modifier.weight(1f),
                         placeholder = { Text("(ex: 7 for July)") }
                     )
                     OutlinedTextField(
                         value = startYear,
-                        onValueChange = { startYear = it },
+                        onValueChange = {
+                            startYear = it
+                            startYearError = it.length != 4 || it.toIntOrNull() == null
+                        },
                         label = { Text("Start Year") },
+                        isError = startYearError,
                         modifier = Modifier.weight(1f)
                     )
                 }
 
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
+                // End Month and Year
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
                     OutlinedTextField(
                         value = endMonth,
-                        onValueChange = { endMonth = it },
+                        onValueChange = {
+                            endMonth = it
+                            endMonthError = it.toIntOrNull() !in 1..12 || it.startsWith("0") || it.isEmpty()
+                        },
                         label = { Text("End Month") },
+                        isError = endMonthError,
                         modifier = Modifier.weight(1f)
                     )
                     OutlinedTextField(
                         value = endYear,
-                        onValueChange = { endYear = it },
+                        onValueChange = {
+                            endYear = it
+                            endYearError = it.length != 4 || it.toIntOrNull() == null
+                        },
                         label = { Text("End Year") },
+                        isError = endYearError,
                         modifier = Modifier.weight(1f)
                     )
                 }
 
                 if (errorMessage.isNotEmpty()) {
-                    Text(
-                        text = errorMessage,
-                        color = Color.Red,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(10.dp)
-                    )
+                    Text(text = errorMessage, color = Color.Red, textAlign = TextAlign.Center, modifier = Modifier.padding(10.dp))
                 }
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    TextButton(onClick = onDismiss) {
-                        Text("Cancel")
-                    }
-
+                // Save and Cancel buttons
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    TextButton(onClick = onDismiss) { Text("Cancel") }
 
                     Button(
                         onClick = {
-                            runBlocking {
-                                val startDate = LocalDate(startYear.toInt(), startMonth.toInt(), 1)
-                                val endDate = LocalDate(endYear.toInt(), endMonth.toInt(), 1)
-                                val gpaValue = gpa.toFloatOrNull()
-                                val degreeN = degreeName
-                                val degreeId = degreeTypes.indexOf(degreeN) + 1
+                            if (
+                                schoolNameError || majorError || degreeName.isEmpty() ||
+                                startMonthError || startYearError || endMonthError || endYearError
+                            ) {
+                                errorMessage = "Please enter all fields correctly."
+                            } else {
+                                runBlocking {
+                                    try {
+                                        val startDate = LocalDate(startYear.toInt(), startMonth.toInt(), 1)
+                                        val endDate = LocalDate(endYear.toInt(), endMonth.toInt(), 1)
+                                        val gpaValue = gpa.toFloatOrNull()
+                                        val degreeId = degreeTypes.indexOf(degreeName) + 1
 
-                                val result = if (education == null) {
-                                    // Adding new education record
-                                    profileController.addEducation(
-                                        userId = userId,
-                                        degreeId = degreeId,
-                                        major = major,
-                                        gpa = gpaValue,
-                                        startDate = startDate,
-                                        endDate = endDate,
-                                        institutionName = schoolName
-                                    )
-                                } else {
-                                    profileController.updateEducation(
-                                        userId = userId,
-                                        educationId = education.id.toString(),
-                                        degreeId = degreeId,
-                                        major = major,
-                                        gpa = gpaValue,
-                                        startDate = startDate,
-                                        endDate = endDate,
-                                        institutionName = schoolName
-                                    )
-                               }
-                                result.onSuccess {
-                                    onEducationEdited()
-                                    onDismiss()
-                                }.onFailure { error ->
-                                    errorMessage = error.message ?: "Failed to save education record."
+                                        val result = if (education == null) {
+                                            profileController.addEducation(
+                                                userId = userId,
+                                                degreeId = degreeId,
+                                                major = major,
+                                                gpa = gpaValue,
+                                                startDate = startDate,
+                                                endDate = endDate,
+                                                institutionName = schoolName
+                                            )
+                                        } else {
+                                            profileController.updateEducation(
+                                                userId = userId,
+                                                educationId = education.id.toString(),
+                                                degreeId = degreeId,
+                                                major = major,
+                                                gpa = gpaValue,
+                                                startDate = startDate,
+                                                endDate = endDate,
+                                                institutionName = schoolName
+                                            )
+                                        }
+                                        result.onSuccess {
+                                            onEducationEdited()
+                                            onDismiss()
+                                        }.onFailure { error ->
+                                            errorMessage = error.message ?: "Failed to save education record."
+                                        }
+                                    } catch (e: Exception) {
+                                        errorMessage = "An unexpected error occurred. Please check your inputs."
+                                    }
                                 }
                             }
                         },
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = Color(0xFF487896),
-                            contentColor = Color.White
-                        )
+                        colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF487896), contentColor = Color.White)
                     ) {
                         Text("Save")
                     }
@@ -1159,6 +1277,7 @@ fun EditEducationDialog(
         }
     }
 }
+
 
 @Composable
 fun EditPortfolioDialog(
@@ -1274,11 +1393,9 @@ fun AddExperienceDialog(
     profileController: ProfileController,
     onWorkExperienceAdded: () -> Unit
 ) {
-
     var company by remember { mutableStateOf("") }
     var location by remember { mutableStateOf("") }
     var positionTitle by remember { mutableStateOf("") }
-    var experienceType by remember { mutableStateOf("") }
     var startMonth by remember { mutableStateOf("") }
     var startYear by remember { mutableStateOf("") }
     var endMonth by remember { mutableStateOf("") }
@@ -1287,8 +1404,13 @@ fun AddExperienceDialog(
     var isCurrentlyWorking by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
 
-
-    var experienceTypeExpanded by remember { mutableStateOf(false) }
+    // Error state tracking
+    var companyError by remember { mutableStateOf(false) }
+    var positionTitleError by remember { mutableStateOf(false) }
+    var startMonthError by remember { mutableStateOf(false) }
+    var startYearError by remember { mutableStateOf(false) }
+    var endMonthError by remember { mutableStateOf(false) }
+    var endYearError by remember { mutableStateOf(false) }
 
     Dialog(onDismissRequest = onDismiss) {
         Surface(
@@ -1299,27 +1421,90 @@ fun AddExperienceDialog(
                 .padding(16.dp)
         ) {
             Column(
-                modifier = Modifier.padding(16.dp).verticalScroll(rememberScrollState()),
+                modifier = Modifier
+                    .padding(16.dp)
+                    .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text("Add Work Experience", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
                 Spacer(modifier = Modifier.height(8.dp))
 
+                OutlinedTextField(
+                    value = company,
+                    onValueChange = {
+                        company = it
+                        companyError = it.isEmpty()
+                    },
+                    label = { Text("Company") },
+                    isError = companyError,
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-                OutlinedTextField(value = company, onValueChange = { company = it }, label = { Text("Company") }, modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(value = location, onValueChange = { location = it }, label = { Text("Location") }, modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(value = positionTitle, onValueChange = { positionTitle = it }, label = { Text("Position Title") }, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(
+                    value = location,
+                    onValueChange = { location = it },
+                    label = { Text("Location") },
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-
+                OutlinedTextField(
+                    value = positionTitle,
+                    onValueChange = {
+                        positionTitle = it
+                        positionTitleError = it.isEmpty()
+                    },
+                    label = { Text("Position Title") },
+                    isError = positionTitleError,
+                    modifier = Modifier.fillMaxWidth()
+                )
 
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                    OutlinedTextField(value = startMonth, onValueChange = { startMonth = it }, label = { Text("Start Month") }, modifier = Modifier.weight(1f), placeholder = { Text("(ex: 7 for July)") })
-                    OutlinedTextField(value = startYear, onValueChange = { startYear = it }, label = { Text("Start Year") }, modifier = Modifier.weight(1f))
+                    OutlinedTextField(
+                        value = startMonth,
+                        onValueChange = {
+                            startMonth = it
+                            startMonthError = it.toIntOrNull() !in 1..12 || it.startsWith("0") || it.isEmpty()
+                        },
+                        label = { Text("Start Month") },
+                        isError = startMonthError,
+                        modifier = Modifier.weight(1f),
+                        placeholder = { Text("(ex: 7 for July)") }
+                    )
+                    OutlinedTextField(
+                        value = startYear,
+                        onValueChange = {
+                            startYear = it
+                            startYearError = it.length != 4 || it.toIntOrNull() == null
+                        },
+                        label = { Text("Start Year") },
+                        isError = startYearError,
+                        modifier = Modifier.weight(1f)
+                    )
                 }
 
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                    OutlinedTextField(value = endMonth, onValueChange = { endMonth = it }, label = { Text("End Month") }, modifier = Modifier.weight(1f))
-                    OutlinedTextField(value = endYear, onValueChange = { endYear = it }, label = { Text("End Year") }, modifier = Modifier.weight(1f))
+                    OutlinedTextField(
+                        value = endMonth,
+                        onValueChange = {
+                            endMonth = it
+                            endMonthError = it.toIntOrNull() !in 1..12 || it.startsWith("0") || it.isEmpty()
+                        },
+                        label = { Text("End Month") },
+                        isError = endMonthError,
+                        modifier = Modifier.weight(1f),
+                        enabled = !isCurrentlyWorking
+                    )
+                    OutlinedTextField(
+                        value = endYear,
+                        onValueChange = {
+                            endYear = it
+                            endYearError = it.length != 4 || it.toIntOrNull() == null
+                        },
+                        label = { Text("End Year") },
+                        isError = endYearError,
+                        modifier = Modifier.weight(1f),
+                        enabled = !isCurrentlyWorking
+                    )
                 }
 
                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
@@ -1327,7 +1512,14 @@ fun AddExperienceDialog(
                     Text("I currently work here")
                 }
 
-                OutlinedTextField(value = description, onValueChange = { description = it }, label = { Text("Description") }, modifier = Modifier.fillMaxWidth().height(100.dp))
+                OutlinedTextField(
+                    value = description,
+                    onValueChange = { description = it },
+                    label = { Text("Description") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(100.dp)
+                )
 
                 if (errorMessage.isNotEmpty()) {
                     Text(text = errorMessage, color = Color.Red, modifier = Modifier.padding(10.dp))
@@ -1337,35 +1529,39 @@ fun AddExperienceDialog(
                     TextButton(onClick = onDismiss) {
                         Text("Cancel")
                     }
-                    Button(onClick = {
-                        runBlocking {
-                            try {
+                    Button(
+                        onClick = {
+                            if (companyError || positionTitleError || startMonthError || startYearError || (!isCurrentlyWorking && (endMonthError || endYearError))) {
+                                errorMessage = "Please fix errors in the form."
+                            } else {
+                                runBlocking {
+                                    try {
+                                        val startDate = LocalDate(startYear.toInt(), startMonth.toInt(), 1)
+                                        val endDate = if (isCurrentlyWorking) Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date else LocalDate(endYear.toInt(), endMonth.toInt(), 1)
+                                        val result = profileController.addWorkExperience(
+                                            userId = userId,
+                                            companyName = company,
+                                            currentlyWorking = isCurrentlyWorking,
+                                            title = positionTitle,
+                                            startDate = startDate,
+                                            endDate = endDate,
+                                            description = description.takeIf { it.isNotEmpty() }
+                                        )
 
-                                val startDate = LocalDate(startYear.toInt(), startMonth.toInt(), 1)
-
-                                val endDate = if (isCurrentlyWorking) LocalDate(endYear.toInt(), endMonth.toInt(), 1) else LocalDate(endYear.toInt(), endMonth.toInt(), 1)
-
-                                val result = profileController.addWorkExperience(
-                                    userId = userId,
-                                    companyName = company,
-                                    currentlyWorking = isCurrentlyWorking,
-                                    title = positionTitle,
-                                    startDate = startDate,
-                                    endDate = endDate,
-                                    description = description.takeIf { it.isNotEmpty() }
-                                )
-
-                                result.onSuccess {
-                                    onWorkExperienceAdded()
-                                    onDismiss()
-                                }.onFailure { error ->
-                                    errorMessage = error.message ?: "Failed to add work experience."
+                                        result.onSuccess {
+                                            onWorkExperienceAdded()
+                                            onDismiss()
+                                        }.onFailure { error ->
+                                            errorMessage = error.message ?: "Failed to add work experience."
+                                        }
+                                    } catch (e: Exception) {
+                                        errorMessage = "Invalid date format or missing input"
+                                    }
                                 }
-                            } catch (e: Exception) {
-                                errorMessage = "Invalid date format"
                             }
-                        }
-                    }, colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF487896), contentColor = Color.White)) {
+                        },
+                        colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF487896), contentColor = Color.White)
+                    ) {
                         Text("Save")
                     }
                 }
@@ -1373,6 +1569,7 @@ fun AddExperienceDialog(
         }
     }
 }
+
 
 @Composable
 fun EditExperienceDialog(
@@ -1383,7 +1580,6 @@ fun EditExperienceDialog(
     onWorkExperienceEdited: () -> Unit,
     onWorkExperienceDeleted: () -> Unit
 ) {
-
     var company by remember { mutableStateOf(experience?.companyName ?: "") }
     var positionTitle by remember { mutableStateOf(experience?.title ?: "") }
     var startMonth by remember { mutableStateOf(experience?.startDate?.month?.value?.toString() ?: "") }
@@ -1393,6 +1589,14 @@ fun EditExperienceDialog(
     var description by remember { mutableStateOf(experience?.description ?: "") }
     var isCurrentlyWorking by remember { mutableStateOf(experience?.currentlyWorking ?: false) }
     var errorMessage by remember { mutableStateOf("") }
+
+    // Error states for validation
+    var companyError by remember { mutableStateOf(false) }
+    var positionTitleError by remember { mutableStateOf(false) }
+    var startMonthError by remember { mutableStateOf(false) }
+    var startYearError by remember { mutableStateOf(false) }
+    var endMonthError by remember { mutableStateOf(false) }
+    var endYearError by remember { mutableStateOf(false) }
 
     Dialog(onDismissRequest = onDismiss) {
         Surface(
@@ -1443,15 +1647,23 @@ fun EditExperienceDialog(
 
                 OutlinedTextField(
                     value = company,
-                    onValueChange = { company = it },
+                    onValueChange = {
+                        company = it
+                        companyError = it.isEmpty()
+                    },
                     label = { Text("Company") },
+                    isError = companyError,
                     modifier = Modifier.fillMaxWidth()
                 )
 
                 OutlinedTextField(
                     value = positionTitle,
-                    onValueChange = { positionTitle = it },
+                    onValueChange = {
+                        positionTitle = it
+                        positionTitleError = it.isEmpty()
+                    },
                     label = { Text("Position Title") },
+                    isError = positionTitleError,
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -1461,15 +1673,23 @@ fun EditExperienceDialog(
                 ) {
                     OutlinedTextField(
                         value = startMonth,
-                        onValueChange = { startMonth = it },
+                        onValueChange = {
+                            startMonth = it
+                            startMonthError = it.toIntOrNull() !in 1..12 || it.startsWith("0") || it.isEmpty()
+                        },
                         label = { Text("Start Month") },
+                        isError = startMonthError,
                         modifier = Modifier.weight(1f),
                         placeholder = { Text("(ex: 7 for July)") }
                     )
                     OutlinedTextField(
                         value = startYear,
-                        onValueChange = { startYear = it },
+                        onValueChange = {
+                            startYear = it
+                            startYearError = it.length != 4 || it.toIntOrNull() == null
+                        },
                         label = { Text("Start Year") },
+                        isError = startYearError,
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -1480,15 +1700,25 @@ fun EditExperienceDialog(
                 ) {
                     OutlinedTextField(
                         value = endMonth,
-                        onValueChange = { endMonth = it },
+                        onValueChange = {
+                            endMonth = it
+                            endMonthError = it.toIntOrNull() !in 1..12 || it.startsWith("0") || it.isEmpty()
+                        },
                         label = { Text("End Month") },
-                        modifier = Modifier.weight(1f)
+                        isError = endMonthError,
+                        modifier = Modifier.weight(1f),
+                        enabled = !isCurrentlyWorking
                     )
                     OutlinedTextField(
                         value = endYear,
-                        onValueChange = { endYear = it },
+                        onValueChange = {
+                            endYear = it
+                            endYearError = it.length != 4 || it.toIntOrNull() == null
+                        },
                         label = { Text("End Year") },
-                        modifier = Modifier.weight(1f)
+                        isError = endYearError,
+                        modifier = Modifier.weight(1f),
+                        enabled = !isCurrentlyWorking
                     )
                 }
 
@@ -1525,45 +1755,46 @@ fun EditExperienceDialog(
                         Text("Cancel")
                     }
 
-
                     Button(
                         onClick = {
-                            // Handle save or update action
-                            runBlocking {
-                                try {
-                                    val startDate = LocalDate(startYear.toInt(), startMonth.toInt(), 1)
-                                    val endDate = if (isCurrentlyWorking) Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date else LocalDate(endYear.toInt(), endMonth.toInt(), 1)
-                                    val result = if (experience == null) {
-
-                                        profileController.addWorkExperience(
-                                            userId = userId,
-                                            companyName = company,
-                                            title = positionTitle,
-                                            currentlyWorking = isCurrentlyWorking,
-                                            startDate = startDate,
-                                            endDate = endDate,
-                                            description = description.takeIf { it.isNotEmpty() }
-                                        )
-                                    } else {
-                                        profileController.updateWorkExperience(
-                                            userId = userId,
-                                            workExperienceID = experience.id.toString(),
-                                            companyName = company,
-                                            currentlyWorking = isCurrentlyWorking,
-                                            title = positionTitle,
-                                            startDate = startDate,
-                                            endDate = endDate,
-                                            description = description.takeIf { it.isNotEmpty() }
-                                        )
+                            if (companyError || positionTitleError || startMonthError || startYearError || (!isCurrentlyWorking && (endMonthError || endYearError))) {
+                                errorMessage = "Please fix the errors in the form."
+                            } else {
+                                runBlocking {
+                                    try {
+                                        val startDate = LocalDate(startYear.toInt(), startMonth.toInt(), 1)
+                                        val endDate = if (isCurrentlyWorking) Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date else LocalDate(endYear.toInt(), endMonth.toInt(), 1)
+                                        val result = if (experience == null) {
+                                            profileController.addWorkExperience(
+                                                userId = userId,
+                                                companyName = company,
+                                                title = positionTitle,
+                                                currentlyWorking = isCurrentlyWorking,
+                                                startDate = startDate,
+                                                endDate = endDate,
+                                                description = description.takeIf { it.isNotEmpty() }
+                                            )
+                                        } else {
+                                            profileController.updateWorkExperience(
+                                                userId = userId,
+                                                workExperienceID = experience.id.toString(),
+                                                companyName = company,
+                                                currentlyWorking = isCurrentlyWorking,
+                                                title = positionTitle,
+                                                startDate = startDate,
+                                                endDate = endDate,
+                                                description = description.takeIf { it.isNotEmpty() }
+                                            )
+                                        }
+                                        result.onSuccess {
+                                            onWorkExperienceEdited()
+                                            onDismiss()
+                                        }.onFailure { error ->
+                                            errorMessage = error.message ?: "Failed to save work experience."
+                                        }
+                                    } catch (e: Exception) {
+                                        errorMessage = "Invalid date format"
                                     }
-                                    result.onSuccess {
-                                        onWorkExperienceEdited()
-                                        onDismiss()
-                                    }.onFailure { error ->
-                                        errorMessage = error.message ?: "Failed to save work experience."
-                                    }
-                                } catch (e: Exception) {
-                                    errorMessage = "Invalid date format"
                                 }
                             }
                         },
@@ -1619,6 +1850,7 @@ fun EditSkillsDialog(
 ) {
     var skillInput by remember { mutableStateOf("") }
     var isDuplicateSkill by remember { mutableStateOf(false) }
+    var isInvalidSkill by remember { mutableStateOf(false) }
     var selectedSkills = remember { mutableStateListOf<String>().apply { addAll(initialSkills) } }
     var errorMessage by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
@@ -1646,23 +1878,45 @@ fun EditSkillsDialog(
 
                 OutlinedTextField(
                     value = skillInput,
-                    onValueChange = { skillInput = it },
+                    onValueChange = {
+                        skillInput = it
+                        isDuplicateSkill = false
+                        isInvalidSkill = false
+                    },
                     label = { Text("Add a new skill") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    isError = isDuplicateSkill || isInvalidSkill
                 )
 
+                if (isDuplicateSkill) {
+                    Text(
+                        text = "This skill has already been added.",
+                        color = Color.Red,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
+
+                if (isInvalidSkill) {
+                    Text(
+                        text = "Invalid skill. Please enter valid text.",
+                        color = Color.Red,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
 
                 Button(
                     onClick = {
-                        if (skillInput.isNotBlank()) {
-                            if (skillInput in selectedSkills) {
-                                isDuplicateSkill = true
-                            } else {
-
-                                selectedSkills.add(skillInput)
-                                skillInput = ""
-                                isDuplicateSkill = false
-                            }
+                        if (skillInput.isBlank()) {
+                            isInvalidSkill = true
+                        } else if (skillInput in selectedSkills) {
+                            isDuplicateSkill = true
+                        } else {
+                            selectedSkills.add(skillInput.trim())
+                            skillInput = ""
+                            isDuplicateSkill = false
+                            isInvalidSkill = false
                         }
                     },
                     modifier = Modifier.align(Alignment.End),
@@ -1671,23 +1925,14 @@ fun EditSkillsDialog(
                     Text("Add")
                 }
 
-                if (isDuplicateSkill) {
-                    Text(
-                        text = "This skill has already been added.",
-                        color = Color.Red,
-                        fontSize = 12.sp,
-                        modifier = Modifier.padding(top = 8.dp)
-                    )
-                }
-
-                Row(
+                // Display skills in a wrapped layout using LazyVerticalGrid
+                LazyVerticalGrid(
+                    columns = GridCells.Adaptive(minSize = 100.dp),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .wrapContentHeight()
-                        .padding(vertical = 8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        .heightIn(max = 200.dp) // Limit height for scrollable grid
                 ) {
-                    selectedSkills.forEach { skill ->
+                    items(selectedSkills) { skill ->
                         SkillChip(skill = skill) {
                             selectedSkills.remove(skill)
                         }
@@ -1695,7 +1940,12 @@ fun EditSkillsDialog(
                 }
 
                 if (errorMessage.isNotEmpty()) {
-                    Text(text = errorMessage, color = Color.Red)
+                    Text(
+                        text = errorMessage,
+                        color = Color.Red,
+                        fontSize = 14.sp,
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
                 }
 
                 Row(
@@ -1708,19 +1958,23 @@ fun EditSkillsDialog(
                     Button(
                         onClick = {
                             scope.launch {
-
-                                selectedSkills.forEach { skill ->
-                                    if (skill !in initialSkills) {
-                                        profileController.addSkill(userId, skill)
+                                try {
+                                    selectedSkills.forEach { skill ->
+                                        if (skill !in initialSkills) {
+                                            profileController.addSkill(userId, skill)
+                                        }
                                     }
-                                }
 
-                                initialSkills.forEach { skill ->
-                                    if (skill !in selectedSkills) {
-                                        profileController.deleteSkill(userId, skill)
+                                    initialSkills.forEach { skill ->
+                                        if (skill !in selectedSkills) {
+                                            profileController.deleteSkill(userId, skill)
+                                        }
                                     }
+
+                                    onSave()
+                                } catch (e: Exception) {
+                                    errorMessage = e.message ?: "Failed to save skills."
                                 }
-                                onSave()
                             }
                         },
                         colors = ButtonDefaults.buttonColors(
@@ -1735,6 +1989,8 @@ fun EditSkillsDialog(
         }
     }
 }
+
+
 
 fun navigateOtherPage(NavigateOtherPage: () -> Unit) {
     NavigateOtherPage()

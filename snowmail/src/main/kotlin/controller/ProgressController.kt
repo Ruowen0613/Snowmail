@@ -45,14 +45,14 @@ class ProgressController(private val jobApplicationRepository: IJobApplicationRe
 
     // return all new emails from last refresh time to now
     // return value is List<Email>
-    suspend fun getNewEmails(userId: String): List<email> {
+    suspend fun getNewEmails(userId: String, linkedEmail: String, appPassword: String): List<email> {
         // get all recruiter emails
         val recruiterEmails = jobApplicationRepository.getAllRecruiterEmailAddress(userId)
         // get last refresh time
         val lastRefreshTime = jobApplicationRepository.getRefreshTime(userId).getOrNull()!!
         // TO BE ADDED: REMOVE HARDCODE EMAIL AND GMAIL PASSWORD
         // search emails
-        val emails = searchEmails("eonyeonz77@gmail.com", "wqgz flgy ejus otjr", lastRefreshTime, recruiterEmails)
+        val emails = searchEmails(linkedEmail, appPassword, lastRefreshTime, recruiterEmails)
         return emails
     }
 
@@ -71,35 +71,35 @@ class ProgressController(private val jobApplicationRepository: IJobApplicationRe
 
 }
 
-suspend fun main() {
-
-    val supabase = createSupabaseClient(
-        supabaseUrl = "https://gwnlngyvkxdpodenpyyj.supabase.co",
-        supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd3bmxuZ3l2a3hkcG9kZW5weXlqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjc5MTAxNTEsImV4cCI6MjA0MzQ4NjE1MX0.olncAUMxSOjcr0YjssWXThtXDXC3q4zasdNYdwavt8g"
-    ) {
-        install(Postgrest)
-        install(Auth)
-        install(Storage)
-    }
-    val JobApplicationRepository = JobApplicationRepository(supabase)
-
-    // getProgress
-    val progressController = ProgressController(JobApplicationRepository)
-    val result: Progress = progressController.getProgress("ed52b6c4-2ae8-4b58-bacd-adc00082a505")
-    println(result)
-    println(result.appliedItemCount)
-    print(result.appliedJobs)
-
-    // modifyStatus
-    val result2 = progressController.modifyStatus("788db112-76bd-4cb1-95ff-93a0e1d7e078", 3)
-    println(result2)
-
-    // getAllAppliedJobs
-    val result3 = progressController.getAllAppliedJobs("ed52b6c4-2ae8-4b58-bacd-adc00082a505")
-    println(result3)
-
-    val result4 = progressController.getNewEmails("ed52b6c4-2ae8-4b58-bacd-adc00082a505")
-    println(result4)
-
-}
+//suspend fun main() {
+//
+//    val supabase = createSupabaseClient(
+//        supabaseUrl = "https://gwnlngyvkxdpodenpyyj.supabase.co",
+//        supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd3bmxuZ3l2a3hkcG9kZW5weXlqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjc5MTAxNTEsImV4cCI6MjA0MzQ4NjE1MX0.olncAUMxSOjcr0YjssWXThtXDXC3q4zasdNYdwavt8g"
+//    ) {
+//        install(Postgrest)
+//        install(Auth)
+//        install(Storage)
+//    }
+//    val JobApplicationRepository = JobApplicationRepository(supabase)
+//
+//    // getProgress
+//    val progressController = ProgressController(JobApplicationRepository)
+//    val result: Progress = progressController.getProgress("ed52b6c4-2ae8-4b58-bacd-adc00082a505")
+//    println(result)
+//    println(result.appliedItemCount)
+//    print(result.appliedJobs)
+//
+//    // modifyStatus
+//    val result2 = progressController.modifyStatus("788db112-76bd-4cb1-95ff-93a0e1d7e078", 3)
+//    println(result2)
+//
+//    // getAllAppliedJobs
+//    val result3 = progressController.getAllAppliedJobs("ed52b6c4-2ae8-4b58-bacd-adc00082a505")
+//    println(result3)
+//
+//    val result4 = progressController.getNewEmails("ed52b6c4-2ae8-4b58-bacd-adc00082a505")
+//    println(result4)
+//
+//}
 

@@ -31,6 +31,7 @@ import model.JobApplication
 import service.email
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import ca.uwaterloo.controller.ProfileController
 
 
 @Composable
@@ -42,6 +43,7 @@ fun JobProgressPage(
 ) {
     val dbStorage = SupabaseClient()
     val progressController = ProgressController(dbStorage.jobApplicationRepository)
+    val profileController = ProfileController(dbStorage.userProfileRepository)
 
     var selectedTabIndex by remember { mutableStateOf(1) }
     var showDialog by remember { mutableStateOf(false) }
@@ -52,10 +54,27 @@ fun JobProgressPage(
     var isLoading by remember { mutableStateOf(true) }
     val coroutineScope = rememberCoroutineScope()
     var refreshTrigger by remember { mutableStateOf(false) }
+    var linkedEmail by remember { mutableStateOf<String>("") }
+    var appPassword by remember { mutableStateOf<String>("") }
 
     LaunchedEffect(userId, refreshTrigger) {
         isLoading = true
-        val getEmailResult = runCatching { progressController.getNewEmails(userId) }
+        val getLinkedEmailResult = profileController.getUserLinkedGmailAccount(userId)
+        val getAppPasswardResult = profileController.getUserGmailAppPassword(userId)
+
+        getLinkedEmailResult.onSuccess { result ->
+            linkedEmail = result
+        }.onFailure { error ->
+            errorMessage = error.message ?: "Failed to retrieve user linked email"
+        }
+
+        getAppPasswardResult.onSuccess { result ->
+            appPassword = result
+        }.onFailure { error ->
+            errorMessage = error.message ?: "Failed to retrieve user app password"
+        }
+
+        val getEmailResult = runCatching { progressController.getNewEmails(userId, linkedEmail, appPassword) }
         val getProgressResult = runCatching { progressController.getProgress(userId) }
 
         getEmailResult.onSuccess { emailList ->
@@ -309,7 +328,7 @@ fun EmailDialog(
     val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(userId) {
-        appliedJobs = progressController.getAllAppliedJobs(userId)
+        appliedJobs = progressController.getAllAppliedJobs(userId, )
     }
 
     val scrollState = rememberScrollState()

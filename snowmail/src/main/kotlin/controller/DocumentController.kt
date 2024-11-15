@@ -11,8 +11,13 @@ import java.nio.file.Paths
 
 class DocumentController(private val documentRepository: IDocumentRepository) {
 
-    suspend fun uploadDocument(bucket: String, userId: String, documentType: String, documentName: String, file: File): Result<String> {
-        val path = "$userId/$documentType/$documentName"
+    suspend fun uploadDocument(
+        userId: String,
+        documentType: String,
+        documentName: String,
+        bucket: String,
+        file: File
+    ): Result<String> {
         return documentRepository.uploadDocument(bucket, path, file)
     }
 
@@ -86,8 +91,16 @@ fun main() = runBlocking<Unit> {
     val bucket = "user_documents"
     val userId = "test"
     val documentType = "other"
-    val documentName = "Q6-2"
+    val documentName = "test-resume-2"
     val expiresInMinutes = 10
+    val file = File(System.getProperty("user.home") + "/Desktop/test-resume.pdf")
+
+    val result = documentController.uploadDocument(bucket, "test", "other", documentName, file)
+    result.onSuccess {
+        println("Upload successful: $it")
+    }.onFailure { error ->
+        println("Error uploading document: ${error.message}")
+    }
 
 //    val result = documentController.createSignedUrl(bucket, userId, documentType, documentName)
 //    result.onSuccess { url ->
@@ -96,15 +109,15 @@ fun main() = runBlocking<Unit> {
 //        println("Error creating signed URL: ${error.message}")
 //    }
 
-    val result = documentController.listDocuments(bucket, userId, documentType)
-    result.onSuccess { documents ->
-        println("Documents in $bucket/$userId/$documentType:")
-        documents.forEach { document ->
-            println(document)
-        }
-    }.onFailure { error ->
-        println("Error listing documents: ${error.message}")
-    }
+//    val result = documentController.listDocuments(bucket, userId, documentType)
+//    result.onSuccess { documents ->
+//        println("Documents in $bucket/$userId/$documentType:")
+//        documents.forEach { document ->
+//            println(document)
+//        }
+//    }.onFailure { error ->
+//        println("Error listing documents: ${error.message}")
+//    }
 
 //    val result = documentController.viewDocument(bucket, userId, documentType, documentName)
 //    result.onSuccess { url ->

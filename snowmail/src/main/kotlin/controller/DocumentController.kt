@@ -30,6 +30,11 @@ class DocumentController(private val documentRepository: IDocumentRepository) {
         val path = "$userId/$documentType/$documentName"
         return documentRepository.createSignedUrl(bucket, path)
     }
+
+    suspend fun listDocuments(bucket: String, userId: String, documentType: String): Result<List<String>> {
+        val path = "$userId/$documentType"
+        return documentRepository.listDocuments(bucket, path)
+    }
 }
 
 fun main() = runBlocking<Unit> {
@@ -44,9 +49,6 @@ fun main() = runBlocking<Unit> {
 //                - transcript.pdf
 //            - other
 //                - other.pdf
-
-//    val dbStorage = SupabaseClient()
-//    val documentController = DocumentController(dbStorage.documentRepository)
 //
 //    val bucket = "user_documents"
 //    val path = "test/Q6-2.jpg"
@@ -94,18 +96,28 @@ fun main() = runBlocking<Unit> {
 //        println("Error creating signed URL: ${error.message}")
 //    }
 
-    val result = documentController.viewDocument(bucket, userId, documentType, documentName)
-    result.onSuccess { url ->
-        println("Signed URL: $url")
-        // Open the URL in the default browser
-        if (Desktop.isDesktopSupported()) {
-            Desktop.getDesktop().browse(URI(url))
-        } else {
-            println("Desktop is not supported. Please open the URL manually.")
+    val result = documentController.listDocuments(bucket, userId, documentType)
+    result.onSuccess { documents ->
+        println("Documents in $bucket/$userId/$documentType:")
+        documents.forEach { document ->
+            println(document)
         }
     }.onFailure { error ->
-        println("Error creating signed URL: ${error.message}")
+        println("Error listing documents: ${error.message}")
     }
+
+//    val result = documentController.viewDocument(bucket, userId, documentType, documentName)
+//    result.onSuccess { url ->
+//        println("Signed URL: $url")
+//        // Open the URL in the default browser
+//        if (Desktop.isDesktopSupported()) {
+//            Desktop.getDesktop().browse(URI(url))
+//        } else {
+//            println("Desktop is not supported. Please open the URL manually.")
+//        }
+//    }.onFailure { error ->
+//        println("Error creating signed URL: ${error.message}")
+//    }
 
 
 

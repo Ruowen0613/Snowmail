@@ -60,6 +60,7 @@ dependencies {
     implementation(libs.supabase.auth)
     implementation(libs.supabase.storage)
 
+
     implementation(kotlin("stdlib-jdk8"))
 
     implementation(libs.pdfbox)
@@ -72,6 +73,10 @@ dependencies {
     testImplementation("org.mockito:mockito-core:4.6.1")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
     testImplementation("org.junit.jupiter:junit-jupiter:5.7.0")
+
+   // implementation ("androidx.compose.ui:ui:1.7.5")
+
+
 }
 
 tasks.test {

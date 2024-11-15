@@ -7,4 +7,5 @@ interface IDocumentRepository {
     suspend fun downloadDocument(bucket: String, path: String): Result<ByteArray>
     suspend fun deleteDocument(bucket: String, path: String): Result<String>
     suspend fun createSignedUrl(bucket: String, path: String): Result<String>
+    suspend fun listDocuments(bucket: String, path: String): Result<List<String>>
 }

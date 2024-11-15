@@ -28,6 +28,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.foundation.text.ClickableText
 import kotlinx.datetime.LocalDate
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.ui.res.painterResource
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -43,6 +44,7 @@ import kotlinx.coroutines.launch
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+
 
 
 @Composable
@@ -315,6 +317,28 @@ fun ProfilePage(userId: String,
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
                 ) {
+                    var showGmailLinkingDialog by remember { mutableStateOf(false) }
+
+                    Button(
+                        onClick = { showGmailLinkingDialog = true },
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = Color(0xFF487896),
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Text("gmail linking")
+                    }
+
+                    if (showGmailLinkingDialog) {
+                        GmailLinkingDialog(
+                            onDismissRequest = { showGmailLinkingDialog = false },
+                            userId = userId,
+                            profileController = profileController
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.weight(0.1f))
+
                     IconButton(
                         onClick = { EditContactDialog = true },
                         modifier = Modifier.size(14.dp)
@@ -2026,6 +2050,118 @@ fun ProfileDetail(label: String, value: String) {
             value,
             style = TextStyle(fontSize = 14.sp, color = Color.Black)
         )
+    }
+}
+
+@Composable
+fun GmailLinkingDialog(
+    onDismissRequest: () -> Unit,
+    userId: String,
+    profileController: ProfileController
+) {
+    var account by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var errorMessage by remember { mutableStateOf("") }
+    val coroutineScope = rememberCoroutineScope()
+
+    Dialog(onDismissRequest = onDismissRequest) {
+        Surface(
+            shape = RoundedCornerShape(8.dp),
+            color = Color.White,
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Gmail Linking",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    color = Color.Black
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Steps for gmail user to link their email account to Snowmail: \n" +
+                            "1. go to Google account setting (”Manage Your Google Account”)\n" +
+                            "2. go to “Security”\n" +
+                            "3. scroll down to “How you sign in to Google”\n" +
+                            "4. enable “2-Step Verification”\n" +
+                            "5. go back to “Security” and search for “App passwords” in the topmost search bar and hit enter\n" +
+                            "6. You should see something like this:",
+                    fontSize = 14.sp,
+                    color = Color.Gray
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+//                Image(
+//                    painter = painterResource(id = R.drawable.apppassword),
+//                    contentDescription = "Gmail App Password",
+//                    modifier = Modifier.size(300.dp)
+//                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    OutlinedTextField(
+                        value = account,
+                        onValueChange = { account = it },
+                        label = { Text("Enter Gmail Account") },
+                        modifier = Modifier.weight(1f)
+                    )
+                    OutlinedTextField(
+                        value = password,
+                        onValueChange = { password = it },
+                        label = { Text("Enter Gmail App Password") },
+                        modifier = Modifier.weight(1f),
+                        //visualTransformation = PasswordVisualTransformation()
+                    )
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+                if (errorMessage.isNotEmpty()) {
+                    Text(
+                        text = errorMessage,
+                        color = Color.Red,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                }
+                Button(
+                    onClick = {
+                        if (account.endsWith("@gmail.com")) {
+                            coroutineScope.launch {
+                                val accountResult = profileController.editUserLinkedGmailAccount(userId, account)
+                                val passwordResult = profileController.editUserGmailAppPassword(userId, password)
+                                if (accountResult.isSuccess && passwordResult.isSuccess) {
+                                    onDismissRequest()
+                                } else {
+                                    errorMessage = "Error linking Gmail account. Please try again."
+                                }
+                            }
+                        } else {
+                            errorMessage = "Please enter a valid Gmail account ending with @gmail.com."
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = Color(0xFF487896),
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text("Link Gmail")
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(
+                    onClick = onDismissRequest,
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = Color(0xFF487896),
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text("Close")
+                }
+            }
+        }
     }
 }
 

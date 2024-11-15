@@ -47,6 +47,8 @@ fun main() = runBlocking<Unit> {
 
     val userId = "c9498eec-ac17-4a3f-8d91-61efba3f7277"
 
+
+
 //    val bucketResult = dbStorage.retrieveBuckets()
 //    bucketResult.onSuccess { buckets ->
 //        println("Buckets: $buckets")
@@ -124,14 +126,6 @@ fun main() = runBlocking<Unit> {
 //        println("Work experience deleted successfully.")
 //    }.onFailure { error ->
 //        println("Error deleting work experience: ${error.message}")
-//    }
-
-    //test get user profile
-//    val profileResult = dbStorage.userProfileRepository.getUserProfile(userId)
-//    profileResult.onSuccess { profile ->
-//        println("User profile: $profile")
-//    }.onFailure { error ->
-//        println("Error fetching user profile: ${error.message}")
 //    }
 
     //test add skill
@@ -231,12 +225,12 @@ fun main() = runBlocking<Unit> {
 //    }
 
     // test get education
-    val result = dbStorage.userProfileRepository.getEducation(userId)
-    result.onSuccess { education ->
-        println("Education: $education")
-    }.onFailure { error ->
-        println("Error fetching education: ${error.message}")
-    }
+//    val result = dbStorage.userProfileRepository.getEducation(userId)
+//    result.onSuccess { education ->
+//        println("Education: $education")
+//    }.onFailure { error ->
+//        println("Error fetching education: ${error.message}")
+//    }
 
 
 

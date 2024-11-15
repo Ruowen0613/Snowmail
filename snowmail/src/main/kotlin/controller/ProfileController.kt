@@ -2,6 +2,7 @@ package ca.uwaterloo.controller
 
 import ca.uwaterloo.model.Education
 import ca.uwaterloo.model.EducationWithDegreeName
+import ca.uwaterloo.model.PersonalProject
 import model.UserProfile
 // import ca.uwaterloo.persistence.DBStorage
 
@@ -12,6 +13,44 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.LocalDate
 
 class ProfileController(private val userProfileRepository: IUserProfileRepository) {
+
+    // get user's profile
+//    suspend fun getUserProfile(userId: String): Result<UserProfile> {
+//        return userProfileRepository.getUserProfile(userId)
+//    }
+
+
+
+    /**********************************************************
+     *                                                        *
+     *   The following 4 functions are for linking Gmail      *
+     *   account and sending Gmail frontend                   *
+     *   Call getters when sending emails                     *
+     *   Call setters when linking Gmail account              *
+     *                                                        *
+     **********************************************************/
+
+    // get user's linked gmail account
+    suspend fun getUserLinkedGmailAccount(userId: String): Result<String> {
+        return userProfileRepository.getUserLinkedGmailAccount(userId)
+    }
+
+    // edit user's linked gmail account
+    // must prompt user to only enter gmail account (end with @gmail.com)
+    suspend fun editUserLinkedGmailAccount(userId: String, linkedGmailAccount: String): Result<Boolean> {
+        return userProfileRepository.editUserLinkedGmailAccount(userId, linkedGmailAccount)
+    }
+
+    // get user's gmail app password
+    suspend fun getUserGmailAppPassword(userId: String): Result<String> {
+        return userProfileRepository.getUserGmailAppPassword(userId)
+    }
+
+    // edit user's gmail app password
+    suspend fun editUserGmailAppPassword(userId: String, gmailAppPassword: String): Result<Boolean> {
+        return userProfileRepository.editUserGmailAppPassword(userId, gmailAppPassword)
+    }
+
 
     // get user's name and display it on profile page
     suspend fun getUserName(userId: String): Result<String> {
@@ -200,6 +239,31 @@ class ProfileController(private val userProfileRepository: IUserProfileRepositor
     // get degree id by name
     suspend fun getDegreeIdByName(degreeName: String): Result<Int> {
         return userProfileRepository.getDegreeIdByName(degreeName)
+    }
+
+    // get projects by userid
+    suspend fun getProjects(userId: String): Result<List<PersonalProject>> {
+        return userProfileRepository.getProjects(userId)
+    }
+
+    // add project to db
+    suspend fun addProject(userId: String, projectName: String, description: String?): Result<Boolean> {
+        return userProfileRepository.addProject(userId, projectName, description)
+    }
+
+    // update project in db
+    suspend fun updateProject(
+        userId: String,
+        projectID: String,
+        projectName: String,
+        description: String?
+    ): Result<Boolean> {
+        return userProfileRepository.updateProject(userId, projectID, projectName, description)
+    }
+
+    // delete project from db
+    suspend fun deleteProject(projectID: String): Result<Boolean> {
+        return userProfileRepository.deleteProject(projectID)
     }
 }
 
@@ -407,6 +471,79 @@ fun main() = runBlocking<Unit> {
 //        println("Degree ID: $degreeId")
 //    }.onFailure { error ->
 //        println("Error fetching degree ID: ${error.message}")
+//    }
+
+    // test getting user's linked gmail account
+//    val result = profileController.getUserLinkedGmailAccount(userId)
+//    result.onSuccess { linkedGmailAccount ->
+//        println("Linked Gmail Account: $linkedGmailAccount")
+//    }.onFailure { error ->
+//        println("Error fetching linked gmail account: ${error.message}")
+//    }
+
+    // test getting user's gmail app password
+//    val result = profileController.getUserGmailAppPassword(userId)
+//    result.onSuccess { gmailAppPassword ->
+//        println("Gmail App Password: $gmailAppPassword")
+//    }.onFailure { error ->
+//        println("Error fetching gmail app password: ${error.message}")
+//    }
+
+    // test editing user's linked gmail account
+//    val linkedGmailAccount = "wrw040613@163.com"
+//    val result = profileController.editUserLinkedGmailAccount(userId, linkedGmailAccount)
+//    result.onSuccess {
+//        println("Linked Gmail Account updated successfully.")
+//    }.onFailure { error ->
+//        println("Error updating linked gmail account: ${error.message}")
+//    }
+
+    // test editing user's gmail app password
+//    val gmailAppPassword = "unwu wnsl agek lxoj"
+//    val result = profileController.editUserGmailAppPassword(userId, gmailAppPassword)
+//    result.onSuccess {
+//        println("Gmail App Password updated successfully.")
+//    }.onFailure { error ->
+//        println("Error updating gmail app password: ${error.message}")
+//    }
+
+    // test getting projects
+//    val result = profileController.getProjects(userId)
+//    result.onSuccess { projects ->
+//        println("Projects: $projects")
+//    }.onFailure { error ->
+//        println("Error fetching projects: ${error.message}")
+//    }
+
+    // test adding project
+//    val projectName = "Project 2"
+//    val description = "This is project 2."
+//    val result = profileController.addProject(userId, projectName, description)
+//    result.onSuccess {
+//        println("Project added successfully.")
+//    }.onFailure { error ->
+//        println("Error adding project: ${error.message}")
+//    }
+
+    // test updating project
+//    val projectID = "1"
+//    val projectName = "Project 1"
+//    val description = "This is project 1."
+//
+//    val result = profileController.updateProject(userId, projectID, projectName, description)
+//    result.onSuccess {
+//        println("Project updated successfully.")
+//    }.onFailure { error ->
+//        println("Error updating project: ${error.message}")
+//    }
+
+    // test deleting project
+//    val projectID = "3"
+//    val result = profileController.deleteProject(projectID)
+//    result.onSuccess {
+//        println("Project deleted successfully.")
+//    }.onFailure { error ->
+//        println("Error deleting project: ${error.message}")
 //    }
 
 }

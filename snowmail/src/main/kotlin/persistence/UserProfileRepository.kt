@@ -33,6 +33,83 @@ class UserProfileRepository(private val supabase: SupabaseClient) : IUserProfile
         }
     }
 
+    // get user's linked gmail account
+    override suspend fun getUserLinkedGmailAccount(userId: String): Result<String> {
+        return try {
+            // fetch user's linked gmail account from db based on userid
+            val linkedGmailAccount = supabase.from("user_profile")
+                .select(columns = Columns.list("linked_gmail_account")) {
+                    filter {
+                        eq("user_id", userId)
+                    }
+                }
+                .decodeSingle<Map<String, String?>>()
+
+            val gmailAccount = linkedGmailAccount["linked_gmail_account"] ?: ""
+            Result.success(gmailAccount)
+        } catch (e: Exception) {
+            Result.failure(Exception("Failed to fetch linked gmail account: ${e.message}"))
+        }
+    }
+
+    // edit user's linked gmail account
+    override suspend fun editUserLinkedGmailAccount(userId: String, linkedGmailAccount: String): Result<Boolean> {
+        return try {
+            // Check if linkedGmailAccount ends with "@gmail.com"
+            if (!linkedGmailAccount.endsWith("@gmail.com")) {
+                throw IllegalArgumentException("Invalid Gmail account: must end with '@gmail.com'")
+            }
+
+            withContext(Dispatchers.IO) {
+                supabase.from("user_profile")
+                    .update(mapOf("linked_gmail_account" to linkedGmailAccount)){
+                        filter {
+                            eq("user_id", userId)
+                        }
+                    }
+                Result.success(true)
+            }
+        } catch (e: Exception) {
+            Result.failure(Exception("Failed to update linked gmail account: ${e.message}"))
+        }
+    }
+
+    // get user's gmail app password
+    override suspend fun getUserGmailAppPassword(userId: String): Result<String> {
+        return try {
+            // fetch user's gmail app password from db based on userid
+            val gmailAppPassword = supabase.from("user_profile")
+                .select(columns = Columns.list("gmail_app_password")) {
+                    filter {
+                        eq("user_id", userId)
+                    }
+                }
+                .decodeSingle<Map<String, String?>>()
+
+            val appPassword = gmailAppPassword["gmail_app_password"] ?: ""
+            Result.success(appPassword)
+        } catch (e: Exception) {
+            Result.failure(Exception("Failed to fetch gmail app password: ${e.message}"))
+        }
+    }
+
+    // edit user's gmail app password
+    override suspend fun editUserGmailAppPassword(userId: String, gmailAppPassword: String): Result<Boolean> {
+        return try {
+            withContext(Dispatchers.IO) {
+                supabase.from("user_profile")
+                    .update(mapOf("gmail_app_password" to gmailAppPassword)){
+                        filter {
+                            eq("user_id", userId)
+                        }
+                    }
+                Result.success(true)
+            }
+        } catch (e: Exception) {
+            Result.failure(Exception("Failed to update gmail app password: ${e.message}"))
+        }
+    }
+
     override suspend fun getUserName(userId: String): Result<String> {
         return try {
             // fetch user's name from db based on userid

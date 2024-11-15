@@ -13,6 +13,44 @@ import kotlinx.datetime.LocalDate
 
 class ProfileController(private val userProfileRepository: IUserProfileRepository) {
 
+    // get user's profile
+//    suspend fun getUserProfile(userId: String): Result<UserProfile> {
+//        return userProfileRepository.getUserProfile(userId)
+//    }
+
+
+
+    /**********************************************************
+     *                                                        *
+     *   The following 4 functions are for linking Gmail      *
+     *   account and sending Gmail frontend                   *
+     *   Call getters when sending emails                     *
+     *   Call setters when linking Gmail account              *
+     *                                                        *
+     **********************************************************/
+
+    // get user's linked gmail account
+    suspend fun getUserLinkedGmailAccount(userId: String): Result<String> {
+        return userProfileRepository.getUserLinkedGmailAccount(userId)
+    }
+
+    // edit user's linked gmail account
+    // must prompt user to only enter gmail account (end with @gmail.com)
+    suspend fun editUserLinkedGmailAccount(userId: String, linkedGmailAccount: String): Result<Boolean> {
+        return userProfileRepository.editUserLinkedGmailAccount(userId, linkedGmailAccount)
+    }
+
+    // get user's gmail app password
+    suspend fun getUserGmailAppPassword(userId: String): Result<String> {
+        return userProfileRepository.getUserGmailAppPassword(userId)
+    }
+
+    // edit user's gmail app password
+    suspend fun editUserGmailAppPassword(userId: String, gmailAppPassword: String): Result<Boolean> {
+        return userProfileRepository.editUserGmailAppPassword(userId, gmailAppPassword)
+    }
+
+
     // get user's name and display it on profile page
     suspend fun getUserName(userId: String): Result<String> {
         return userProfileRepository.getUserName(userId)
@@ -407,6 +445,40 @@ fun main() = runBlocking<Unit> {
 //        println("Degree ID: $degreeId")
 //    }.onFailure { error ->
 //        println("Error fetching degree ID: ${error.message}")
+//    }
+
+    // test getting user's linked gmail account
+//    val result = profileController.getUserLinkedGmailAccount(userId)
+//    result.onSuccess { linkedGmailAccount ->
+//        println("Linked Gmail Account: $linkedGmailAccount")
+//    }.onFailure { error ->
+//        println("Error fetching linked gmail account: ${error.message}")
+//    }
+
+    // test getting user's gmail app password
+//    val result = profileController.getUserGmailAppPassword(userId)
+//    result.onSuccess { gmailAppPassword ->
+//        println("Gmail App Password: $gmailAppPassword")
+//    }.onFailure { error ->
+//        println("Error fetching gmail app password: ${error.message}")
+//    }
+
+    // test editing user's linked gmail account
+//    val linkedGmailAccount = "wrw040613@163.com"
+//    val result = profileController.editUserLinkedGmailAccount(userId, linkedGmailAccount)
+//    result.onSuccess {
+//        println("Linked Gmail Account updated successfully.")
+//    }.onFailure { error ->
+//        println("Error updating linked gmail account: ${error.message}")
+//    }
+
+    // test editing user's gmail app password
+//    val gmailAppPassword = "unwu wnsl agek lxoj"
+//    val result = profileController.editUserGmailAppPassword(userId, gmailAppPassword)
+//    result.onSuccess {
+//        println("Gmail App Password updated successfully.")
+//    }.onFailure { error ->
+//        println("Error updating gmail app password: ${error.message}")
 //    }
 
 }

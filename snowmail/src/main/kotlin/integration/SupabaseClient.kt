@@ -125,12 +125,12 @@ fun main() = runBlocking<Unit> {
 //    }
 
     //test get user profile
-//    val profileResult = dbStorage.userProfileRepository.getUserProfile(userId)
-//    profileResult.onSuccess { profile ->
-//        println("User profile: $profile")
-//    }.onFailure { error ->
-//        println("Error fetching user profile: ${error.message}")
-//    }
+    val profileResult = dbStorage.userProfileRepository.getUserProfile(userId)
+    profileResult.onSuccess { profile ->
+        println("User profile: $profile")
+    }.onFailure { error ->
+        println("Error fetching user profile: ${error.message}")
+    }
 
     //test add skill
 //    val skill = "C++"
@@ -229,12 +229,12 @@ fun main() = runBlocking<Unit> {
 //    }
 
     // test get education
-    val result = dbStorage.userProfileRepository.getEducation(userId)
-    result.onSuccess { education ->
-        println("Education: $education")
-    }.onFailure { error ->
-        println("Error fetching education: ${error.message}")
-    }
+//    val result = dbStorage.userProfileRepository.getEducation(userId)
+//    result.onSuccess { education ->
+//        println("Education: $education")
+//    }.onFailure { error ->
+//        println("Error fetching education: ${error.message}")
+//    }
 
 
 

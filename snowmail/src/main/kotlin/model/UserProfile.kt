@@ -15,4 +15,6 @@ data class UserProfile(
     @SerialName("github_url") val githubUrl: String? = null,
     @SerialName("personal_website_url") val personalWebsiteUrl: String? = null,
     @SerialName("phone") var phone: String? = null,
+    @SerialName("linked_gmail_account") val linkedGmailAccount: String? = null,
+    @SerialName("gmail_app_password") val gmailAppPassword: String? = null
 )

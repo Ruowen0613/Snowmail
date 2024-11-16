@@ -249,10 +249,45 @@ class OpenAIClient(private val httpClient: HttpClient) {
             throw RuntimeException("Failed to parse response: ${e.message}")
         }
     }
+
+    suspend fun classifyEmail(emailContent: String): String {
+        val prompt = """
+            Classify the following email content into one of the categories: Interview, Offer, Rejection, or Unknown.
+            
+            Email content:
+            $emailContent
+        """.trimIndent()
+
+        val message = listOf(
+            mapOf("role" to "user", "content" to prompt)
+        )
+
+        val request = OpenAIRequest(
+            model = "gpt-3.5-turbo",
+            messages = message,
+            max_tokens = 100
+        )
+
+        val response: HttpResponse = httpClient.post("https://api.openai.com/v1/chat/completions") {
+            contentType(ContentType.Application.Json)
+            header("Authorization", "Bearer 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")
+            setBody(Json.encodeToString(OpenAIRequest.serializer(), request))
+        }
+
+        val responseBody: String = response.bodyAsText()
+        val json = Json { ignoreUnknownKeys = true }
+        val parsedResponse = json.decodeFromString(ChatCompletionResponse.serializer(), responseBody)
+        return parsedResponse.choices.firstOrNull()?.message?.content?.trim() ?: "Unknown"
+    }
+
 }
 
 suspend fun main() {
-//    val openAIClient = OpenAIClient(HttpClient(CIO))
+    val openAIClient = OpenAIClient(HttpClient(CIO))
+
+    val result = openAIClient.classifyEmail("Thank you for your application. We regret to inform you that you have not been selected for the next round of interviews.")
+    println(result)
+
 //    val userInput = UserInput(
 //        jobDescription = "Software Engineer",
 //        recruiterEmail = "recruiter@example.com",
@@ -293,4 +328,7 @@ suspend fun main() {
 //    )
 //
 //    println(openAIClient.generateEmail(userInput, userProfile, listOf(education), listOf(workExperience)))
+
+
+
 }

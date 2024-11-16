@@ -3,22 +3,28 @@ package ca.uwaterloo.controller
 import ca.uwaterloo.persistence.IDocumentRepository
 import integration.SupabaseClient
 import kotlinx.coroutines.runBlocking
+import kotlinx.datetime.LocalDate
 import java.awt.Desktop
 import java.io.File
 import java.net.URI
 import java.nio.file.Files
 import java.nio.file.Paths
 
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+
 class DocumentController(private val documentRepository: IDocumentRepository) {
 
     suspend fun uploadDocument(
         userId: String,
-        documentType: String,
+        documentType: Int,
         documentName: String,
         bucket: String,
+        uploadedAt: LocalDate,
         file: File
     ): Result<String> {
-        return documentRepository.uploadDocument(bucket, path, file)
+        return documentRepository.uploadDocument(userId, documentType, documentName, bucket, uploadedAt, file)
     }
 
     suspend fun downloadDocument(bucket: String, userId: String, documentType: String, documentName: String): Result<ByteArray> {
@@ -88,14 +94,16 @@ fun main() = runBlocking<Unit> {
 
 
     val documentController = DocumentController(SupabaseClient().documentRepository)
-    val bucket = "user_documents"
     val userId = "test"
-    val documentType = "other"
-    val documentName = "test-resume-2"
+    val bucket = "user_documents"
+    val documentType = 4
+    val documentName = "test-resume-3"
+    val uploadedAt = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
     val expiresInMinutes = 10
     val file = File(System.getProperty("user.home") + "/Desktop/test-resume.pdf")
 
-    val result = documentController.uploadDocument(bucket, "test", "other", documentName, file)
+
+    val result = documentController.uploadDocument(userId, documentType, documentName, bucket, uploadedAt, file)
     result.onSuccess {
         println("Upload successful: $it")
     }.onFailure { error ->

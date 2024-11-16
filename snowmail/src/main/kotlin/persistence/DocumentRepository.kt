@@ -28,7 +28,8 @@ class DocumentRepository(private val supabase: SupabaseClient) : IDocumentReposi
         documentType: Int,
         documentName: String,
         bucket: String,
-        uploadedAt: LocalDate, file: File
+        uploadedAt: LocalDate,
+        file: File
     ): Result<String> {
         return try {
             val path = "$userId/$documentType/$documentName"

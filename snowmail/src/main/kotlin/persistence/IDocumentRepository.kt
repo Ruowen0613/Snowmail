@@ -1,6 +1,6 @@
 package ca.uwaterloo.persistence
 
-import kotlinx.datetime.LocalDate
+import ca.uwaterloo.model.Document
 import java.io.File
 
 interface IDocumentRepository {
@@ -8,10 +8,16 @@ interface IDocumentRepository {
                                documentType: Int,
                                documentName: String,
                                bucket: String,
-                               uploadedAt: LocalDate,
                                file: File): Result<String>
     suspend fun downloadDocument(bucket: String, path: String): Result<ByteArray>
-    suspend fun deleteDocument(bucket: String, path: String): Result<String>
+    suspend fun deleteDocument(
+        userId: String,
+        documentType: Int,
+        documentName: String,
+        bucket: String,
+    ): Result<String>
+    suspend fun removeDocumentRecord(userId: String, documentType: Int, documentName: String): Result<Boolean>
     suspend fun createSignedUrl(bucket: String, path: String): Result<String>
     suspend fun listDocuments(bucket: String, path: String): Result<List<String>>
+    suspend fun getDocuments(bucket: String, documentType: Int): Result<List<Document>>
 }

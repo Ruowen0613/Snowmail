@@ -2,6 +2,7 @@ package ca.uwaterloo.persistence
 
 import ca.uwaterloo.model.Document
 import ca.uwaterloo.model.Education
+import ca.uwaterloo.model.WorkExperience
 import ca.uwaterloo.view.UserSession.userId
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from
@@ -17,28 +18,43 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonObject
-
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 class DocumentRepository(private val supabase: SupabaseClient) : IDocumentRepository {
 
     private val storage = supabase.storage
+
+    private fun mapIntToDocumentType(documentType: Int): String {
+        return when (documentType) {
+            1 -> "resume"
+            2 -> "cover_letter"
+            3 -> "transcript"
+            4 -> "other"
+            else -> "unknown"
+        }
+    }
 
     override suspend fun uploadDocument(
         userId: String,
         documentType: Int,
         documentName: String,
         bucket: String,
-        uploadedAt: LocalDate,
         file: File
     ): Result<String> {
         return try {
-            val path = "$userId/$documentType/$documentName"
+            val documentTypeString = mapIntToDocumentType(documentType)
+            val encodedDocumentName = URLEncoder.encode(documentName, StandardCharsets.UTF_8.toString())
+
+            println("Document name: $encodedDocumentName")
+
+            val path = "$userId/$documentTypeString/$encodedDocumentName"
             if (!file.exists()) {
                 return Result.failure(Exception("File does not exist: ${file.path}"))
             }
             val fileContent = file.readBytes()
             storage.from(bucket).upload(path, fileContent)
-            val insertResult = addDocument(userId, documentType, documentName, bucket, path, uploadedAt)
+            val insertResult = addDocumentRecord(userId, documentType, documentName, bucket, path)
             if (insertResult.isFailure) {
                 return Result.failure(Exception("Error inserting document metadata: ${insertResult.exceptionOrNull()?.message}"))
             }
@@ -48,13 +64,12 @@ class DocumentRepository(private val supabase: SupabaseClient) : IDocumentReposi
         }
     }
 
-    private suspend fun addDocument(
+    private suspend fun addDocumentRecord(
         userId: String,
         documentType: Int,
         documentName: String,
         bucket: String,
         path: String,
-        uploadedAt: LocalDate,
     ): Result<Boolean> {
         return try {
             val document = Document(
@@ -63,12 +78,11 @@ class DocumentRepository(private val supabase: SupabaseClient) : IDocumentReposi
                 documentName = documentName,
                 bucket = bucket,
                 path = path,
-                uploadedAt = uploadedAt
             )
             supabase.from("document").insert(document)
             Result.success(true)
         } catch (e: Exception) {
-            Result.failure(Exception("Failed to add education: ${e.message}"))
+            Result.failure(Exception("Failed to add document: ${e.message}"))
         }
     }
 
@@ -81,18 +95,67 @@ class DocumentRepository(private val supabase: SupabaseClient) : IDocumentReposi
         }
     }
 
-    override suspend fun deleteDocument(bucket: String, path: String): Result<String> {
+    override suspend fun deleteDocument(
+        userId: String,
+        documentType: Int,
+        documentName: String,
+        bucket: String,
+    ): Result<String> {
         return try {
+            // Remove the document record first
+            val removeResult = removeDocumentRecord(userId, documentType, documentName)
+            if (removeResult.isFailure) {
+                return Result.failure(Exception("Error removing document record: ${removeResult.exceptionOrNull()?.message}"))
+            }
+
+            // If record removal is successful, delete the document from storage
+            val documentTypeString = mapIntToDocumentType(documentType)
+            val encodedDocumentName = URLEncoder.encode(documentName, StandardCharsets.UTF_8.toString())
+            val path = "$userId/$documentTypeString/$encodedDocumentName"
             storage.from(bucket).delete(path)
-            Result.success("Document deleted successfully.")
+            Result.success("Document record removed and document deleted successfully.")
         } catch (e: Exception) {
             Result.failure(Exception("Error deleting document: ${e.message}"))
         }
     }
 
+    override suspend fun removeDocumentRecord(userId: String, documentType: Int, documentName: String): Result<Boolean> {
+        return try {
+            // Check if the document exists
+            val existingDocument = supabase.from("document")
+                .select {
+                    filter {
+                        eq("user_id", userId)
+                        eq("document_type", documentType)
+                        eq("document_name", documentName)
+                    }
+                }
+                .decodeSingleOrNull<Document>()
+
+            // If exists, delete it
+            if (existingDocument != null) {
+                supabase.from("document")
+                    .delete {
+                        filter {
+                            eq("user_id", userId)
+                            eq("document_name", documentName)
+                        }
+                    }
+                Result.success(true)
+            } else {
+                // If not exists, return failure
+                Result.failure(Exception("Document not found"))
+            }
+        } catch (e: Exception) {
+            Result.failure(Exception("Failed to delete document: ${e.message}"))
+        }
+    }
+
+
+
     override suspend fun createSignedUrl(bucket: String, path: String): Result<String> {
         return try {
-            val url = storage.from(bucket).createSignedUrl(path, 5.minutes)
+            val url = storage.from(bucket).createSignedUrl(path, 30.minutes)
             Result.success(url)
         } catch (e: Exception) {
             Result.failure(Exception("Error creating signed URL: ${e.message}"))
@@ -106,6 +169,22 @@ class DocumentRepository(private val supabase: SupabaseClient) : IDocumentReposi
             Result.success(fileNames)
         } catch (e: Exception) {
             Result.failure(Exception("Error listing documents: ${e.message}"))
+        }
+    }
+
+    override suspend fun getDocuments(userId: String, documentType: Int): Result<List<Document>> {
+        return try {
+            val documents = supabase.from("document")
+                .select {
+                    filter {
+                        eq("user_id", userId)
+                        eq("document_type", documentType)
+                    }
+                }
+                .decodeList<Document>()
+            Result.success(documents)
+        } catch (e: Exception) {
+            Result.failure(Exception("Failed to fetch documents: ${e.message}"))
         }
     }
 

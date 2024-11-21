@@ -32,11 +32,14 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
 import ca.uwaterloo.controller.ProfileController
+import ca.uwaterloo.controller.SignInController
 
 import integration.SupabaseClient
 import ca.uwaterloo.model.Education
 import ca.uwaterloo.model.EducationWithDegreeName
 import ca.uwaterloo.model.WorkExperience
+import ca.uwaterloo.model.PersonalProject
+
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.launch
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -51,9 +54,10 @@ import java.net.URI
 @Composable
 fun ProfilePage(userId: String,
                 NavigateToDocuments: () -> Unit, NavigateToEmialGen: () -> Unit,
-                NavigateToProgress: () -> Unit) {
+                NavigateToProgress: () -> Unit,  NavigateToLogin: () -> Unit) {
     val dbStorage = SupabaseClient()
     val profileController = ProfileController(dbStorage.userProfileRepository)
+    val signInController = SignInController(dbStorage.authRepository)
 
 
     var showEducationDialog by remember { mutableStateOf(false) }
@@ -82,6 +86,13 @@ fun ProfilePage(userId: String,
 
     var workExperienceList by remember { mutableStateOf<List<WorkExperience>>(emptyList()) }
 
+    // Project State Variables
+    var projectList by remember { mutableStateOf<List<PersonalProject>>(emptyList()) }
+    var showProjectDialog by remember { mutableStateOf(false) }
+    var showEditProjectDialog by remember { mutableStateOf(false) }
+    var selectedProject by remember { mutableStateOf<PersonalProject?>(null) }
+
+
     var currentPage by remember { mutableStateOf("ProfilePage") }
 
     var selectedTabIndex by remember { mutableStateOf(3) }
@@ -107,6 +118,18 @@ fun ProfilePage(userId: String,
             }
         }
     }
+
+    fun refreshProjectList() {
+        runBlocking {
+            val result = profileController.getProjects(userId)
+            result.onSuccess { projects ->
+                projectList = projects
+            }.onFailure { error ->
+                errorMessage = error.message ?: "Failed to retrieve projects"
+            }
+        }
+    }
+
 
     fun refreshContactInfo() {
         runBlocking {
@@ -177,6 +200,14 @@ fun ProfilePage(userId: String,
         val getGithubResult = profileController.getUserGithub(userId)
         val getWebsiteResult = profileController.getUserPersonalWebsite(userId)
 
+        val projectResult = profileController.getProjects(userId)
+
+        projectResult.onSuccess { projects ->
+            projectList = projects
+        }.onFailure { error ->
+            errorMessage = error.message ?: "Failed to retrieve projects"
+        }
+
         getNameResult.onSuccess { name ->
 
             userName = name
@@ -246,6 +277,7 @@ fun ProfilePage(userId: String,
     }
 
 
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -268,6 +300,23 @@ fun ProfilePage(userId: String,
             }
         )
 
+        Button(
+            onClick = {
+                NavigateToLogin()
+                runBlocking {
+                    signInController.logoutUser()
+                }
+            },
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = Color.White, // White background
+                contentColor = Color(0xFF487896) // Text color
+            ),
+            modifier = Modifier
+                .align(Alignment.End)
+                .padding(top = 16.dp, end = 16.dp) // Add spacing from the edges
+        ) {
+            Text("Sign Out", fontWeight = FontWeight.Bold)
+        }
 
         Row(
             modifier = Modifier
@@ -284,6 +333,7 @@ fun ProfilePage(userId: String,
             )
 
             Spacer(modifier = Modifier.width(16.dp))
+
 
             // Name
             if (errorMessage.isNotEmpty()) {
@@ -460,6 +510,8 @@ fun ProfilePage(userId: String,
                 }
 
 
+
+
                 SectionTitle("Education")
                 Card(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
                     if (educationList.isEmpty()) {
@@ -553,7 +605,6 @@ fun ProfilePage(userId: String,
                         )
                     }
                 }
-
 
 
                 SectionTitle("Work Experience")
@@ -653,6 +704,109 @@ fun ProfilePage(userId: String,
                         )
                     }
                 }
+
+                ProjectSection(
+                    userId = userId,
+                    profileController = profileController,
+                    projectList = projectList,
+                    showProjectDialog = showProjectDialog,
+                    showEditProjectDialog = showEditProjectDialog,
+                    selectedProject = selectedProject,
+                    onProjectAdded = { refreshProjectList() },
+                    onProjectEdited = { refreshProjectList() },
+                    onProjectDeleted = { refreshProjectList() },
+                    onShowProjectDialogChange = { showProjectDialog = it },
+                    onShowEditProjectDialogChange = { showEditProjectDialog = it },
+                    onSelectedProjectChange = { selectedProject = it }
+                )
+
+//                SectionTitle("Projects")
+//                Card(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+//                    if (projectList.isEmpty()) {
+//                        Text(
+//                            text = "No projects added",
+//                            fontSize = 14.sp,
+//                            color = Color.Gray,
+//                            modifier = Modifier.padding(8.dp)
+//                        )
+//                    } else {
+//                        Column(modifier = Modifier.padding(8.dp)) {
+//                            projectList.forEach { project ->
+//                                Box(
+//                                    modifier = Modifier
+//                                        .fillMaxWidth()
+//                                        .clickable {
+//                                            selectedProject = project
+//                                            showEditProjectDialog = true
+//                                        }
+//                                        .padding(vertical = 8.dp)
+//                                ) {
+//                                    Column {
+//                                        Text(
+//                                            text = project.projectName,
+//                                            fontSize = 16.sp,
+//                                            fontWeight = FontWeight.Bold
+//                                        )
+//                                        Text(
+//                                            text = project.description ?: "",
+//                                            fontSize = 14.sp,
+//                                            color = Color.Gray
+//                                        )
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
+//
+//                    Row(
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .padding(16.dp),
+//                        horizontalArrangement = Arrangement.End
+//                    ) {
+//                        IconButton(
+//                            onClick = {
+//                                selectedProject = null
+//                                showProjectDialog = true
+//                            },
+//                            modifier = Modifier.size(15.dp)
+//                        ) {
+//                            Icon(
+//                                imageVector = Icons.Default.Add,
+//                                contentDescription = "Add",
+//                                tint = Color(0xFF487896)
+//                            )
+//                        }
+//                    }
+//
+//                    if (showProjectDialog) {
+//                        AddProjectDialog(
+//                            onDismiss = { showProjectDialog = false },
+//                            userId = userId,
+//                            profileController = profileController,
+//                            onProjectAdded = { refreshProjectList() }
+//                        )
+//                    }
+//
+//                    if (showEditProjectDialog) {
+//                        EditProjectDialog(
+//                            onDismiss = { showEditProjectDialog = false },
+//                            userId = userId,
+//                            profileController = profileController,
+//                            project = selectedProject,
+//                            onProjectEdited = {
+//                                refreshProjectList()
+//                                selectedProject = null
+//                                showEditProjectDialog = false
+//                            },
+//                            onProjectDeleted = {
+//                                refreshProjectList()
+//                                selectedProject = null
+//                                showEditProjectDialog = false
+//                            }
+//                        )
+//                    }
+//                }
 
                 SectionTitle("Skills")
 
@@ -1837,6 +1991,170 @@ fun EditExperienceDialog(
 }
 
 @Composable
+fun AddProjectDialog(
+    onDismiss: () -> Unit,
+    userId: String,
+    profileController: ProfileController,
+    onProjectAdded: () -> Unit
+) {
+    var projectName by remember { mutableStateOf("") }
+    var description by remember { mutableStateOf("") }
+    var errorMessage by remember { mutableStateOf("") }
+
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            shape = RoundedCornerShape(8.dp),
+            color = Color.White,
+            modifier = Modifier.fillMaxWidth().padding(16.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp).verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text("Add Project", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+                Spacer(modifier = Modifier.height(8.dp))
+
+                OutlinedTextField(
+                    value = projectName,
+                    onValueChange = { projectName = it },
+                    label = { Text("Project Name") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                OutlinedTextField(
+                    value = description,
+                    onValueChange = { description = it },
+                    label = { Text("Description") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                if (errorMessage.isNotEmpty()) {
+                    Text(
+                        text = errorMessage,
+                        color = Color.Red,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(10.dp)
+                    )
+                }
+
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    TextButton(onClick = onDismiss) {
+                        Text("Cancel")
+                    }
+                    Button(
+                        onClick = {
+                            runBlocking {
+                                val result = profileController.addProject(userId, projectName, description)
+                                result.onSuccess {
+                                    onProjectAdded()
+                                }.onFailure { error ->
+                                    errorMessage = error.message ?: "Failed to add project"
+                                }
+                            }
+                        }
+                    ) {
+                        Text("Save")
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun EditProjectDialog(
+    project: PersonalProject? = null,
+    onDismiss: () -> Unit,
+    userId: String,
+    profileController: ProfileController,
+    onProjectEdited: () -> Unit,
+    onProjectDeleted: () -> Unit
+) {
+    var projectName by remember { mutableStateOf(project?.projectName ?: "") }
+    var description by remember { mutableStateOf(project?.description ?: "") }
+    var errorMessage by remember { mutableStateOf("") }
+
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            shape = RoundedCornerShape(8.dp),
+            color = Color.White,
+            modifier = Modifier.fillMaxWidth().padding(16.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp).verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    if (project != null) {
+                        IconButton(onClick = {
+                            runBlocking {
+                                val result = profileController.deleteProject(project.id.toString())
+                                result.onSuccess {
+                                    onProjectDeleted()
+                                }.onFailure { error ->
+                                    errorMessage = error.message ?: "Failed to delete project"
+                                }
+                            }
+                        }) {
+                            Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete")
+                        }
+                    }
+                }
+
+                Text("Edit Project", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+                Spacer(modifier = Modifier.height(8.dp))
+
+                OutlinedTextField(
+                    value = projectName,
+                    onValueChange = { projectName = it },
+                    label = { Text("Project Name") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                OutlinedTextField(
+                    value = description,
+                    onValueChange = { description = it },
+                    label = { Text("Description") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                if (errorMessage.isNotEmpty()) {
+                    Text(
+                        text = errorMessage,
+                        color = Color.Red,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(10.dp)
+                    )
+                }
+
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    TextButton(onClick = onDismiss) {
+                        Text("Cancel")
+                    }
+                    Button(
+                        onClick = {
+                            runBlocking {
+                                val result = profileController.updateProject(userId, project?.id.toString(), projectName, description)
+                                result.onSuccess {
+                                    onProjectEdited()
+                                }.onFailure { error ->
+                                    errorMessage = error.message ?: "Failed to update project"
+                                }
+                            }
+                        }
+                    ) {
+                        Text("Save")
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
 fun SkillChip(skill: String, onDelete: () -> Unit) {
     Surface(
         shape = RoundedCornerShape(16.dp),
@@ -2241,9 +2559,3 @@ fun GmailLinkingDialog(
     }
 }
 
-fun main() = application {
-    Window(onCloseRequest = ::exitApplication, title = "Profile Page") {
-        var currentPage by remember { mutableStateOf("profilePage") }
-        ProfilePage(UserSession.userId ?: "DefaultUserId", { currentPage = "profilePage"}, { currentPage = "profilePage"}, { currentPage = "profilePage"})
-    }
-}

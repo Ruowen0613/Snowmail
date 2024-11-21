@@ -13,9 +13,9 @@ class SignInController(private val authRepository: IAuthRepository) {
         return authRepository.signInUser(email, password)
     }
 
-//    suspend fun logoutUser(): String {
-//        return dbStorage.signOutUser()
-//    }
+    suspend fun logoutUser(): String {
+        return authRepository.signOutUser()
+    }
 }
 
 fun main() = runBlocking<Unit> {

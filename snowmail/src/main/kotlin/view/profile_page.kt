@@ -13,8 +13,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.application
 import androidx.compose.foundation.background
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.text.font.FontWeight
@@ -24,11 +22,8 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.foundation.text.ClickableText
 import kotlinx.datetime.LocalDate
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.ui.res.painterResource
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -37,7 +32,6 @@ import ca.uwaterloo.controller.ProfileController
 import ca.uwaterloo.controller.SignInController
 
 import integration.SupabaseClient
-import ca.uwaterloo.model.Education
 import ca.uwaterloo.model.EducationWithDegreeName
 import ca.uwaterloo.model.WorkExperience
 import ca.uwaterloo.model.PersonalProject
@@ -48,8 +42,8 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 
-import ca.uwaterloo.view.projects.ProjectSection
-
+import ca.uwaterloo.view.components.ProjectSection
+import ca.uwaterloo.view.components.WorkExperienceSection
 
 
 @Composable
@@ -608,103 +602,118 @@ fun ProfilePage(userId: String,
                 }
 
 
-                SectionTitle("Work Experience")
+//                SectionTitle("Work Experience")
+//
+//                Card(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+//                    if (workExperienceList.isEmpty()) {
+//                        Text(
+//                            text = "No experiences added",
+//                            fontSize = 14.sp,
+//                            color = Color.Gray,
+//                            modifier = Modifier.padding(8.dp)
+//                        )
+//                    } else {
+//                        Column(modifier = Modifier.padding(8.dp)) {
+//                            workExperienceList.forEach { experience ->
+//
+//                                Box(
+//                                    modifier = Modifier
+//                                        .fillMaxWidth()
+//                                        .clickable {
+//                                            selectedExperience = experience
+//                                            showEditExperienceDialog = true
+//                                        }
+//                                        .padding(vertical = 8.dp)
+//                                ) {
+//                                    Column {
+//                                        Text(
+//                                            text = "${experience.companyName} - ${experience.title}",
+//                                            fontSize = 14.sp,
+//                                            color = Color.Black
+//                                        )
+//                                        Text(
+//                                            text = "From ${experience.startDate} to ${experience.endDate ?: "Present"}",
+//                                            fontSize = 12.sp,
+//                                            color = Color.Gray
+//                                        )
+//                                        if (!experience.description.isNullOrEmpty()) {
+//                                            Text(
+//                                                text = experience.description,
+//                                                fontSize = 12.sp,
+//                                                color = Color.Gray
+//                                            )
+//                                        }
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
+//
+//                    Row(
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .padding(16.dp),
+//                        horizontalArrangement = Arrangement.End
+//                    ) {
+//                        IconButton(
+//                            onClick = {
+//                                selectedExperience = null
+//                                showExperienceDialog = true
+//                            },
+//                            modifier = Modifier.size(15.dp)
+//                        ) {
+//                            Icon(
+//                                imageVector = Icons.Default.Add,
+//                                contentDescription = "Add",
+//                                tint = Color(0xFF487896)
+//                            )
+//                        }
+//                    }
+//
+//                    if (showExperienceDialog) {
+//                        AddExperienceDialog(
+//                            onDismiss = { showExperienceDialog = false },
+//                            userId = userId,
+//                            profileController = profileController,
+//                            onWorkExperienceAdded = { refreshWorkExperienceList() }
+//                        )
+//                    }
+//
+//                    // Show Edit Experience Dialog
+//                    if (showEditExperienceDialog) {
+//                        EditExperienceDialog(
+//                            onDismiss = { showEditExperienceDialog = false },
+//                            userId = userId,
+//                            profileController = profileController,
+//                            experience = selectedExperience,
+//                            onWorkExperienceEdited = {
+//                                refreshWorkExperienceList()
+//                                selectedExperience = null
+//                                showEditExperienceDialog = false
+//                            },
+//                            onWorkExperienceDeleted = {
+//                                refreshWorkExperienceList()
+//                                selectedExperience = null
+//                                showEditExperienceDialog = false
+//                            }
+//                        )
+//                    }
+//                }
 
-                Card(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
-                    if (workExperienceList.isEmpty()) {
-                        Text(
-                            text = "No experiences added",
-                            fontSize = 14.sp,
-                            color = Color.Gray,
-                            modifier = Modifier.padding(8.dp)
-                        )
-                    } else {
-                        Column(modifier = Modifier.padding(8.dp)) {
-                            workExperienceList.forEach { experience ->
-
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clickable {
-                                            selectedExperience = experience
-                                            showEditExperienceDialog = true
-                                        }
-                                        .padding(vertical = 8.dp)
-                                ) {
-                                    Column {
-                                        Text(
-                                            text = "${experience.companyName} - ${experience.title}",
-                                            fontSize = 14.sp,
-                                            color = Color.Black
-                                        )
-                                        Text(
-                                            text = "From ${experience.startDate} to ${experience.endDate ?: "Present"}",
-                                            fontSize = 12.sp,
-                                            color = Color.Gray
-                                        )
-                                        if (!experience.description.isNullOrEmpty()) {
-                                            Text(
-                                                text = experience.description,
-                                                fontSize = 12.sp,
-                                                color = Color.Gray
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        horizontalArrangement = Arrangement.End
-                    ) {
-                        IconButton(
-                            onClick = {
-                                selectedExperience = null
-                                showExperienceDialog = true
-                            },
-                            modifier = Modifier.size(15.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Add,
-                                contentDescription = "Add",
-                                tint = Color(0xFF487896)
-                            )
-                        }
-                    }
-
-                    if (showExperienceDialog) {
-                        AddExperienceDialog(
-                            onDismiss = { showExperienceDialog = false },
-                            userId = userId,
-                            profileController = profileController,
-                            onWorkExperienceAdded = { refreshWorkExperienceList() }
-                        )
-                    }
-
-                    // Show Edit Experience Dialog
-                    if (showEditExperienceDialog) {
-                        EditExperienceDialog(
-                            onDismiss = { showEditExperienceDialog = false },
-                            userId = userId,
-                            profileController = profileController,
-                            experience = selectedExperience,
-                            onWorkExperienceEdited = {
-                                refreshWorkExperienceList()
-                                selectedExperience = null
-                                showEditExperienceDialog = false
-                            },
-                            onWorkExperienceDeleted = {
-                                refreshWorkExperienceList()
-                                selectedExperience = null
-                                showEditExperienceDialog = false
-                            }
-                        )
-                    }
-                }
+                WorkExperienceSection(
+                    userId = userId,
+                    profileController = profileController,
+                    workExperienceList = workExperienceList,
+                    showWorkExperienceDialog = showExperienceDialog,
+                    showEditWorkExperienceDialog = showEditExperienceDialog,
+                    selectedWorkExperience = selectedExperience,
+                    onWorkExperienceAdded = { refreshWorkExperienceList() },
+                    onWorkExperienceEdited = { refreshWorkExperienceList() },
+                    onWorkExperienceDeleted = { refreshWorkExperienceList() },
+                    onShowWorkExperienceDialogChange = { showExperienceDialog = it },
+                    onShowEditWorkExperienceDialogChange = { showEditExperienceDialog = it },
+                    onSelectedWorkExperienceChange = { selectedExperience = it }
+                )
 
                 ProjectSection(
                     userId = userId,

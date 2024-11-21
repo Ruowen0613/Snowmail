@@ -1,4 +1,4 @@
-package ca.uwaterloo.view.projects
+package ca.uwaterloo.view.components
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -14,7 +14,8 @@ import androidx.compose.material.icons.filled.Add
 import ca.uwaterloo.controller.ProfileController
 import ca.uwaterloo.model.PersonalProject
 import ca.uwaterloo.view.SectionTitle
-import kotlinx.coroutines.runBlocking
+import ca.uwaterloo.view.dialogs.AddProjectDialog
+import ca.uwaterloo.view.dialogs.EditProjectDialog
 
 @Composable
 fun ProjectSection(

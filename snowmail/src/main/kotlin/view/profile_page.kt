@@ -41,6 +41,7 @@ import kotlinx.coroutines.launch
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import ca.uwaterloo.view.components.EducationSection
 
 import ca.uwaterloo.view.components.ProjectSection
 import ca.uwaterloo.view.components.WorkExperienceSection
@@ -319,15 +320,15 @@ fun ProfilePage(userId: String,
                 .padding(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Profile Picture
-            Box(
-                modifier = Modifier
-                    .size(80.dp)
-                    .clip(CircleShape)
-                    .background(Color(0xFFE2E2E2)),
-            )
-
-            Spacer(modifier = Modifier.width(16.dp))
+//            // Profile Picture
+//            Box(
+//                modifier = Modifier
+//                    .size(80.dp)
+//                    .clip(CircleShape)
+//                    .background(Color(0xFFE2E2E2)),
+//            )
+//
+//            Spacer(modifier = Modifier.width(16.dp))
 
 
             // Name
@@ -507,99 +508,99 @@ fun ProfilePage(userId: String,
 
 
 
-                SectionTitle("Education")
-                Card(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
-                    if (educationList.isEmpty()) {
-                        Text(
-                            text = "No education records added",
-                            fontSize = 14.sp,
-                            color = Color.Gray,
-                            modifier = Modifier.padding(8.dp)
-                        )
-                    } else {
-                        Column(modifier = Modifier.padding(8.dp)) {
-                            educationList.forEach { education ->
-                                // Clickable Box for each education record
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clickable {
-                                            selectedEducation = education
-                                            showEditEducationDialog = true
-                                        }
-                                        .padding(vertical = 8.dp)
-                                ) {
-                                    Column {
-                                        Text(
-                                            text = "${education.institutionName}, ${education.degreeName} in ${education.major}",
-                                            fontSize = 14.sp,
-                                            color = Color.Black
-                                        )
-                                        Text(
-                                            text = "GPA: ${education.gpa ?: "N/A"}",
-                                            fontSize = 12.sp,
-                                            color = Color.Gray
-                                        )
-                                        Text(
-                                            text = "From ${education.startDate} to ${education.endDate}",
-                                            fontSize = 12.sp,
-                                            color = Color.Gray
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        horizontalArrangement = Arrangement.End
-                    ) {
-                        IconButton(
-                            onClick = {
-                                selectedEducation = null
-                                showEducationDialog = true
-                            },
-                            modifier = Modifier.size(15.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Add,
-                                contentDescription = "Add",
-                                tint = Color(0xFF487896)
-                            )
-                        }
-                    }
-
-                    if (showEducationDialog) {
-                        AddEducationDialog(
-                            onDismiss = { showEducationDialog = false },
-                            userId = userId,
-                            profileController = profileController,
-                            onEducationAdded = { refreshEducationList() }
-                        )
-                    }
-
-                    if (showEditEducationDialog) {
-                        EditEducationDialog(
-                            onDismiss = { showEditEducationDialog = false },
-                            userId = userId,
-                            profileController = profileController,
-                            education = selectedEducation,
-                            onEducationEdited = {
-                                refreshEducationList()
-                                selectedEducation = null
-                                showEducationDialog = false
-                            },
-                            onEducationDeleted = {
-                                refreshEducationList()
-                                selectedEducation = null
-                                showEditEducationDialog = false
-                            }
-                        )
-                    }
-                }
+//                SectionTitle("Education")
+//                Card(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+//                    if (educationList.isEmpty()) {
+//                        Text(
+//                            text = "No education records added",
+//                            fontSize = 14.sp,
+//                            color = Color.Gray,
+//                            modifier = Modifier.padding(8.dp)
+//                        )
+//                    } else {
+//                        Column(modifier = Modifier.padding(8.dp)) {
+//                            educationList.forEach { education ->
+//                                // Clickable Box for each education record
+//                                Box(
+//                                    modifier = Modifier
+//                                        .fillMaxWidth()
+//                                        .clickable {
+//                                            selectedEducation = education
+//                                            showEditEducationDialog = true
+//                                        }
+//                                        .padding(vertical = 8.dp)
+//                                ) {
+//                                    Column {
+//                                        Text(
+//                                            text = "${education.institutionName}, ${education.degreeName} in ${education.major}",
+//                                            fontSize = 14.sp,
+//                                            color = Color.Black
+//                                        )
+//                                        Text(
+//                                            text = "GPA: ${education.gpa ?: "N/A"}",
+//                                            fontSize = 12.sp,
+//                                            color = Color.Gray
+//                                        )
+//                                        Text(
+//                                            text = "From ${education.startDate} to ${education.endDate}",
+//                                            fontSize = 12.sp,
+//                                            color = Color.Gray
+//                                        )
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
+//
+//                    Row(
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .padding(16.dp),
+//                        horizontalArrangement = Arrangement.End
+//                    ) {
+//                        IconButton(
+//                            onClick = {
+//                                selectedEducation = null
+//                                showEducationDialog = true
+//                            },
+//                            modifier = Modifier.size(15.dp)
+//                        ) {
+//                            Icon(
+//                                imageVector = Icons.Default.Add,
+//                                contentDescription = "Add",
+//                                tint = Color(0xFF487896)
+//                            )
+//                        }
+//                    }
+//
+//                    if (showEducationDialog) {
+//                        AddEducationDialog(
+//                            onDismiss = { showEducationDialog = false },
+//                            userId = userId,
+//                            profileController = profileController,
+//                            onEducationAdded = { refreshEducationList() }
+//                        )
+//                    }
+//
+//                    if (showEditEducationDialog) {
+//                        EditEducationDialog(
+//                            onDismiss = { showEditEducationDialog = false },
+//                            userId = userId,
+//                            profileController = profileController,
+//                            education = selectedEducation,
+//                            onEducationEdited = {
+//                                refreshEducationList()
+//                                selectedEducation = null
+//                                showEducationDialog = false
+//                            },
+//                            onEducationDeleted = {
+//                                refreshEducationList()
+//                                selectedEducation = null
+//                                showEditEducationDialog = false
+//                            }
+//                        )
+//                    }
+//                }
 
 
 //                SectionTitle("Work Experience")
@@ -700,6 +701,21 @@ fun ProfilePage(userId: String,
 //                    }
 //                }
 
+                EducationSection(
+                    userId = userId,
+                    profileController = profileController,
+                    educationList = educationList,
+                    showEducationDialog = showEducationDialog,
+                    showEditEducationDialog = showEditEducationDialog,
+                    selectedEducation = selectedEducation,
+                    onEducationAdded = { refreshEducationList() },
+                    onEducationEdited = { refreshEducationList() },
+                    onEducationDeleted = { refreshEducationList() },
+                    onShowEducationDialogChange = { showEducationDialog = it },
+                    onShowEditEducationDialogChange = { showEditEducationDialog = it },
+                    onSelectedEducationChange = { selectedEducation = it }
+                )
+
                 WorkExperienceSection(
                     userId = userId,
                     profileController = profileController,
@@ -730,93 +746,6 @@ fun ProfilePage(userId: String,
                     onSelectedProjectChange = { selectedProject = it }
                 )
 
-//                SectionTitle("Projects")
-//                Card(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
-//                    if (projectList.isEmpty()) {
-//                        Text(
-//                            text = "No projects added",
-//                            fontSize = 14.sp,
-//                            color = Color.Gray,
-//                            modifier = Modifier.padding(8.dp)
-//                        )
-//                    } else {
-//                        Column(modifier = Modifier.padding(8.dp)) {
-//                            projectList.forEach { project ->
-//                                Box(
-//                                    modifier = Modifier
-//                                        .fillMaxWidth()
-//                                        .clickable {
-//                                            selectedProject = project
-//                                            showEditProjectDialog = true
-//                                        }
-//                                        .padding(vertical = 8.dp)
-//                                ) {
-//                                    Column {
-//                                        Text(
-//                                            text = project.projectName,
-//                                            fontSize = 16.sp,
-//                                            fontWeight = FontWeight.Bold
-//                                        )
-//                                        Text(
-//                                            text = project.description ?: "",
-//                                            fontSize = 14.sp,
-//                                            color = Color.Gray
-//                                        )
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }
-//
-//                    Row(
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .padding(16.dp),
-//                        horizontalArrangement = Arrangement.End
-//                    ) {
-//                        IconButton(
-//                            onClick = {
-//                                selectedProject = null
-//                                showProjectDialog = true
-//                            },
-//                            modifier = Modifier.size(15.dp)
-//                        ) {
-//                            Icon(
-//                                imageVector = Icons.Default.Add,
-//                                contentDescription = "Add",
-//                                tint = Color(0xFF487896)
-//                            )
-//                        }
-//                    }
-//
-//                    if (showProjectDialog) {
-//                        AddProjectDialog(
-//                            onDismiss = { showProjectDialog = false },
-//                            userId = userId,
-//                            profileController = profileController,
-//                            onProjectAdded = { refreshProjectList() }
-//                        )
-//                    }
-//
-//                    if (showEditProjectDialog) {
-//                        EditProjectDialog(
-//                            onDismiss = { showEditProjectDialog = false },
-//                            userId = userId,
-//                            profileController = profileController,
-//                            project = selectedProject,
-//                            onProjectEdited = {
-//                                refreshProjectList()
-//                                selectedProject = null
-//                                showEditProjectDialog = false
-//                            },
-//                            onProjectDeleted = {
-//                                refreshProjectList()
-//                                selectedProject = null
-//                                showEditProjectDialog = false
-//                            }
-//                        )
-//                    }
-//                }
 
                 SectionTitle("Skills")
 
@@ -1575,594 +1504,430 @@ fun EditPortfolioDialog(
 
 
 
-@Composable
-fun AddExperienceDialog(
-    onDismiss: () -> Unit,
-    userId: String,
-    profileController: ProfileController,
-    onWorkExperienceAdded: () -> Unit
-) {
-    var company by remember { mutableStateOf("") }
-    var location by remember { mutableStateOf("") }
-    var positionTitle by remember { mutableStateOf("") }
-    var startMonth by remember { mutableStateOf("") }
-    var startYear by remember { mutableStateOf("") }
-    var endMonth by remember { mutableStateOf("") }
-    var endYear by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
-    var isCurrentlyWorking by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf("") }
-
-    // Error state tracking
-    var companyError by remember { mutableStateOf(false) }
-    var positionTitleError by remember { mutableStateOf(false) }
-    var startMonthError by remember { mutableStateOf(false) }
-    var startYearError by remember { mutableStateOf(false) }
-    var endMonthError by remember { mutableStateOf(false) }
-    var endYearError by remember { mutableStateOf(false) }
-
-    Dialog(onDismissRequest = onDismiss) {
-        Surface(
-            shape = RoundedCornerShape(8.dp),
-            color = Color.White,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Column(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Text("Add Work Experience", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
-                Spacer(modifier = Modifier.height(8.dp))
-
-                OutlinedTextField(
-                    value = company,
-                    onValueChange = {
-                        company = it
-                        companyError = it.isEmpty()
-                    },
-                    label = { Text("Company") },
-                    isError = companyError,
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                OutlinedTextField(
-                    value = location,
-                    onValueChange = { location = it },
-                    label = { Text("Location") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                OutlinedTextField(
-                    value = positionTitle,
-                    onValueChange = {
-                        positionTitle = it
-                        positionTitleError = it.isEmpty()
-                    },
-                    label = { Text("Position Title") },
-                    isError = positionTitleError,
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                    OutlinedTextField(
-                        value = startMonth,
-                        onValueChange = {
-                            startMonth = it
-                            startMonthError = it.toIntOrNull() !in 1..12 || it.startsWith("0") || it.isEmpty()
-                        },
-                        label = { Text("Start Month") },
-                        isError = startMonthError,
-                        modifier = Modifier.weight(1f),
-                        placeholder = { Text("(ex: 7 for July)") }
-                    )
-                    OutlinedTextField(
-                        value = startYear,
-                        onValueChange = {
-                            startYear = it
-                            startYearError = it.length != 4 || it.toIntOrNull() == null
-                        },
-                        label = { Text("Start Year") },
-                        isError = startYearError,
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                    OutlinedTextField(
-                        value = endMonth,
-                        onValueChange = {
-                            endMonth = it
-                            endMonthError = it.toIntOrNull() !in 1..12 || it.startsWith("0") || it.isEmpty()
-                        },
-                        label = { Text("End Month") },
-                        isError = endMonthError,
-                        modifier = Modifier.weight(1f),
-                        enabled = !isCurrentlyWorking
-                    )
-                    OutlinedTextField(
-                        value = endYear,
-                        onValueChange = {
-                            endYear = it
-                            endYearError = it.length != 4 || it.toIntOrNull() == null
-                        },
-                        label = { Text("End Year") },
-                        isError = endYearError,
-                        modifier = Modifier.weight(1f),
-                        enabled = !isCurrentlyWorking
-                    )
-                }
-
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                    Checkbox(checked = isCurrentlyWorking, onCheckedChange = { isCurrentlyWorking = it })
-                    Text("I currently work here")
-                }
-
-                OutlinedTextField(
-                    value = description,
-                    onValueChange = { description = it },
-                    label = { Text("Description") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(100.dp)
-                )
-
-                if (errorMessage.isNotEmpty()) {
-                    Text(text = errorMessage, color = Color.Red, modifier = Modifier.padding(10.dp))
-                }
-
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    TextButton(onClick = onDismiss) {
-                        Text("Cancel")
-                    }
-                    Button(
-                        onClick = {
-                            if (companyError || positionTitleError || startMonthError || startYearError || (!isCurrentlyWorking && (endMonthError || endYearError))) {
-                                errorMessage = "Please fix errors in the form."
-                            } else {
-                                runBlocking {
-                                    try {
-                                        val startDate = LocalDate(startYear.toInt(), startMonth.toInt(), 1)
-                                        val endDate = if (isCurrentlyWorking) Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date else LocalDate(endYear.toInt(), endMonth.toInt(), 1)
-                                        val result = profileController.addWorkExperience(
-                                            userId = userId,
-                                            companyName = company,
-                                            currentlyWorking = isCurrentlyWorking,
-                                            title = positionTitle,
-                                            startDate = startDate,
-                                            endDate = endDate,
-                                            description = description.takeIf { it.isNotEmpty() }
-                                        )
-
-                                        result.onSuccess {
-                                            onWorkExperienceAdded()
-                                            onDismiss()
-                                        }.onFailure { error ->
-                                            errorMessage = error.message ?: "Failed to add work experience."
-                                        }
-                                    } catch (e: Exception) {
-                                        errorMessage = "Invalid date format or missing input"
-                                    }
-                                }
-                            }
-                        },
-                        colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF487896), contentColor = Color.White)
-                    ) {
-                        Text("Save")
-                    }
-                }
-            }
-        }
-    }
-}
-
-
-@Composable
-fun EditExperienceDialog(
-    experience: WorkExperience? = null,
-    onDismiss: () -> Unit,
-    userId: String,
-    profileController: ProfileController,
-    onWorkExperienceEdited: () -> Unit,
-    onWorkExperienceDeleted: () -> Unit
-) {
-    var company by remember { mutableStateOf(experience?.companyName ?: "") }
-    var positionTitle by remember { mutableStateOf(experience?.title ?: "") }
-    var startMonth by remember { mutableStateOf(experience?.startDate?.month?.value?.toString() ?: "") }
-    var startYear by remember { mutableStateOf(experience?.startDate?.year.toString() ?: "") }
-    var endMonth by remember { mutableStateOf(experience?.endDate?.month?.value?.toString() ?: "") }
-    var endYear by remember { mutableStateOf(experience?.endDate?.year.toString() ?: "") }
-    var description by remember { mutableStateOf(experience?.description ?: "") }
-    var isCurrentlyWorking by remember { mutableStateOf(experience?.currentlyWorking ?: false) }
-    var errorMessage by remember { mutableStateOf("") }
-
-    // Error states for validation
-    var companyError by remember { mutableStateOf(false) }
-    var positionTitleError by remember { mutableStateOf(false) }
-    var startMonthError by remember { mutableStateOf(false) }
-    var startYearError by remember { mutableStateOf(false) }
-    var endMonthError by remember { mutableStateOf(false) }
-    var endYearError by remember { mutableStateOf(false) }
-
-    Dialog(onDismissRequest = onDismiss) {
-        Surface(
-            shape = RoundedCornerShape(8.dp),
-            color = Color.White,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Column(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    if (experience != null) {
-                        IconButton(
-                            onClick = {
-                                runBlocking {
-                                    val result = experience.id?.let { id ->
-                                        profileController.deleteWorkExperience(id.toString())
-                                    } ?: Result.failure(Exception("Experience ID is null"))
-
-                                    result.onSuccess {
-                                        onWorkExperienceDeleted()
-                                        onDismiss()
-                                    }.onFailure { error ->
-                                        errorMessage = error.message ?: "Failed to delete work experience."
-                                    }
-                                }
-                            }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Delete,
-                                contentDescription = "Delete Work Experience",
-                                tint = Color(0xFFBE0303)
-                            )
-                        }
-                    }
-                }
-
-                Text("Edit Work Experience", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
-                Spacer(modifier = Modifier.height(8.dp))
-
-                OutlinedTextField(
-                    value = company,
-                    onValueChange = {
-                        company = it
-                        companyError = it.isEmpty()
-                    },
-                    label = { Text("Company") },
-                    isError = companyError,
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                OutlinedTextField(
-                    value = positionTitle,
-                    onValueChange = {
-                        positionTitle = it
-                        positionTitleError = it.isEmpty()
-                    },
-                    label = { Text("Position Title") },
-                    isError = positionTitleError,
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    OutlinedTextField(
-                        value = startMonth,
-                        onValueChange = {
-                            startMonth = it
-                            startMonthError = it.toIntOrNull() !in 1..12 || it.startsWith("0") || it.isEmpty()
-                        },
-                        label = { Text("Start Month") },
-                        isError = startMonthError,
-                        modifier = Modifier.weight(1f),
-                        placeholder = { Text("(ex: 7 for July)") }
-                    )
-                    OutlinedTextField(
-                        value = startYear,
-                        onValueChange = {
-                            startYear = it
-                            startYearError = it.length != 4 || it.toIntOrNull() == null
-                        },
-                        label = { Text("Start Year") },
-                        isError = startYearError,
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    OutlinedTextField(
-                        value = endMonth,
-                        onValueChange = {
-                            endMonth = it
-                            endMonthError = it.toIntOrNull() !in 1..12 || it.startsWith("0") || it.isEmpty()
-                        },
-                        label = { Text("End Month") },
-                        isError = endMonthError,
-                        modifier = Modifier.weight(1f),
-                        enabled = !isCurrentlyWorking
-                    )
-                    OutlinedTextField(
-                        value = endYear,
-                        onValueChange = {
-                            endYear = it
-                            endYearError = it.length != 4 || it.toIntOrNull() == null
-                        },
-                        label = { Text("End Year") },
-                        isError = endYearError,
-                        modifier = Modifier.weight(1f),
-                        enabled = !isCurrentlyWorking
-                    )
-                }
-
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                    Checkbox(
-                        checked = isCurrentlyWorking,
-                        onCheckedChange = { isCurrentlyWorking = it }
-                    )
-                    Text("I currently work here")
-                }
-
-                OutlinedTextField(
-                    value = description,
-                    onValueChange = { description = it },
-                    label = { Text("Description") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(100.dp)
-                )
-
-                if (errorMessage.isNotEmpty()) {
-                    Text(
-                        text = errorMessage,
-                        color = Color.Red,
-                        modifier = Modifier.padding(10.dp)
-                    )
-                }
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    TextButton(onClick = onDismiss) {
-                        Text("Cancel")
-                    }
-
-                    Button(
-                        onClick = {
-                            if (companyError || positionTitleError || startMonthError || startYearError || (!isCurrentlyWorking && (endMonthError || endYearError))) {
-                                errorMessage = "Please fix the errors in the form."
-                            } else {
-                                runBlocking {
-                                    try {
-                                        val startDate = LocalDate(startYear.toInt(), startMonth.toInt(), 1)
-                                        val endDate = if (isCurrentlyWorking) Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date else LocalDate(endYear.toInt(), endMonth.toInt(), 1)
-                                        val result = if (experience == null) {
-                                            profileController.addWorkExperience(
-                                                userId = userId,
-                                                companyName = company,
-                                                title = positionTitle,
-                                                currentlyWorking = isCurrentlyWorking,
-                                                startDate = startDate,
-                                                endDate = endDate,
-                                                description = description.takeIf { it.isNotEmpty() }
-                                            )
-                                        } else {
-                                            profileController.updateWorkExperience(
-                                                userId = userId,
-                                                workExperienceID = experience.id.toString(),
-                                                companyName = company,
-                                                currentlyWorking = isCurrentlyWorking,
-                                                title = positionTitle,
-                                                startDate = startDate,
-                                                endDate = endDate,
-                                                description = description.takeIf { it.isNotEmpty() }
-                                            )
-                                        }
-                                        result.onSuccess {
-                                            onWorkExperienceEdited()
-                                            onDismiss()
-                                        }.onFailure { error ->
-                                            errorMessage = error.message ?: "Failed to save work experience."
-                                        }
-                                    } catch (e: Exception) {
-                                        errorMessage = "Invalid date format"
-                                    }
-                                }
-                            }
-                        },
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = Color(0xFF487896),
-                            contentColor = Color.White
-                        )
-                    ) {
-                        Text("Save")
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun AddProjectDialog(
-    onDismiss: () -> Unit,
-    userId: String,
-    profileController: ProfileController,
-    onProjectAdded: () -> Unit
-) {
-    var projectName by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
-    var errorMessage by remember { mutableStateOf("") }
-
-    Dialog(onDismissRequest = onDismiss) {
-        Surface(
-            shape = RoundedCornerShape(8.dp),
-            color = Color.White,
-            modifier = Modifier.fillMaxWidth().padding(16.dp)
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp).verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Text("Add Project", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
-                Spacer(modifier = Modifier.height(8.dp))
-
-                OutlinedTextField(
-                    value = projectName,
-                    onValueChange = { projectName = it },
-                    label = { Text("Project Name") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                OutlinedTextField(
-                    value = description,
-                    onValueChange = { description = it },
-                    label = { Text("Description") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                if (errorMessage.isNotEmpty()) {
-                    Text(
-                        text = errorMessage,
-                        color = Color.Red,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(10.dp)
-                    )
-                }
-
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    TextButton(onClick = onDismiss) {
-                        Text("Cancel")
-                    }
-                    Button(
-                        onClick = {
-                            runBlocking {
-                                val result = profileController.addProject(userId, projectName, description)
-                                result.onSuccess {
-                                    onProjectAdded()
-                                }.onFailure { error ->
-                                    errorMessage = error.message ?: "Failed to add project"
-                                }
-                            }
-                        }
-                    ) {
-                        Text("Save")
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun EditProjectDialog(
-    project: PersonalProject? = null,
-    onDismiss: () -> Unit,
-    userId: String,
-    profileController: ProfileController,
-    onProjectEdited: () -> Unit,
-    onProjectDeleted: () -> Unit
-) {
-    var projectName by remember { mutableStateOf(project?.projectName ?: "") }
-    var description by remember { mutableStateOf(project?.description ?: "") }
-    var errorMessage by remember { mutableStateOf("") }
-
-    Dialog(onDismissRequest = onDismiss) {
-        Surface(
-            shape = RoundedCornerShape(8.dp),
-            color = Color.White,
-            modifier = Modifier.fillMaxWidth().padding(16.dp)
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp).verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    if (project != null) {
-                        IconButton(onClick = {
-                            runBlocking {
-                                val result = profileController.deleteProject(project.id.toString())
-                                result.onSuccess {
-                                    onProjectDeleted()
-                                }.onFailure { error ->
-                                    errorMessage = error.message ?: "Failed to delete project"
-                                }
-                            }
-                        }) {
-                            Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete")
-                        }
-                    }
-                }
-
-                Text("Edit Project", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
-                Spacer(modifier = Modifier.height(8.dp))
-
-                OutlinedTextField(
-                    value = projectName,
-                    onValueChange = { projectName = it },
-                    label = { Text("Project Name") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                OutlinedTextField(
-                    value = description,
-                    onValueChange = { description = it },
-                    label = { Text("Description") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                if (errorMessage.isNotEmpty()) {
-                    Text(
-                        text = errorMessage,
-                        color = Color.Red,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(10.dp)
-                    )
-                }
-
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    TextButton(onClick = onDismiss) {
-                        Text("Cancel")
-                    }
-                    Button(
-                        onClick = {
-                            runBlocking {
-                                val result = profileController.updateProject(userId, project?.id.toString(), projectName, description)
-                                result.onSuccess {
-                                    onProjectEdited()
-                                }.onFailure { error ->
-                                    errorMessage = error.message ?: "Failed to update project"
-                                }
-                            }
-                        }
-                    ) {
-                        Text("Save")
-                    }
-                }
-            }
-        }
-    }
-}
+//@Composable
+//fun AddExperienceDialog(
+//    onDismiss: () -> Unit,
+//    userId: String,
+//    profileController: ProfileController,
+//    onWorkExperienceAdded: () -> Unit
+//) {
+//    var company by remember { mutableStateOf("") }
+//    var location by remember { mutableStateOf("") }
+//    var positionTitle by remember { mutableStateOf("") }
+//    var startMonth by remember { mutableStateOf("") }
+//    var startYear by remember { mutableStateOf("") }
+//    var endMonth by remember { mutableStateOf("") }
+//    var endYear by remember { mutableStateOf("") }
+//    var description by remember { mutableStateOf("") }
+//    var isCurrentlyWorking by remember { mutableStateOf(false) }
+//    var errorMessage by remember { mutableStateOf("") }
+//
+//    // Error state tracking
+//    var companyError by remember { mutableStateOf(false) }
+//    var positionTitleError by remember { mutableStateOf(false) }
+//    var startMonthError by remember { mutableStateOf(false) }
+//    var startYearError by remember { mutableStateOf(false) }
+//    var endMonthError by remember { mutableStateOf(false) }
+//    var endYearError by remember { mutableStateOf(false) }
+//
+//    Dialog(onDismissRequest = onDismiss) {
+//        Surface(
+//            shape = RoundedCornerShape(8.dp),
+//            color = Color.White,
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .padding(16.dp)
+//        ) {
+//            Column(
+//                modifier = Modifier
+//                    .padding(16.dp)
+//                    .verticalScroll(rememberScrollState()),
+//                verticalArrangement = Arrangement.spacedBy(8.dp)
+//            ) {
+//                Text("Add Work Experience", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+//                Spacer(modifier = Modifier.height(8.dp))
+//
+//                OutlinedTextField(
+//                    value = company,
+//                    onValueChange = {
+//                        company = it
+//                        companyError = it.isEmpty()
+//                    },
+//                    label = { Text("Company") },
+//                    isError = companyError,
+//                    modifier = Modifier.fillMaxWidth()
+//                )
+//
+//                OutlinedTextField(
+//                    value = location,
+//                    onValueChange = { location = it },
+//                    label = { Text("Location") },
+//                    modifier = Modifier.fillMaxWidth()
+//                )
+//
+//                OutlinedTextField(
+//                    value = positionTitle,
+//                    onValueChange = {
+//                        positionTitle = it
+//                        positionTitleError = it.isEmpty()
+//                    },
+//                    label = { Text("Position Title") },
+//                    isError = positionTitleError,
+//                    modifier = Modifier.fillMaxWidth()
+//                )
+//
+//                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+//                    OutlinedTextField(
+//                        value = startMonth,
+//                        onValueChange = {
+//                            startMonth = it
+//                            startMonthError = it.toIntOrNull() !in 1..12 || it.startsWith("0") || it.isEmpty()
+//                        },
+//                        label = { Text("Start Month") },
+//                        isError = startMonthError,
+//                        modifier = Modifier.weight(1f),
+//                        placeholder = { Text("(ex: 7 for July)") }
+//                    )
+//                    OutlinedTextField(
+//                        value = startYear,
+//                        onValueChange = {
+//                            startYear = it
+//                            startYearError = it.length != 4 || it.toIntOrNull() == null
+//                        },
+//                        label = { Text("Start Year") },
+//                        isError = startYearError,
+//                        modifier = Modifier.weight(1f)
+//                    )
+//                }
+//
+//                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+//                    OutlinedTextField(
+//                        value = endMonth,
+//                        onValueChange = {
+//                            endMonth = it
+//                            endMonthError = it.toIntOrNull() !in 1..12 || it.startsWith("0") || it.isEmpty()
+//                        },
+//                        label = { Text("End Month") },
+//                        isError = endMonthError,
+//                        modifier = Modifier.weight(1f),
+//                        enabled = !isCurrentlyWorking
+//                    )
+//                    OutlinedTextField(
+//                        value = endYear,
+//                        onValueChange = {
+//                            endYear = it
+//                            endYearError = it.length != 4 || it.toIntOrNull() == null
+//                        },
+//                        label = { Text("End Year") },
+//                        isError = endYearError,
+//                        modifier = Modifier.weight(1f),
+//                        enabled = !isCurrentlyWorking
+//                    )
+//                }
+//
+//                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+//                    Checkbox(checked = isCurrentlyWorking, onCheckedChange = { isCurrentlyWorking = it })
+//                    Text("I currently work here")
+//                }
+//
+//                OutlinedTextField(
+//                    value = description,
+//                    onValueChange = { description = it },
+//                    label = { Text("Description") },
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .height(100.dp)
+//                )
+//
+//                if (errorMessage.isNotEmpty()) {
+//                    Text(text = errorMessage, color = Color.Red, modifier = Modifier.padding(10.dp))
+//                }
+//
+//                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+//                    TextButton(onClick = onDismiss) {
+//                        Text("Cancel")
+//                    }
+//                    Button(
+//                        onClick = {
+//                            if (companyError || positionTitleError || startMonthError || startYearError || (!isCurrentlyWorking && (endMonthError || endYearError))) {
+//                                errorMessage = "Please fix errors in the form."
+//                            } else {
+//                                runBlocking {
+//                                    try {
+//                                        val startDate = LocalDate(startYear.toInt(), startMonth.toInt(), 1)
+//                                        val endDate = if (isCurrentlyWorking) Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date else LocalDate(endYear.toInt(), endMonth.toInt(), 1)
+//                                        val result = profileController.addWorkExperience(
+//                                            userId = userId,
+//                                            companyName = company,
+//                                            currentlyWorking = isCurrentlyWorking,
+//                                            title = positionTitle,
+//                                            startDate = startDate,
+//                                            endDate = endDate,
+//                                            description = description.takeIf { it.isNotEmpty() }
+//                                        )
+//
+//                                        result.onSuccess {
+//                                            onWorkExperienceAdded()
+//                                            onDismiss()
+//                                        }.onFailure { error ->
+//                                            errorMessage = error.message ?: "Failed to add work experience."
+//                                        }
+//                                    } catch (e: Exception) {
+//                                        errorMessage = "Invalid date format or missing input"
+//                                    }
+//                                }
+//                            }
+//                        },
+//                        colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF487896), contentColor = Color.White)
+//                    ) {
+//                        Text("Save")
+//                    }
+//                }
+//            }
+//        }
+//    }
+//}
+//
+//
+//@Composable
+//fun EditExperienceDialog(
+//    experience: WorkExperience? = null,
+//    onDismiss: () -> Unit,
+//    userId: String,
+//    profileController: ProfileController,
+//    onWorkExperienceEdited: () -> Unit,
+//    onWorkExperienceDeleted: () -> Unit
+//) {
+//    var company by remember { mutableStateOf(experience?.companyName ?: "") }
+//    var positionTitle by remember { mutableStateOf(experience?.title ?: "") }
+//    var startMonth by remember { mutableStateOf(experience?.startDate?.month?.value?.toString() ?: "") }
+//    var startYear by remember { mutableStateOf(experience?.startDate?.year.toString() ?: "") }
+//    var endMonth by remember { mutableStateOf(experience?.endDate?.month?.value?.toString() ?: "") }
+//    var endYear by remember { mutableStateOf(experience?.endDate?.year.toString() ?: "") }
+//    var description by remember { mutableStateOf(experience?.description ?: "") }
+//    var isCurrentlyWorking by remember { mutableStateOf(experience?.currentlyWorking ?: false) }
+//    var errorMessage by remember { mutableStateOf("") }
+//
+//    // Error states for validation
+//    var companyError by remember { mutableStateOf(false) }
+//    var positionTitleError by remember { mutableStateOf(false) }
+//    var startMonthError by remember { mutableStateOf(false) }
+//    var startYearError by remember { mutableStateOf(false) }
+//    var endMonthError by remember { mutableStateOf(false) }
+//    var endYearError by remember { mutableStateOf(false) }
+//
+//    Dialog(onDismissRequest = onDismiss) {
+//        Surface(
+//            shape = RoundedCornerShape(8.dp),
+//            color = Color.White,
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .padding(16.dp)
+//        ) {
+//            Column(
+//                modifier = Modifier
+//                    .padding(16.dp)
+//                    .verticalScroll(rememberScrollState()),
+//                verticalArrangement = Arrangement.spacedBy(8.dp)
+//            ) {
+//                Row(
+//                    modifier = Modifier.fillMaxWidth(),
+//                    horizontalArrangement = Arrangement.End
+//                ) {
+//                    if (experience != null) {
+//                        IconButton(
+//                            onClick = {
+//                                runBlocking {
+//                                    val result = experience.id?.let { id ->
+//                                        profileController.deleteWorkExperience(id.toString())
+//                                    } ?: Result.failure(Exception("Experience ID is null"))
+//
+//                                    result.onSuccess {
+//                                        onWorkExperienceDeleted()
+//                                        onDismiss()
+//                                    }.onFailure { error ->
+//                                        errorMessage = error.message ?: "Failed to delete work experience."
+//                                    }
+//                                }
+//                            }
+//                        ) {
+//                            Icon(
+//                                imageVector = Icons.Default.Delete,
+//                                contentDescription = "Delete Work Experience",
+//                                tint = Color(0xFFBE0303)
+//                            )
+//                        }
+//                    }
+//                }
+//
+//                Text("Edit Work Experience", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+//                Spacer(modifier = Modifier.height(8.dp))
+//
+//                OutlinedTextField(
+//                    value = company,
+//                    onValueChange = {
+//                        company = it
+//                        companyError = it.isEmpty()
+//                    },
+//                    label = { Text("Company") },
+//                    isError = companyError,
+//                    modifier = Modifier.fillMaxWidth()
+//                )
+//
+//                OutlinedTextField(
+//                    value = positionTitle,
+//                    onValueChange = {
+//                        positionTitle = it
+//                        positionTitleError = it.isEmpty()
+//                    },
+//                    label = { Text("Position Title") },
+//                    isError = positionTitleError,
+//                    modifier = Modifier.fillMaxWidth()
+//                )
+//
+//                Row(
+//                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+//                    modifier = Modifier.fillMaxWidth()
+//                ) {
+//                    OutlinedTextField(
+//                        value = startMonth,
+//                        onValueChange = {
+//                            startMonth = it
+//                            startMonthError = it.toIntOrNull() !in 1..12 || it.startsWith("0") || it.isEmpty()
+//                        },
+//                        label = { Text("Start Month") },
+//                        isError = startMonthError,
+//                        modifier = Modifier.weight(1f),
+//                        placeholder = { Text("(ex: 7 for July)") }
+//                    )
+//                    OutlinedTextField(
+//                        value = startYear,
+//                        onValueChange = {
+//                            startYear = it
+//                            startYearError = it.length != 4 || it.toIntOrNull() == null
+//                        },
+//                        label = { Text("Start Year") },
+//                        isError = startYearError,
+//                        modifier = Modifier.weight(1f)
+//                    )
+//                }
+//
+//                Row(
+//                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+//                    modifier = Modifier.fillMaxWidth()
+//                ) {
+//                    OutlinedTextField(
+//                        value = endMonth,
+//                        onValueChange = {
+//                            endMonth = it
+//                            endMonthError = it.toIntOrNull() !in 1..12 || it.startsWith("0") || it.isEmpty()
+//                        },
+//                        label = { Text("End Month") },
+//                        isError = endMonthError,
+//                        modifier = Modifier.weight(1f),
+//                        enabled = !isCurrentlyWorking
+//                    )
+//                    OutlinedTextField(
+//                        value = endYear,
+//                        onValueChange = {
+//                            endYear = it
+//                            endYearError = it.length != 4 || it.toIntOrNull() == null
+//                        },
+//                        label = { Text("End Year") },
+//                        isError = endYearError,
+//                        modifier = Modifier.weight(1f),
+//                        enabled = !isCurrentlyWorking
+//                    )
+//                }
+//
+//                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+//                    Checkbox(
+//                        checked = isCurrentlyWorking,
+//                        onCheckedChange = { isCurrentlyWorking = it }
+//                    )
+//                    Text("I currently work here")
+//                }
+//
+//                OutlinedTextField(
+//                    value = description,
+//                    onValueChange = { description = it },
+//                    label = { Text("Description") },
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .height(100.dp)
+//                )
+//
+//                if (errorMessage.isNotEmpty()) {
+//                    Text(
+//                        text = errorMessage,
+//                        color = Color.Red,
+//                        modifier = Modifier.padding(10.dp)
+//                    )
+//                }
+//
+//                Row(
+//                    modifier = Modifier.fillMaxWidth(),
+//                    horizontalArrangement = Arrangement.SpaceBetween
+//                ) {
+//                    TextButton(onClick = onDismiss) {
+//                        Text("Cancel")
+//                    }
+//
+//                    Button(
+//                        onClick = {
+//                            if (companyError || positionTitleError || startMonthError || startYearError || (!isCurrentlyWorking && (endMonthError || endYearError))) {
+//                                errorMessage = "Please fix the errors in the form."
+//                            } else {
+//                                runBlocking {
+//                                    try {
+//                                        val startDate = LocalDate(startYear.toInt(), startMonth.toInt(), 1)
+//                                        val endDate = if (isCurrentlyWorking) Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date else LocalDate(endYear.toInt(), endMonth.toInt(), 1)
+//                                        val result = if (experience == null) {
+//                                            profileController.addWorkExperience(
+//                                                userId = userId,
+//                                                companyName = company,
+//                                                title = positionTitle,
+//                                                currentlyWorking = isCurrentlyWorking,
+//                                                startDate = startDate,
+//                                                endDate = endDate,
+//                                                description = description.takeIf { it.isNotEmpty() }
+//                                            )
+//                                        } else {
+//                                            profileController.updateWorkExperience(
+//                                                userId = userId,
+//                                                workExperienceID = experience.id.toString(),
+//                                                companyName = company,
+//                                                currentlyWorking = isCurrentlyWorking,
+//                                                title = positionTitle,
+//                                                startDate = startDate,
+//                                                endDate = endDate,
+//                                                description = description.takeIf { it.isNotEmpty() }
+//                                            )
+//                                        }
+//                                        result.onSuccess {
+//                                            onWorkExperienceEdited()
+//                                            onDismiss()
+//                                        }.onFailure { error ->
+//                                            errorMessage = error.message ?: "Failed to save work experience."
+//                                        }
+//                                    } catch (e: Exception) {
+//                                        errorMessage = "Invalid date format"
+//                                    }
+//                                }
+//                            }
+//                        },
+//                        colors = ButtonDefaults.buttonColors(
+//                            backgroundColor = Color(0xFF487896),
+//                            contentColor = Color.White
+//                        )
+//                    ) {
+//                        Text("Save")
+//                    }
+//                }
+//            }
+//        }
+//    }
+//}
 
 @Composable
 fun SkillChip(skill: String, onDelete: () -> Unit) {

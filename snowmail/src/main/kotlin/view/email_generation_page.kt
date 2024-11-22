@@ -21,6 +21,7 @@ import ca.uwaterloo.controller.ProfileController
 import ca.uwaterloo.model.EducationWithDegreeName
 import ca.uwaterloo.model.WorkExperience
 import ca.uwaterloo.service.ParserService
+import ca.uwaterloo.view.theme.AppTheme
 import controller.EmailGenerationController
 import controller.SendEmailController
 import integration.OpenAIClient
@@ -163,49 +164,51 @@ fun EmailGenerationPage(userId: String, NavigateToDocuments: () -> Unit, Navigat
 
 
 
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colors.background
-    ) {
-        Column(
+    AppTheme {
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp)
-                .background(Color(0xFFF8FAFC))
+                .background(MaterialTheme.colors.background)
         ) {
-            TopNavigationBar(
-                selectedTabIndex = selectedTabIndex,
-                onTabSelected = { index ->
-                    selectedTabIndex = index
-                    when (index) {
-                        0 -> {}
-                        1 -> navigateOtherPage(NavigateToProgress)
-                        2 -> navigateOtherPage(NavigateToDocuments)
-                        3 -> navigateOtherPage(NavigateToProfile)
-                    }
-                }
-            )
-
-            Spacer(modifier = Modifier.height(64.dp))
-
-            Row(
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(24.dp)
-            ) { // this is the row for user input forms and content
-                Column(
+                    .fillMaxSize()
+                    .padding(16.dp)
+                    .background(Color(0xFFF8FAFC))
+            ) {
+                TopNavigationBar(
+                    selectedTabIndex = selectedTabIndex,
+                    onTabSelected = { index ->
+                        selectedTabIndex = index
+                        when (index) {
+                            0 -> {}
+                            1 -> navigateOtherPage(NavigateToProgress)
+                            2 -> navigateOtherPage(NavigateToDocuments)
+                            3 -> navigateOtherPage(NavigateToProfile)
+                        }
+                    }
+                )
+
+                Spacer(modifier = Modifier.height(64.dp))
+
+                Row(
                     modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight(),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(24.dp)
+                ) { // this is the row for user input forms and content
                     Column(
                         modifier = Modifier
-                            .clip(RoundedCornerShape(32.dp)) // Rounded corners
-                            .background(Color.White) // White background
-                            .padding(32.dp)
+                            .weight(1f)
+                            .fillMaxHeight(),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
+                        Column(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(32.dp)) // Rounded corners
+                                .background(Color.White) // White background
+                                .padding(32.dp)
+                        ) {
 //                        OutlinedButton(
 //                            onClick = { showDocumentDialog = true },
 //                            modifier = Modifier
@@ -219,137 +222,137 @@ fun EmailGenerationPage(userId: String, NavigateToDocuments: () -> Unit, Navigat
 //                        ) {
 //                            Text("Select Documents", color = Color.Black, textAlign = TextAlign.Left)
 //                        }
-                        DocumentSelectionDropdown(
-                            userId = userId,
-                            selectedDocument = selectedDocument,
-                            onDocumentSelected = { document ->
-                                selectedDocument = document
-                            }
-                        )
-                    }
-
-                    Column(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(32.dp)) // Rounded corners
-                            .background(Color.White) // White background
-                            .padding(32.dp)
-                    ) {
-
-                        TextField(
-                            value = descriptionInput,
-                            onValueChange = { descriptionInput = it },
-                            label = { Text("Job Description") },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(300.dp),
-                            colors = TextFieldDefaults.outlinedTextFieldColors(
-                                focusedLabelColor = Color.Transparent,
-                                //unfocusedLabelColor = Color.Transparent,
-                                focusedBorderColor = Color.Transparent,
-                                unfocusedBorderColor = Color.Transparent
+                            DocumentSelectionDropdown(
+                                userId = userId,
+                                selectedDocument = selectedDocument,
+                                onDocumentSelected = { document ->
+                                    selectedDocument = document
+                                }
                             )
-                        )
-                    }
-                }
+                        }
 
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight(),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    Spacer(modifier = Modifier.weight(0.1f))
+                        Column(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(32.dp)) // Rounded corners
+                                .background(Color.White) // White background
+                                .padding(32.dp)
+                        ) {
+
+                            TextField(
+                                value = descriptionInput,
+                                onValueChange = { descriptionInput = it },
+                                label = { Text("Job Description") },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(300.dp),
+                                colors = TextFieldDefaults.outlinedTextFieldColors(
+                                    focusedLabelColor = Color.Transparent,
+                                    //unfocusedLabelColor = Color.Transparent,
+                                    focusedBorderColor = Color.Transparent,
+                                    unfocusedBorderColor = Color.Transparent
+                                )
+                            )
+                        }
+                    }
 
                     Column(
                         modifier = Modifier
                             .weight(1f)
-                            .clip(RoundedCornerShape(32.dp)) // Rounded corners
-                            .background(Color.White) // White background
-                            .padding(32.dp)
                             .fillMaxHeight(),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        TextField(
-                            value = companyInput,
-                            onValueChange = { companyInput = it },
-                            label = { Text("Company Name") },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(32.dp)) // Rounded corners
-                                .background(Color(0x6B727F80)),
-                            colors = TextFieldDefaults.outlinedTextFieldColors(
-                                focusedLabelColor = Color.Transparent,
-                                //unfocusedLabelColor = Color.Transparent,
-                                disabledTextColor = Color.Transparent,
-
-                                //disabledIndicatorColor = Color.Transparent
-                                focusedBorderColor = Color.Transparent,
-                                unfocusedBorderColor = Color.Transparent
-                            )
-                        )
-
                         Spacer(modifier = Modifier.weight(0.1f))
 
-                        TextField(
-                            value = jobtitleInput,
-                            onValueChange = { jobtitleInput = it },
-                            label = { Text("Job Title") },
+                        Column(
                             modifier = Modifier
-                                .fillMaxWidth()
+                                .weight(1f)
                                 .clip(RoundedCornerShape(32.dp)) // Rounded corners
-                                .background(Color(0x6B727F80)),
-                            colors = TextFieldDefaults.outlinedTextFieldColors(
-                                focusedLabelColor = Color.Transparent,
-                                //unfocusedLabelColor = Color.Transparent,
-                                disabledTextColor = Color.Transparent,
+                                .background(Color.White) // White background
+                                .padding(32.dp)
+                                .fillMaxHeight(),
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            TextField(
+                                value = companyInput,
+                                onValueChange = { companyInput = it },
+                                label = { Text("Company Name") },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(32.dp)) // Rounded corners
+                                    .background(Color(0x6B727F80)),
+                                colors = TextFieldDefaults.outlinedTextFieldColors(
+                                    focusedLabelColor = Color.Transparent,
+                                    //unfocusedLabelColor = Color.Transparent,
+                                    disabledTextColor = Color.Transparent,
 
-                                //disabledIndicatorColor = Color.Transparent
-                                focusedBorderColor = Color.Transparent,
-                                unfocusedBorderColor = Color.Transparent
+                                    //disabledIndicatorColor = Color.Transparent
+                                    focusedBorderColor = Color.Transparent,
+                                    unfocusedBorderColor = Color.Transparent
+                                )
                             )
-                        )
 
-                        Spacer(modifier = Modifier.weight(0.1f))
+                            Spacer(modifier = Modifier.weight(0.1f))
 
-                        TextField(
-                            value = recruiterNameInput,
-                            onValueChange = { recruiterNameInput = it },
-                            label = { Text("Recruiter Name") },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(32.dp)) // Rounded corners
-                                .background(Color(0x6B727F80)),
-                            colors = TextFieldDefaults.outlinedTextFieldColors(
-                                focusedLabelColor = Color.Transparent,
-                                //unfocusedLabelColor = Color.Transparent,
-                                focusedBorderColor = Color.Transparent,
-                                unfocusedBorderColor = Color.Transparent
+                            TextField(
+                                value = jobtitleInput,
+                                onValueChange = { jobtitleInput = it },
+                                label = { Text("Job Title") },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(32.dp)) // Rounded corners
+                                    .background(Color(0x6B727F80)),
+                                colors = TextFieldDefaults.outlinedTextFieldColors(
+                                    focusedLabelColor = Color.Transparent,
+                                    //unfocusedLabelColor = Color.Transparent,
+                                    disabledTextColor = Color.Transparent,
+
+                                    //disabledIndicatorColor = Color.Transparent
+                                    focusedBorderColor = Color.Transparent,
+                                    unfocusedBorderColor = Color.Transparent
+                                )
                             )
-                        )
 
-                        Spacer(modifier = Modifier.weight(0.1f))
+                            Spacer(modifier = Modifier.weight(0.1f))
 
-                        TextField(
-                            value = recruiterEmailInput,
-                            onValueChange = { recruiterEmailInput = it },
-                            label = { Text("Recruiter Email") },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(32.dp)) // Rounded corners
-                                .background(Color(0x6B727F80)),
-                            colors = TextFieldDefaults.outlinedTextFieldColors(
-                                focusedLabelColor = Color.Transparent,
-                                //unfocusedLabelColor = Color.Transparent,
-                                disabledTextColor = Color.Transparent,
-
-                                //disabledIndicatorColor = Color.Transparent
-                                focusedBorderColor = Color.Transparent,
-                                unfocusedBorderColor = Color.Transparent
+                            TextField(
+                                value = recruiterNameInput,
+                                onValueChange = { recruiterNameInput = it },
+                                label = { Text("Recruiter Name") },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(32.dp)) // Rounded corners
+                                    .background(Color(0x6B727F80)),
+                                colors = TextFieldDefaults.outlinedTextFieldColors(
+                                    focusedLabelColor = Color.Transparent,
+                                    //unfocusedLabelColor = Color.Transparent,
+                                    focusedBorderColor = Color.Transparent,
+                                    unfocusedBorderColor = Color.Transparent
+                                )
                             )
-                        )
+
+                            Spacer(modifier = Modifier.weight(0.1f))
+
+                            TextField(
+                                value = recruiterEmailInput,
+                                onValueChange = { recruiterEmailInput = it },
+                                label = { Text("Recruiter Email") },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(32.dp)) // Rounded corners
+                                    .background(Color(0x6B727F80)),
+                                colors = TextFieldDefaults.outlinedTextFieldColors(
+                                    focusedLabelColor = Color.Transparent,
+                                    //unfocusedLabelColor = Color.Transparent,
+                                    disabledTextColor = Color.Transparent,
+
+                                    //disabledIndicatorColor = Color.Transparent
+                                    focusedBorderColor = Color.Transparent,
+                                    unfocusedBorderColor = Color.Transparent
+                                )
+                            )
 
 
-                    }
+                        }
                         Spacer(modifier = Modifier.weight(0.1f))
 
                         Button(
@@ -382,29 +385,29 @@ fun EmailGenerationPage(userId: String, NavigateToDocuments: () -> Unit, Navigat
                             Text("Generate Email")
                         }
 
-                }
-                if (showDialog) {
-                    EditableAlertDialog(
-                        userId = userId,
-                        onDismissRequest = { showDialog = false },
-                       // title = { Text("Generated Email") },
-                        title = "Generated Email",
-                        initialText = emailContent,
-                        reciepientAddress = recruiterEmailInput,
-                        jobTitle = jobtitleInput,
-                        companyName = companyInput,
-                        onConfirm = { newText ->
-                            emailContent = newText
-                            showDialog = false
-                        }
-                        //text = { Text(emailContent) },
+                    }
+                    if (showDialog) {
+                        EditableAlertDialog(
+                            userId = userId,
+                            onDismissRequest = { showDialog = false },
+                            // title = { Text("Generated Email") },
+                            title = "Generated Email",
+                            initialText = emailContent,
+                            reciepientAddress = recruiterEmailInput,
+                            jobTitle = jobtitleInput,
+                            companyName = companyInput,
+                            onConfirm = { newText ->
+                                emailContent = newText
+                                showDialog = false
+                            }
+                            //text = { Text(emailContent) },
 //                        confirmButton = {
 //                            Button(onClick = { showDialog = false }) {
 //                                Text("Close")
 //                            }
 //                        }
-                    )
-                }
+                        )
+                    }
 
 //                if (showDocumentDialog) {
 //                    DocumentSelectionDialog(
@@ -415,6 +418,7 @@ fun EmailGenerationPage(userId: String, NavigateToDocuments: () -> Unit, Navigat
 //                        }
 //                    )
 //                }
+                }
             }
         }
     }

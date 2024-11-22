@@ -20,6 +20,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
+import ca.uwaterloo.view.theme.AppTheme
 
 
 // import ca.uwaterloo.persistence.DBStorage
@@ -35,37 +36,47 @@ val buttonColor = 0xFF487896
 
 @Composable
 fun SignUpPage(NavigateToLogin: () -> Unit, NavigateToHome: () -> Unit) {
-    Box(Modifier.fillMaxSize().background(Color(fullPageColor)), contentAlignment = Alignment.Center) {
-        Column (horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()) {
-            Row { Spacer(modifier = Modifier.fillMaxHeight(0.05f)) }
-            Row {
-                Box(modifier = Modifier.fillMaxHeight(0.15f).background(Color(fullPageColor))) {
-                    Row {
-                        Text(
-                            text = "Join ",
-                            fontSize = 50.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.Black,
-                            fontFamily = FontFamily.Default
-                        )
-                        Text(
-                            text = "Snowmail!",
-                            fontSize = 50.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xff2b5dc7),
-                            fontFamily = FontFamily.Default
-                        )
+
+    AppTheme {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colors.background)
+        ) {
+            Column(
+                modifier = Modifier.fillMaxSize().padding(16.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Row { Spacer(modifier = Modifier.fillMaxHeight(0.05f)) }
+                Row {
+                    Box(modifier = Modifier.fillMaxHeight(0.15f).background(Color(fullPageColor))) {
+                        Row {
+                            Text(
+                                text = "Join ",
+                                fontSize = 50.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.Black,
+                                fontFamily = FontFamily.Default
+                            )
+                            Text(
+                                text = "Snowmail!",
+                                fontSize = 50.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xff2b5dc7),
+                                fontFamily = FontFamily.Default
+                            )
+                        }
                     }
                 }
+
+                Row { Spacer(modifier = Modifier.fillMaxHeight(0.01f)) }
+                Row(Modifier.fillMaxHeight(0.93f)) { RegisterForm(NavigateToLogin, NavigateToHome) }
+                Row { Spacer(modifier = Modifier.fillMaxHeight(0.01f)) }
             }
 
-            Row { Spacer(modifier = Modifier.fillMaxHeight(0.01f)) }
-            Row(Modifier.fillMaxHeight(0.93f)) { RegisterForm(NavigateToLogin, NavigateToHome) }
-            Row { Spacer(modifier = Modifier.fillMaxHeight(0.01f)) }
         }
-
     }
-
 
 }
 

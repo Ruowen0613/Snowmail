@@ -1,5 +1,6 @@
 package ca.uwaterloo.view
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.*
@@ -24,6 +25,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
+import ca.uwaterloo.view.theme.AppTheme
 
 import integration.SupabaseClient
 
@@ -33,71 +35,79 @@ object UserSession {
 
 @Composable
 fun loginPage(NavigateToSignup: () -> Unit, NavigateToHome: () -> Unit) {
-    Column (
-        modifier = Modifier.fillMaxSize().padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,) {
-        Row {
-            Text(
-                "Job Hunting: ",
-                textAlign = TextAlign.Center,
-                fontSize = 30.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 12.dp),
-                color = Color.Black
-            )
-            Text(
-                "Tough",
-                textAlign = TextAlign.Center,
-                fontSize = 30.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 12.dp),
-                color = Color(0xff2b5dc7)
-            )
+    AppTheme {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colors.background)
+        ) {
+            Column(
+                modifier = Modifier.fillMaxSize().padding(16.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Row {
+                    Text(
+                        "Job Hunting: ",
+                        textAlign = TextAlign.Center,
+                        fontSize = 30.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 12.dp),
+                        color = Color.Black
+                    )
+                    Text(
+                        "Tough",
+                        textAlign = TextAlign.Center,
+                        fontSize = 30.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 12.dp),
+                        color = Color(0xff2b5dc7)
+                    )
+                }
+                Row {
+                    Text(
+                        "But you Do Not ",
+                        textAlign = TextAlign.Center,
+                        fontSize = 30.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 12.dp),
+                        color = Color.Black
+                    )
+                    Text(
+                        "Have",
+                        textAlign = TextAlign.Center,
+                        fontSize = 30.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 12.dp),
+                        color = Color(0xff2b5dc7)
+                    )
+                }
+                Row {
+                    Text(
+                        "to Do It ",
+                        textAlign = TextAlign.Center,
+                        fontSize = 30.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 12.dp),
+                        color = Color.Black
+                    )
+                    Text(
+                        "Alone!",
+                        textAlign = TextAlign.Center,
+                        fontSize = 30.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 12.dp),
+                        color = Color(0xff2b5dc7)
+                    )
+                }
+
+
+                Row(Modifier.fillMaxWidth()) { loginForm(NavigateToSignup, NavigateToHome) }
+            }
+
+
         }
-        Row {
-            Text(
-                "But you Do Not ",
-                textAlign = TextAlign.Center,
-                fontSize = 30.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 12.dp),
-                color = Color.Black
-            )
-            Text(
-                "Have",
-                textAlign = TextAlign.Center,
-                fontSize = 30.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 12.dp),
-                color = Color(0xff2b5dc7)
-            )
-        }
-        Row {
-            Text(
-                "to Do It ",
-                textAlign = TextAlign.Center,
-                fontSize = 30.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 12.dp),
-                color = Color.Black
-            )
-            Text(
-                "Alone!",
-                textAlign = TextAlign.Center,
-                fontSize = 30.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 12.dp),
-                color = Color(0xff2b5dc7)
-            )
-        }
-
-
-        Row(Modifier.fillMaxWidth()) { loginForm(NavigateToSignup, NavigateToHome) }
-    }
-
-
-}
+    }}
 
 
 @Composable

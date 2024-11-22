@@ -49,6 +49,7 @@ import ca.uwaterloo.view.components.WorkExperienceSection
 
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.style.TextDecoration
+import ca.uwaterloo.view.theme.AppTheme
 import java.awt.Desktop
 import java.net.URI
 
@@ -97,7 +98,6 @@ fun ProfilePage(userId: String,
     var currentPage by remember { mutableStateOf("ProfilePage") }
 
     var selectedTabIndex by remember { mutableStateOf(3) }
-
 
 
     fun refreshEducationList() {
@@ -223,8 +223,8 @@ fun ProfilePage(userId: String,
         }
             .onFailure { error ->
 
-            errorMessage = error.message ?: "Failed to retrieve education records"
-        }
+                errorMessage = error.message ?: "Failed to retrieve education records"
+            }
 
         experienceResult.onSuccess { experiences ->
             workExperienceList = experiences
@@ -277,336 +277,342 @@ fun ProfilePage(userId: String,
         }
     }
 
-
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-            .background(Color(0xFFF8FAFC))
-            .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-
-        TopNavigationBar(
-            selectedTabIndex = selectedTabIndex,
-            onTabSelected = { index ->
-                selectedTabIndex = index
-                when (index) {
-                    0 -> navigateOtherPage(NavigateToEmialGen)
-                    1 -> navigateOtherPage(NavigateToProgress)
-                    2 -> navigateOtherPage(NavigateToDocuments)
-                    3 -> {}
-                }
-            }
-        )
-
-        Button(
-            onClick = {
-                NavigateToLogin()
-                runBlocking {
-                    signInController.logoutUser()
-                }
-            },
-            colors = ButtonDefaults.buttonColors(
-                backgroundColor = Color.White, // White background
-                contentColor = Color(0xFF487896) // Text color
-            ),
+    AppTheme {
+        Box(
             modifier = Modifier
-                .align(Alignment.End)
-                .padding(top = 16.dp, end = 16.dp) // Add spacing from the edges
+                .fillMaxSize()
+                .background(MaterialTheme.colors.background)
         ) {
-            Text("Sign Out", fontWeight = FontWeight.Bold)
-        }
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(0.8f)
-                .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-//            // Profile Picture
-//            Box(
-//                modifier = Modifier
-//                    .size(80.dp)
-//                    .clip(CircleShape)
-//                    .background(Color(0xFFE2E2E2)),
-//            )
-//
-//            Spacer(modifier = Modifier.width(16.dp))
-
-
-            // Name
-            if (errorMessage.isNotEmpty()) {
-                Text(
-                    text = errorMessage,
-                    color = Color.Red,
-                    modifier = Modifier.padding(10.dp)
-                )
-            } else {
-                Text(
-                    text = userName.ifEmpty { "Loading..." },
-                    fontSize = 24.sp,
-                    style = MaterialTheme.typography.h5,
-                    modifier = Modifier.align(Alignment.CenterVertically)
-                )
-            }
-        }
-
-        Card(
-            modifier = Modifier
-                .fillMaxWidth(0.8f)
-                .padding(10.dp),
-            elevation = 8.dp
-        ) {
-
             Column(
-                modifier = Modifier.padding(8.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+                    .background(MaterialTheme.colors.background)
+                    .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
+                TopNavigationBar(
+                    selectedTabIndex = selectedTabIndex,
+                    onTabSelected = { index ->
+                        selectedTabIndex = index
+                        when (index) {
+                            0 -> navigateOtherPage(NavigateToEmialGen)
+                            1 -> navigateOtherPage(NavigateToProgress)
+                            2 -> navigateOtherPage(NavigateToDocuments)
+                            3 -> {}
+                        }
+                    }
+                )
+
+                Button(
+                    onClick = {
+                        NavigateToLogin()
+                        runBlocking {
+                            signInController.logoutUser()
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = Color.White, // White background
+                        contentColor = Color(0xFF487896) // Text color
+                    ),
+                    modifier = Modifier
+                        .align(Alignment.End)
+                        .padding(top = 16.dp, end = 16.dp) // Add spacing from the edges
                 ) {
-                    var showGmailLinkingDialog by remember { mutableStateOf(false) }
+                    Text("Sign Out", fontWeight = FontWeight.Bold)
+                }
 
-                    Button(
-                        onClick = { showGmailLinkingDialog = true },
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = Color(0xFF487896),
-                            contentColor = Color.White
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(0.8f)
+                        .padding(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+        //            // Profile Picture
+        //            Box(
+        //                modifier = Modifier
+        //                    .size(80.dp)
+        //                    .clip(CircleShape)
+        //                    .background(Color(0xFFE2E2E2)),
+        //            )
+        //
+        //            Spacer(modifier = Modifier.width(16.dp))
+
+
+                    // Name
+                    if (errorMessage.isNotEmpty()) {
+                        Text(
+                            text = errorMessage,
+                            color = Color.Red,
+                            modifier = Modifier.padding(10.dp)
                         )
-                    ) {
-                        Text("gmail linking")
-                    }
-
-                    if (showGmailLinkingDialog) {
-                        GmailLinkingDialog(
-                            onDismissRequest = { showGmailLinkingDialog = false },
-                            userId = userId,
-                            profileController = profileController
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.weight(0.1f))
-
-                    IconButton(
-                        onClick = { EditContactDialog = true },
-                        modifier = Modifier.size(14.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = "Edit",
-                            tint = Color(0xFF487896)
+                    } else {
+                        Text(
+                            text = userName.ifEmpty { "Loading..." },
+                            fontSize = 24.sp,
+                            style = MaterialTheme.typography.h5,
+                            modifier = Modifier.align(Alignment.CenterVertically)
                         )
                     }
                 }
 
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth(0.8f)
+                        .padding(10.dp),
+                    elevation = 8.dp
+                ) {
 
-                Spacer(modifier = Modifier.height(4.dp))
-
-                SectionTitle("Contact Information")
-                Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
-
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp),
-                        elevation = 4.dp
+                    Column(
+                        modifier = Modifier.padding(8.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
+
                         Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.End
                         ) {
-                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                                ProfileDetail(label = "Email Address:", value = userEmail)
-                                ProfileDetail(label = "Location:", value = userLocation ?: "Location not available")
-                                ProfileDetail(label = "Phone: +1 ", value = userPhone ?: "Phone not available")
+                            var showGmailLinkingDialog by remember { mutableStateOf(false) }
+
+                            Button(
+                                onClick = { showGmailLinkingDialog = true },
+                                colors = ButtonDefaults.buttonColors(
+                                    backgroundColor = Color(0xFF487896),
+                                    contentColor = Color.White
+                                )
+                            ) {
+                                Text("gmail linking")
                             }
 
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Spacer(modifier = Modifier.width(8.dp))
-
-//                                Text(
-//                                    text = "Resume.pdf",
-//                                    modifier = Modifier
-//                                        .padding(end = 32.dp)
-//                                        .clickable {
-//                                            // Add the action to open the resume file
-//                                        },
-//                                    style = MaterialTheme.typography.body1.copy(
-//                                        fontSize = 14.sp,
-//                                        color = Color(0xFF2669A0)
-//                                    )
-//                                )
-                            }
-                        }
-                    }
-                }
-
-                if (EditContactDialog) {
-                    EditContactDialog(
-                        userId = userId,
-                        profileController = profileController,
-                        userLocation = userLocation,
-                        userPhone = userPhone,
-                        onDismiss = { EditContactDialog = false },
-                        onContactUpdated = {
-                            refreshContactInfo()
-                            EditContactDialog = false
-                        }
-                    )
-                }
-
-                SectionTitle("Portfolio")
-                Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
-
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp),
-                        elevation = 4.dp
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                                ProfileDetail(label = "LinkedIn URL:", value = userLinkedIn ?: "Not available")
-                                ProfileDetail(label = "GitHub URL:", value = userGithub ?: "Not available")
-                                ProfileDetail(label = "Portfolio URL:", value = userPersonalWebsite ?: "Not available")
+                            if (showGmailLinkingDialog) {
+                                GmailLinkingDialog(
+                                    onDismissRequest = { showGmailLinkingDialog = false },
+                                    userId = userId,
+                                    profileController = profileController
+                                )
                             }
 
-                            IconButton(onClick = { showEditPortfolioDialog = true }) {
+                            Spacer(modifier = Modifier.weight(0.1f))
+
+                            IconButton(
+                                onClick = { EditContactDialog = true },
+                                modifier = Modifier.size(14.dp)
+                            ) {
                                 Icon(
                                     imageVector = Icons.Default.Edit,
-                                    contentDescription = "Edit Portfolio & Socials",
-                                    tint = Color.Gray
+                                    contentDescription = "Edit",
+                                    tint = Color(0xFF487896)
                                 )
                             }
                         }
-                    }
-                }
-
-                if (showEditPortfolioDialog) {
-                    EditPortfolioDialog(
-                        userId = userId,
-                        profileController = profileController,
-                        linkedInUrl = userLinkedIn,
-                        githubUrl = userGithub,
-                        portfolioUrl = userPersonalWebsite,
-                        onDismiss = { showEditPortfolioDialog = false },
-                        onLinksUpdated = {
-                            refreshPortfolioInfo()
-                            showEditPortfolioDialog = false
-                        }
-                    )
-                }
 
 
-                EducationSection(
-                    userId = userId,
-                    profileController = profileController,
-                    educationList = educationList,
-                    showEducationDialog = showEducationDialog,
-                    showEditEducationDialog = showEditEducationDialog,
-                    selectedEducation = selectedEducation,
-                    onEducationAdded = { refreshEducationList() },
-                    onEducationEdited = { refreshEducationList() },
-                    onEducationDeleted = { refreshEducationList() },
-                    onShowEducationDialogChange = { showEducationDialog = it },
-                    onShowEditEducationDialogChange = { showEditEducationDialog = it },
-                    onSelectedEducationChange = { selectedEducation = it }
-                )
+                        Spacer(modifier = Modifier.height(4.dp))
 
-                WorkExperienceSection(
-                    userId = userId,
-                    profileController = profileController,
-                    workExperienceList = workExperienceList,
-                    showWorkExperienceDialog = showExperienceDialog,
-                    showEditWorkExperienceDialog = showEditExperienceDialog,
-                    selectedWorkExperience = selectedExperience,
-                    onWorkExperienceAdded = { refreshWorkExperienceList() },
-                    onWorkExperienceEdited = { refreshWorkExperienceList() },
-                    onWorkExperienceDeleted = { refreshWorkExperienceList() },
-                    onShowWorkExperienceDialogChange = { showExperienceDialog = it },
-                    onShowEditWorkExperienceDialogChange = { showEditExperienceDialog = it },
-                    onSelectedWorkExperienceChange = { selectedExperience = it }
-                )
+                        SectionTitle("Contact Information")
+                        Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
 
-                ProjectSection(
-                    userId = userId,
-                    profileController = profileController,
-                    projectList = projectList,
-                    showProjectDialog = showProjectDialog,
-                    showEditProjectDialog = showEditProjectDialog,
-                    selectedProject = selectedProject,
-                    onProjectAdded = { refreshProjectList() },
-                    onProjectEdited = { refreshProjectList() },
-                    onProjectDeleted = { refreshProjectList() },
-                    onShowProjectDialogChange = { showProjectDialog = it },
-                    onShowEditProjectDialogChange = { showEditProjectDialog = it },
-                    onSelectedProjectChange = { selectedProject = it }
-                )
-
-
-                SectionTitle("Skills")
-
-                Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
-                    IconButton(
-                        onClick = { showSkillsDialog = true },
-                        modifier = Modifier.size(24.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = "Add Skill",
-                            tint = Color(0xFF487896)
-                        )
-                    }
-
-                    if (skills.isEmpty()) {
-                        Text("No items added", fontSize = 14.sp, color = Color.Gray)
-                    } else {
-                        Row(
-                            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            skills.forEach { skill ->
-                                SkillChip(skill = skill, onDelete = {
-                                    runBlocking {
-                                        profileController.deleteSkill(userId, skill)
-                                        refreshSkills()
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(8.dp),
+                                elevation = 4.dp
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(8.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                        ProfileDetail(label = "Email Address:", value = userEmail)
+                                        ProfileDetail(label = "Location:", value = userLocation ?: "Location not available")
+                                        ProfileDetail(label = "Phone: +1 ", value = userPhone ?: "Phone not available")
                                     }
-                                })
+
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Spacer(modifier = Modifier.width(8.dp))
+
+        //                                Text(
+        //                                    text = "Resume.pdf",
+        //                                    modifier = Modifier
+        //                                        .padding(end = 32.dp)
+        //                                        .clickable {
+        //                                            // Add the action to open the resume file
+        //                                        },
+        //                                    style = MaterialTheme.typography.body1.copy(
+        //                                        fontSize = 14.sp,
+        //                                        color = Color(0xFF2669A0)
+        //                                    )
+        //                                )
+                                    }
+                                }
                             }
                         }
-                    }
 
-                    if (showSkillsDialog) {
-                        EditSkillsDialog(
-                            onDismiss = { showSkillsDialog = false },
-                            onSave = {
-                                refreshSkills()
-                                showSkillsDialog = false
-                            },
+                        if (EditContactDialog) {
+                            EditContactDialog(
+                                userId = userId,
+                                profileController = profileController,
+                                userLocation = userLocation,
+                                userPhone = userPhone,
+                                onDismiss = { EditContactDialog = false },
+                                onContactUpdated = {
+                                    refreshContactInfo()
+                                    EditContactDialog = false
+                                }
+                            )
+                        }
+
+                        SectionTitle("Portfolio")
+                        Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(8.dp),
+                                elevation = 4.dp
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(8.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                        ProfileDetail(label = "LinkedIn URL:", value = userLinkedIn ?: "Not available")
+                                        ProfileDetail(label = "GitHub URL:", value = userGithub ?: "Not available")
+                                        ProfileDetail(label = "Portfolio URL:", value = userPersonalWebsite ?: "Not available")
+                                    }
+
+                                    IconButton(onClick = { showEditPortfolioDialog = true }) {
+                                        Icon(
+                                            imageVector = Icons.Default.Edit,
+                                            contentDescription = "Edit Portfolio & Socials",
+                                            tint = Color.Gray
+                                        )
+                                    }
+                                }
+                            }
+                        }
+
+                        if (showEditPortfolioDialog) {
+                            EditPortfolioDialog(
+                                userId = userId,
+                                profileController = profileController,
+                                linkedInUrl = userLinkedIn,
+                                githubUrl = userGithub,
+                                portfolioUrl = userPersonalWebsite,
+                                onDismiss = { showEditPortfolioDialog = false },
+                                onLinksUpdated = {
+                                    refreshPortfolioInfo()
+                                    showEditPortfolioDialog = false
+                                }
+                            )
+                        }
+
+
+                        EducationSection(
                             userId = userId,
                             profileController = profileController,
-                            initialSkills = skills
+                            educationList = educationList,
+                            showEducationDialog = showEducationDialog,
+                            showEditEducationDialog = showEditEducationDialog,
+                            selectedEducation = selectedEducation,
+                            onEducationAdded = { refreshEducationList() },
+                            onEducationEdited = { refreshEducationList() },
+                            onEducationDeleted = { refreshEducationList() },
+                            onShowEducationDialogChange = { showEducationDialog = it },
+                            onShowEditEducationDialogChange = { showEditEducationDialog = it },
+                            onSelectedEducationChange = { selectedEducation = it }
                         )
-                    }
 
-                    if (errorMessage.isNotEmpty()) {
-                        Text(text = errorMessage, color = Color.Red)
+                        WorkExperienceSection(
+                            userId = userId,
+                            profileController = profileController,
+                            workExperienceList = workExperienceList,
+                            showWorkExperienceDialog = showExperienceDialog,
+                            showEditWorkExperienceDialog = showEditExperienceDialog,
+                            selectedWorkExperience = selectedExperience,
+                            onWorkExperienceAdded = { refreshWorkExperienceList() },
+                            onWorkExperienceEdited = { refreshWorkExperienceList() },
+                            onWorkExperienceDeleted = { refreshWorkExperienceList() },
+                            onShowWorkExperienceDialogChange = { showExperienceDialog = it },
+                            onShowEditWorkExperienceDialogChange = { showEditExperienceDialog = it },
+                            onSelectedWorkExperienceChange = { selectedExperience = it }
+                        )
+
+                        ProjectSection(
+                            userId = userId,
+                            profileController = profileController,
+                            projectList = projectList,
+                            showProjectDialog = showProjectDialog,
+                            showEditProjectDialog = showEditProjectDialog,
+                            selectedProject = selectedProject,
+                            onProjectAdded = { refreshProjectList() },
+                            onProjectEdited = { refreshProjectList() },
+                            onProjectDeleted = { refreshProjectList() },
+                            onShowProjectDialogChange = { showProjectDialog = it },
+                            onShowEditProjectDialogChange = { showEditProjectDialog = it },
+                            onSelectedProjectChange = { selectedProject = it }
+                        )
+
+
+                        SectionTitle("Skills")
+
+                        Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+                            IconButton(
+                                onClick = { showSkillsDialog = true },
+                                modifier = Modifier.size(24.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Add,
+                                    contentDescription = "Add Skill",
+                                    tint = Color(0xFF487896)
+                                )
+                            }
+
+                            if (skills.isEmpty()) {
+                                Text("No items added", fontSize = 14.sp, color = Color.Gray)
+                            } else {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    skills.forEach { skill ->
+                                        SkillChip(skill = skill, onDelete = {
+                                            runBlocking {
+                                                profileController.deleteSkill(userId, skill)
+                                                refreshSkills()
+                                            }
+                                        })
+                                    }
+                                }
+                            }
+
+                            if (showSkillsDialog) {
+                                EditSkillsDialog(
+                                    onDismiss = { showSkillsDialog = false },
+                                    onSave = {
+                                        refreshSkills()
+                                        showSkillsDialog = false
+                                    },
+                                    userId = userId,
+                                    profileController = profileController,
+                                    initialSkills = skills
+                                )
+                            }
+
+                            if (errorMessage.isNotEmpty()) {
+                                Text(text = errorMessage, color = Color.Red)
+                            }
+                        }
+
                     }
                 }
-
             }
         }
     }

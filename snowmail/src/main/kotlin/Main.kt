@@ -8,6 +8,7 @@ import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.application
 import ca.uwaterloo.service.ParserService
 import ca.uwaterloo.view.*
+import ca.uwaterloo.view.theme.AppTheme
 import integration.OpenAIClient
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
@@ -23,17 +24,12 @@ fun main() {
     // Initialize the EmailGenerationService
     val emailGenerationService = EmailGenerationService(openAIClient, parserService)
 
-    // Start the Ktor server in a separate thread
-//    thread {
-//        embeddedServer(Netty, port = 8080) {
-//            configureRouting(emailGenerationService)
-//        }.start(wait = true)
-//    }
-
 
     application {
-        Window(onCloseRequest = ::exitApplication, title = "Snowmail", state = WindowState(size = DpSize(1200.dp, 800.dp))) {
-            websitePage()
+        AppTheme {
+            Window(onCloseRequest = ::exitApplication, title = "Snowmail", state = WindowState(size = DpSize(1200.dp, 800.dp))) {
+                websitePage()
+            }
         }
     }
 }

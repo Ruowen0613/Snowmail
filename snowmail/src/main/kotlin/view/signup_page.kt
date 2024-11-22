@@ -188,8 +188,7 @@ fun RegisterForm(NavigateToLogin: () -> Unit, NavigateToHome: () -> Unit) {
                 val errorInformation = true
                 var errorMessage by remember { mutableStateOf("") }
 
-                Row(modifier = Modifier.fillMaxHeight(0.03f)) {}
-
+                Row(modifier = Modifier.fillMaxHeight(0.07f)) {}
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                     // register button
                     Button(onClick = {

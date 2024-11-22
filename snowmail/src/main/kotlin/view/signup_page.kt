@@ -49,7 +49,7 @@ fun SignUpPage(NavigateToLogin: () -> Unit, NavigateToHome: () -> Unit) {
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Row { Spacer(modifier = Modifier.padding(16.dp)) }
+                Row { Spacer(modifier = Modifier.padding(20.dp)) }
                 Row {
                     Text(
                         text = "Join ",

@@ -49,6 +49,7 @@ import ca.uwaterloo.view.components.WorkExperienceSection
 
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.style.TextDecoration
+import ca.uwaterloo.service.EmailValidatingService
 import java.awt.Desktop
 import java.net.URI
 
@@ -1198,19 +1199,33 @@ fun GmailLinkingDialog(
                 ) {
                     Button(
                         onClick = {
-                            if (account.endsWith("@gmail.com")) {
-                                coroutineScope.launch {
+                            if (account.isBlank() || !account.endsWith("@gmail.com")) {
+                                errorMessage = "Please enter a valid Gmail account ending with @gmail.com."
+                                return@Button
+                            }
+
+                            if (password.isBlank()) {
+                                errorMessage = "App Password cannot be empty."
+                                return@Button
+                            }
+
+                            val emailValidatingService = EmailValidatingService()
+                            coroutineScope.launch {
+                                val isValid = emailValidatingService.verifyEmail(account, password)
+                                if (isValid) {
+                                    errorMessage = ""
+                                    successMessage = true
+
                                     val accountResult = profileController.editUserLinkedGmailAccount(userId, account)
                                     val passwordResult = profileController.editUserGmailAppPassword(userId, password)
                                     if (accountResult.isSuccess && passwordResult.isSuccess) {
                                         successMessage = true
-                                        //onDismissRequest()
                                     } else {
-                                        errorMessage = "Error linking Gmail account. Please try again."
+                                        errorMessage = "Failed to link Gmail account. Please try again."
                                     }
+                                } else {
+                                    errorMessage = "Invalid email or App Password. Please try again."
                                 }
-                            } else {
-                                errorMessage = "Please enter a valid Gmail account ending with @gmail.com."
                             }
                         },
                         colors = ButtonDefaults.buttonColors(
@@ -1221,6 +1236,7 @@ fun GmailLinkingDialog(
                     ) {
                         Text("Link Gmail")
                     }
+
 
                     Button(
                         onClick = onDismissRequest,

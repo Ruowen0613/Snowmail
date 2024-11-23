@@ -5,7 +5,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -40,7 +43,36 @@ fun EditProjectDialog(
                 modifier = Modifier.padding(16.dp).verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Text("Edit Project", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+                // Row for Edit Project text and Delete icon
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("Edit Project", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+                    if (project != null) {
+                        IconButton(
+                            onClick = {
+                                runBlocking {
+                                    val result = profileController.deleteProject((project.id ?: 0).toString())
+                                    result.onSuccess {
+                                        onProjectDeleted()
+                                        onDismiss()
+                                    }.onFailure { error ->
+                                        errorMessage = error.message ?: "Failed to delete project"
+                                    }
+                                }
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "Delete Project",
+                                tint = Color(0xFFBE0303)
+                            )
+                        }
+                    }
+                }
+
                 Spacer(modifier = Modifier.height(8.dp))
 
                 OutlinedTextField(
@@ -86,26 +118,6 @@ fun EditProjectDialog(
                         colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF487896), contentColor = Color.White)
                     ) {
                         Text("Save")
-                    }
-                }
-
-                if (project != null) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Button(
-                        onClick = {
-                            runBlocking {
-                                val result = profileController.deleteProject((project.id ?: 0).toString())
-                                result.onSuccess {
-                                    onProjectDeleted()
-                                    onDismiss()
-                                }.onFailure {
-                                    errorMessage = it.message ?: "Failed to delete project"
-                                }
-                            }
-                        },
-                        colors = ButtonDefaults.buttonColors(backgroundColor = Color.Red, contentColor = Color.White)
-                    ) {
-                        Text("Delete")
                     }
                 }
             }

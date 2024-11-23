@@ -43,12 +43,10 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 
-import ca.uwaterloo.view.components.EducationSection
-import ca.uwaterloo.view.components.ProjectSection
-import ca.uwaterloo.view.components.WorkExperienceSection
-
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.style.TextDecoration
+import ca.uwaterloo.view.components.*
+import ca.uwaterloo.view.theme.AppTheme
 import ca.uwaterloo.service.EmailValidatingService
 import java.awt.Desktop
 import java.net.URI
@@ -98,7 +96,6 @@ fun ProfilePage(userId: String,
     var currentPage by remember { mutableStateOf("ProfilePage") }
 
     var selectedTabIndex by remember { mutableStateOf(3) }
-
 
 
     fun refreshEducationList() {
@@ -278,336 +275,300 @@ fun ProfilePage(userId: String,
         }
     }
 
-
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-            .background(Color(0xFFF8FAFC))
-            .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-
-        TopNavigationBar(
-            selectedTabIndex = selectedTabIndex,
-            onTabSelected = { index ->
-                selectedTabIndex = index
-                when (index) {
-                    0 -> navigateOtherPage(NavigateToEmialGen)
-                    1 -> navigateOtherPage(NavigateToProgress)
-                    2 -> navigateOtherPage(NavigateToDocuments)
-                    3 -> {}
-                }
-            }
-        )
-
-        Button(
-            onClick = {
-                NavigateToLogin()
-                runBlocking {
-                    signInController.logoutUser()
-                }
-            },
-            colors = ButtonDefaults.buttonColors(
-                backgroundColor = Color.White, // White background
-                contentColor = Color(0xFF487896) // Text color
-            ),
+    AppTheme {
+        Box(
             modifier = Modifier
-                .align(Alignment.End)
-                .padding(top = 16.dp, end = 16.dp) // Add spacing from the edges
+                .fillMaxSize()
+                .background(MaterialTheme.colors.background)
         ) {
-            Text("Sign Out", fontWeight = FontWeight.Bold)
-        }
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(0.8f)
-                .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-//            // Profile Picture
-//            Box(
-//                modifier = Modifier
-//                    .size(80.dp)
-//                    .clip(CircleShape)
-//                    .background(Color(0xFFE2E2E2)),
-//            )
-//
-//            Spacer(modifier = Modifier.width(16.dp))
-
-
-            // Name
-            if (errorMessage.isNotEmpty()) {
-                Text(
-                    text = errorMessage,
-                    color = Color.Red,
-                    modifier = Modifier.padding(10.dp)
-                )
-            } else {
-                Text(
-                    text = userName.ifEmpty { "Loading..." },
-                    fontSize = 24.sp,
-                    style = MaterialTheme.typography.h5,
-                    modifier = Modifier.align(Alignment.CenterVertically)
-                )
-            }
-        }
-
-        Card(
-            modifier = Modifier
-                .fillMaxWidth(0.8f)
-                .padding(10.dp),
-            elevation = 8.dp
-        ) {
-
             Column(
-                modifier = Modifier.padding(8.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+                    .background(MaterialTheme.colors.background)
+                    .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
+                TopNavigationBar(
+                    selectedTabIndex = selectedTabIndex,
+                    onTabSelected = { index ->
+                        selectedTabIndex = index
+                        when (index) {
+                            0 -> navigateOtherPage(NavigateToEmialGen)
+                            1 -> navigateOtherPage(NavigateToProgress)
+                            2 -> navigateOtherPage(NavigateToDocuments)
+                            3 -> {}
+                        }
+                    }
+                )
+
+                Button(
+                    onClick = {
+                        NavigateToLogin()
+                        runBlocking {
+                            signInController.logoutUser()
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = Color.White, // White background
+                        contentColor = Color(0xFF487896) // Text color
+                    ),
+                    modifier = Modifier
+                        .align(Alignment.End)
+                        .padding(top = 16.dp, end = 16.dp) // Add spacing from the edges
                 ) {
-                    var showGmailLinkingDialog by remember { mutableStateOf(false) }
+                    Text("Sign Out", fontWeight = FontWeight.Bold)
+                }
 
-                    Button(
-                        onClick = { showGmailLinkingDialog = true },
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = Color(0xFF487896),
-                            contentColor = Color.White
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(0.8f)
+                        .padding(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+        //            // Profile Picture
+        //            Box(
+        //                modifier = Modifier
+        //                    .size(80.dp)
+        //                    .clip(CircleShape)
+        //                    .background(Color(0xFFE2E2E2)),
+        //            )
+        //
+        //            Spacer(modifier = Modifier.width(16.dp))
+
+
+                    // Name
+                    if (errorMessage.isNotEmpty()) {
+                        Text(
+                            text = errorMessage,
+                            color = Color.Red,
+                            modifier = Modifier.padding(10.dp)
                         )
-                    ) {
-                        Text("gmail linking")
-                    }
-
-                    if (showGmailLinkingDialog) {
-                        GmailLinkingDialog(
-                            onDismissRequest = { showGmailLinkingDialog = false },
-                            userId = userId,
-                            profileController = profileController
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.weight(0.1f))
-
-                    IconButton(
-                        onClick = { EditContactDialog = true },
-                        modifier = Modifier.size(14.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = "Edit",
-                            tint = Color(0xFF487896)
+                    } else {
+                        Text(
+                            text = userName.ifEmpty { "Loading..." },
+                            fontSize = 24.sp,
+                            style = MaterialTheme.typography.h5,
+                            modifier = Modifier.align(Alignment.CenterVertically)
                         )
                     }
                 }
 
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth(0.8f)
+                        .padding(10.dp),
+                    elevation = 8.dp
+                ) {
 
-                Spacer(modifier = Modifier.height(4.dp))
-
-                SectionTitle("Contact Information")
-                Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
-
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp),
-                        elevation = 4.dp
+                    Column(
+                        modifier = Modifier.padding(8.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
+
                         Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.End
                         ) {
-                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                                ProfileDetail(label = "Email Address:", value = userEmail)
-                                ProfileDetail(label = "Location:", value = userLocation ?: "Location not available")
-                                ProfileDetail(label = "Phone: +1 ", value = userPhone ?: "Phone not available")
+                            var showGmailLinkingDialog by remember { mutableStateOf(false) }
+
+                            Button(
+                                onClick = { showGmailLinkingDialog = true },
+                                colors = ButtonDefaults.buttonColors(
+                                    backgroundColor = Color(0xFF487896),
+                                    contentColor = Color.White
+                                )
+                            ) {
+                                Text("gmail linking")
                             }
 
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Spacer(modifier = Modifier.width(8.dp))
-
-//                                Text(
-//                                    text = "Resume.pdf",
-//                                    modifier = Modifier
-//                                        .padding(end = 32.dp)
-//                                        .clickable {
-//                                            // Add the action to open the resume file
-//                                        },
-//                                    style = MaterialTheme.typography.body1.copy(
-//                                        fontSize = 14.sp,
-//                                        color = Color(0xFF2669A0)
-//                                    )
-//                                )
-                            }
-                        }
-                    }
-                }
-
-                if (EditContactDialog) {
-                    EditContactDialog(
-                        userId = userId,
-                        profileController = profileController,
-                        userLocation = userLocation,
-                        userPhone = userPhone,
-                        onDismiss = { EditContactDialog = false },
-                        onContactUpdated = {
-                            refreshContactInfo()
-                            EditContactDialog = false
-                        }
-                    )
-                }
-
-                SectionTitle("Portfolio")
-                Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
-
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp),
-                        elevation = 4.dp
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                                ProfileDetail(label = "LinkedIn URL:", value = userLinkedIn ?: "Not available")
-                                ProfileDetail(label = "GitHub URL:", value = userGithub ?: "Not available")
-                                ProfileDetail(label = "Portfolio URL:", value = userPersonalWebsite ?: "Not available")
+                            if (showGmailLinkingDialog) {
+                                GmailLinkingDialog(
+                                    onDismissRequest = { showGmailLinkingDialog = false },
+                                    userId = userId,
+                                    profileController = profileController
+                                )
                             }
 
-                            IconButton(onClick = { showEditPortfolioDialog = true }) {
+                            Spacer(modifier = Modifier.weight(0.1f))
+
+                            IconButton(
+                                onClick = { EditContactDialog = true },
+                                modifier = Modifier.size(14.dp)
+                            ) {
                                 Icon(
                                     imageVector = Icons.Default.Edit,
-                                    contentDescription = "Edit Portfolio & Socials",
-                                    tint = Color.Gray
+                                    contentDescription = "Edit",
+                                    tint = Color(0xFF487896)
                                 )
                             }
                         }
-                    }
-                }
-
-                if (showEditPortfolioDialog) {
-                    EditPortfolioDialog(
-                        userId = userId,
-                        profileController = profileController,
-                        linkedInUrl = userLinkedIn,
-                        githubUrl = userGithub,
-                        portfolioUrl = userPersonalWebsite,
-                        onDismiss = { showEditPortfolioDialog = false },
-                        onLinksUpdated = {
-                            refreshPortfolioInfo()
-                            showEditPortfolioDialog = false
-                        }
-                    )
-                }
 
 
-                EducationSection(
-                    userId = userId,
-                    profileController = profileController,
-                    educationList = educationList,
-                    showEducationDialog = showEducationDialog,
-                    showEditEducationDialog = showEditEducationDialog,
-                    selectedEducation = selectedEducation,
-                    onEducationAdded = { refreshEducationList() },
-                    onEducationEdited = { refreshEducationList() },
-                    onEducationDeleted = { refreshEducationList() },
-                    onShowEducationDialogChange = { showEducationDialog = it },
-                    onShowEditEducationDialogChange = { showEditEducationDialog = it },
-                    onSelectedEducationChange = { selectedEducation = it }
-                )
+                        Spacer(modifier = Modifier.height(4.dp))
 
-                WorkExperienceSection(
-                    userId = userId,
-                    profileController = profileController,
-                    workExperienceList = workExperienceList,
-                    showWorkExperienceDialog = showExperienceDialog,
-                    showEditWorkExperienceDialog = showEditExperienceDialog,
-                    selectedWorkExperience = selectedExperience,
-                    onWorkExperienceAdded = { refreshWorkExperienceList() },
-                    onWorkExperienceEdited = { refreshWorkExperienceList() },
-                    onWorkExperienceDeleted = { refreshWorkExperienceList() },
-                    onShowWorkExperienceDialogChange = { showExperienceDialog = it },
-                    onShowEditWorkExperienceDialogChange = { showEditExperienceDialog = it },
-                    onSelectedWorkExperienceChange = { selectedExperience = it }
-                )
+                        SectionTitle("Contact Information")
+                        Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
 
-                ProjectSection(
-                    userId = userId,
-                    profileController = profileController,
-                    projectList = projectList,
-                    showProjectDialog = showProjectDialog,
-                    showEditProjectDialog = showEditProjectDialog,
-                    selectedProject = selectedProject,
-                    onProjectAdded = { refreshProjectList() },
-                    onProjectEdited = { refreshProjectList() },
-                    onProjectDeleted = { refreshProjectList() },
-                    onShowProjectDialogChange = { showProjectDialog = it },
-                    onShowEditProjectDialogChange = { showEditProjectDialog = it },
-                    onSelectedProjectChange = { selectedProject = it }
-                )
-
-
-                SectionTitle("Skills")
-
-                Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
-                    IconButton(
-                        onClick = { showSkillsDialog = true },
-                        modifier = Modifier.size(24.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = "Add Skill",
-                            tint = Color(0xFF487896)
-                        )
-                    }
-
-                    if (skills.isEmpty()) {
-                        Text("No items added", fontSize = 14.sp, color = Color.Gray)
-                    } else {
-                        Row(
-                            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            skills.forEach { skill ->
-                                SkillChip(skill = skill, onDelete = {
-                                    runBlocking {
-                                        profileController.deleteSkill(userId, skill)
-                                        refreshSkills()
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(8.dp),
+                                elevation = 4.dp
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(8.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                        ProfileDetail(label = "Email Address:", value = userEmail)
+                                        ProfileDetail(label = "Location:", value = userLocation ?: "Location not available")
+                                        ProfileDetail(label = "Phone: +1 ", value = userPhone ?: "Phone not available")
                                     }
-                                })
+
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Spacer(modifier = Modifier.width(8.dp))
+
+        //                                Text(
+        //                                    text = "Resume.pdf",
+        //                                    modifier = Modifier
+        //                                        .padding(end = 32.dp)
+        //                                        .clickable {
+        //                                            // Add the action to open the resume file
+        //                                        },
+        //                                    style = MaterialTheme.typography.body1.copy(
+        //                                        fontSize = 14.sp,
+        //                                        color = Color(0xFF2669A0)
+        //                                    )
+        //                                )
+                                    }
+                                }
                             }
                         }
-                    }
 
-                    if (showSkillsDialog) {
-                        EditSkillsDialog(
-                            onDismiss = { showSkillsDialog = false },
-                            onSave = {
-                                refreshSkills()
-                                showSkillsDialog = false
-                            },
+                        if (EditContactDialog) {
+                            EditContactDialog(
+                                userId = userId,
+                                profileController = profileController,
+                                userLocation = userLocation,
+                                userPhone = userPhone,
+                                onDismiss = { EditContactDialog = false },
+                                onContactUpdated = {
+                                    refreshContactInfo()
+                                    EditContactDialog = false
+                                }
+                            )
+                        }
+
+                        SectionTitle("Portfolio")
+                        Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(8.dp),
+                                elevation = 4.dp
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(8.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                        ProfileDetail(label = "LinkedIn URL:", value = userLinkedIn ?: "Not available")
+                                        ProfileDetail(label = "GitHub URL:", value = userGithub ?: "Not available")
+                                        ProfileDetail(label = "Portfolio URL:", value = userPersonalWebsite ?: "Not available")
+                                    }
+
+                                    IconButton(onClick = { showEditPortfolioDialog = true }) {
+                                        Icon(
+                                            imageVector = Icons.Default.Edit,
+                                            contentDescription = "Edit Portfolio & Socials",
+                                            tint = Color.Gray
+                                        )
+                                    }
+                                }
+                            }
+                        }
+
+                        if (showEditPortfolioDialog) {
+                            EditPortfolioDialog(
+                                userId = userId,
+                                profileController = profileController,
+                                linkedInUrl = userLinkedIn,
+                                githubUrl = userGithub,
+                                portfolioUrl = userPersonalWebsite,
+                                onDismiss = { showEditPortfolioDialog = false },
+                                onLinksUpdated = {
+                                    refreshPortfolioInfo()
+                                    showEditPortfolioDialog = false
+                                }
+                            )
+                        }
+
+
+                        EducationSection(
                             userId = userId,
                             profileController = profileController,
-                            initialSkills = skills
+                            educationList = educationList,
+                            showEducationDialog = showEducationDialog,
+                            showEditEducationDialog = showEditEducationDialog,
+                            selectedEducation = selectedEducation,
+                            onEducationAdded = { refreshEducationList() },
+                            onEducationEdited = { refreshEducationList() },
+                            onEducationDeleted = { refreshEducationList() },
+                            onShowEducationDialogChange = { showEducationDialog = it },
+                            onShowEditEducationDialogChange = { showEditEducationDialog = it },
+                            onSelectedEducationChange = { selectedEducation = it }
+                        )
+
+                        WorkExperienceSection(
+                            userId = userId,
+                            profileController = profileController,
+                            workExperienceList = workExperienceList,
+                            showWorkExperienceDialog = showExperienceDialog,
+                            showEditWorkExperienceDialog = showEditExperienceDialog,
+                            selectedWorkExperience = selectedExperience,
+                            onWorkExperienceAdded = { refreshWorkExperienceList() },
+                            onWorkExperienceEdited = { refreshWorkExperienceList() },
+                            onWorkExperienceDeleted = { refreshWorkExperienceList() },
+                            onShowWorkExperienceDialogChange = { showExperienceDialog = it },
+                            onShowEditWorkExperienceDialogChange = { showEditExperienceDialog = it },
+                            onSelectedWorkExperienceChange = { selectedExperience = it }
+                        )
+
+                        ProjectSection(
+                            userId = userId,
+                            profileController = profileController,
+                            projectList = projectList,
+                            showProjectDialog = showProjectDialog,
+                            showEditProjectDialog = showEditProjectDialog,
+                            selectedProject = selectedProject,
+                            onProjectAdded = { refreshProjectList() },
+                            onProjectEdited = { refreshProjectList() },
+                            onProjectDeleted = { refreshProjectList() },
+                            onShowProjectDialogChange = { showProjectDialog = it },
+                            onShowEditProjectDialogChange = { showEditProjectDialog = it },
+                            onSelectedProjectChange = { selectedProject = it }
+                        )
+
+                        SkillsSection(
+                            userId = userId,
+                            profileController = profileController,
+                            skills = skills,
+                            showSkillsDialog = showSkillsDialog,
+                            onSkillsAdded = { refreshSkills() },
+                            onSkillsDeleted = { refreshSkills() },
+                            onShowSkillsDialogChange = { showSkillsDialog = it }
                         )
                     }
-
-                    if (errorMessage.isNotEmpty()) {
-                        Text(text = errorMessage, color = Color.Red)
-                    }
                 }
-
             }
         }
     }
@@ -834,184 +795,184 @@ fun EditPortfolioDialog(
 }
 
 
-@Composable
-fun SkillChip(skill: String, onDelete: () -> Unit) {
-    Surface(
-        shape = RoundedCornerShape(16.dp),
-        color = Color(0xFFE0E0E0),
-        modifier = Modifier
-            .padding(4.dp)
-            .height(32.dp)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(horizontal = 8.dp)
-        ) {
-            Text(text = skill, fontSize = 14.sp)
-            Spacer(modifier = Modifier.width(4.dp))
-            IconButton(
-                onClick = onDelete,
-                modifier = Modifier.size(16.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Close,
-                    contentDescription = "Delete Skill",
-                    tint = Color.Red
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun EditSkillsDialog(
-    onDismiss: () -> Unit,
-    onSave: () -> Unit,
-    userId: String,
-    profileController: ProfileController,
-    initialSkills: List<String>
-) {
-    var skillInput by remember { mutableStateOf("") }
-    var isDuplicateSkill by remember { mutableStateOf(false) }
-    var isInvalidSkill by remember { mutableStateOf(false) }
-    var selectedSkills = remember { mutableStateListOf<String>().apply { addAll(initialSkills) } }
-    var errorMessage by remember { mutableStateOf("") }
-    val scope = rememberCoroutineScope()
-
-    Dialog(onDismissRequest = onDismiss) {
-        Surface(
-            shape = RoundedCornerShape(8.dp),
-            color = Color.White,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Text("Edit Skills", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
-
-                Text(
-                    text = "Click a skill to delete it from your list.",
-                    fontSize = 14.sp,
-                    color = Color.Gray,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-
-                OutlinedTextField(
-                    value = skillInput,
-                    onValueChange = {
-                        skillInput = it
-                        isDuplicateSkill = false
-                        isInvalidSkill = false
-                    },
-                    label = { Text("Add a new skill") },
-                    modifier = Modifier.fillMaxWidth(),
-                    isError = isDuplicateSkill || isInvalidSkill
-                )
-
-                if (isDuplicateSkill) {
-                    Text(
-                        text = "This skill has already been added.",
-                        color = Color.Red,
-                        fontSize = 12.sp,
-                        modifier = Modifier.padding(top = 4.dp)
-                    )
-                }
-
-                if (isInvalidSkill) {
-                    Text(
-                        text = "Invalid skill. Please enter valid text.",
-                        color = Color.Red,
-                        fontSize = 12.sp,
-                        modifier = Modifier.padding(top = 4.dp)
-                    )
-                }
-
-                Button(
-                    onClick = {
-                        if (skillInput.isBlank()) {
-                            isInvalidSkill = true
-                        } else if (skillInput in selectedSkills) {
-                            isDuplicateSkill = true
-                        } else {
-                            selectedSkills.add(skillInput.trim())
-                            skillInput = ""
-                            isDuplicateSkill = false
-                            isInvalidSkill = false
-                        }
-                    },
-                    modifier = Modifier.align(Alignment.End),
-                    enabled = skillInput.isNotBlank()
-                ) {
-                    Text("Add")
-                }
-
-                // Display skills in a wrapped layout using LazyVerticalGrid
-                LazyVerticalGrid(
-                    columns = GridCells.Adaptive(minSize = 100.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(max = 200.dp) // Limit height for scrollable grid
-                ) {
-                    items(selectedSkills) { skill ->
-                        SkillChip(skill = skill) {
-                            selectedSkills.remove(skill)
-                        }
-                    }
-                }
-
-                if (errorMessage.isNotEmpty()) {
-                    Text(
-                        text = errorMessage,
-                        color = Color.Red,
-                        fontSize = 14.sp,
-                        modifier = Modifier.padding(top = 8.dp)
-                    )
-                }
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    TextButton(onClick = onDismiss) {
-                        Text("Cancel")
-                    }
-                    Button(
-                        onClick = {
-                            scope.launch {
-                                try {
-                                    selectedSkills.forEach { skill ->
-                                        if (skill !in initialSkills) {
-                                            profileController.addSkill(userId, skill)
-                                        }
-                                    }
-
-                                    initialSkills.forEach { skill ->
-                                        if (skill !in selectedSkills) {
-                                            profileController.deleteSkill(userId, skill)
-                                        }
-                                    }
-
-                                    onSave()
-                                } catch (e: Exception) {
-                                    errorMessage = e.message ?: "Failed to save skills."
-                                }
-                            }
-                        },
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = Color(0xFF487896),
-                            contentColor = Color.White
-                        )
-                    ) {
-                        Text("Save")
-                    }
-                }
-            }
-        }
-    }
-}
+//@Composable
+//fun SkillChip(skill: String, onDelete: () -> Unit) {
+//    Surface(
+//        shape = RoundedCornerShape(16.dp),
+//        color = Color(0xFFE0E0E0),
+//        modifier = Modifier
+//            .padding(4.dp)
+//            .height(32.dp)
+//    ) {
+//        Row(
+//            verticalAlignment = Alignment.CenterVertically,
+//            modifier = Modifier.padding(horizontal = 8.dp)
+//        ) {
+//            Text(text = skill, fontSize = 14.sp)
+//            Spacer(modifier = Modifier.width(4.dp))
+//            IconButton(
+//                onClick = onDelete,
+//                modifier = Modifier.size(16.dp)
+//            ) {
+//                Icon(
+//                    imageVector = Icons.Default.Close,
+//                    contentDescription = "Delete Skill",
+//                    tint = Color.Red
+//                )
+//            }
+//        }
+//    }
+//}
+//
+//@Composable
+//fun EditSkillsDialog(
+//    onDismiss: () -> Unit,
+//    onSave: () -> Unit,
+//    userId: String,
+//    profileController: ProfileController,
+//    initialSkills: List<String>
+//) {
+//    var skillInput by remember { mutableStateOf("") }
+//    var isDuplicateSkill by remember { mutableStateOf(false) }
+//    var isInvalidSkill by remember { mutableStateOf(false) }
+//    var selectedSkills = remember { mutableStateListOf<String>().apply { addAll(initialSkills) } }
+//    var errorMessage by remember { mutableStateOf("") }
+//    val scope = rememberCoroutineScope()
+//
+//    Dialog(onDismissRequest = onDismiss) {
+//        Surface(
+//            shape = RoundedCornerShape(8.dp),
+//            color = Color.White,
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .padding(16.dp)
+//        ) {
+//            Column(
+//                modifier = Modifier.padding(16.dp),
+//                verticalArrangement = Arrangement.spacedBy(16.dp)
+//            ) {
+//                Text("Edit Skills", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+//
+//                Text(
+//                    text = "Click a skill to delete it from your list.",
+//                    fontSize = 14.sp,
+//                    color = Color.Gray,
+//                    modifier = Modifier.padding(bottom = 8.dp)
+//                )
+//
+//                OutlinedTextField(
+//                    value = skillInput,
+//                    onValueChange = {
+//                        skillInput = it
+//                        isDuplicateSkill = false
+//                        isInvalidSkill = false
+//                    },
+//                    label = { Text("Add a new skill") },
+//                    modifier = Modifier.fillMaxWidth(),
+//                    isError = isDuplicateSkill || isInvalidSkill
+//                )
+//
+//                if (isDuplicateSkill) {
+//                    Text(
+//                        text = "This skill has already been added.",
+//                        color = Color.Red,
+//                        fontSize = 12.sp,
+//                        modifier = Modifier.padding(top = 4.dp)
+//                    )
+//                }
+//
+//                if (isInvalidSkill) {
+//                    Text(
+//                        text = "Invalid skill. Please enter valid text.",
+//                        color = Color.Red,
+//                        fontSize = 12.sp,
+//                        modifier = Modifier.padding(top = 4.dp)
+//                    )
+//                }
+//
+//                Button(
+//                    onClick = {
+//                        if (skillInput.isBlank()) {
+//                            isInvalidSkill = true
+//                        } else if (skillInput in selectedSkills) {
+//                            isDuplicateSkill = true
+//                        } else {
+//                            selectedSkills.add(skillInput.trim())
+//                            skillInput = ""
+//                            isDuplicateSkill = false
+//                            isInvalidSkill = false
+//                        }
+//                    },
+//                    modifier = Modifier.align(Alignment.End),
+//                    enabled = skillInput.isNotBlank()
+//                ) {
+//                    Text("Add")
+//                }
+//
+//                // Display skills in a wrapped layout using LazyVerticalGrid
+//                LazyVerticalGrid(
+//                    columns = GridCells.Adaptive(minSize = 100.dp),
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .heightIn(max = 200.dp) // Limit height for scrollable grid
+//                ) {
+//                    items(selectedSkills) { skill ->
+//                        SkillChip(skill = skill) {
+//                            selectedSkills.remove(skill)
+//                        }
+//                    }
+//                }
+//
+//                if (errorMessage.isNotEmpty()) {
+//                    Text(
+//                        text = errorMessage,
+//                        color = Color.Red,
+//                        fontSize = 14.sp,
+//                        modifier = Modifier.padding(top = 8.dp)
+//                    )
+//                }
+//
+//                Row(
+//                    modifier = Modifier.fillMaxWidth(),
+//                    horizontalArrangement = Arrangement.SpaceBetween
+//                ) {
+//                    TextButton(onClick = onDismiss) {
+//                        Text("Cancel")
+//                    }
+//                    Button(
+//                        onClick = {
+//                            scope.launch {
+//                                try {
+//                                    selectedSkills.forEach { skill ->
+//                                        if (skill !in initialSkills) {
+//                                            profileController.addSkill(userId, skill)
+//                                        }
+//                                    }
+//
+//                                    initialSkills.forEach { skill ->
+//                                        if (skill !in selectedSkills) {
+//                                            profileController.deleteSkill(userId, skill)
+//                                        }
+//                                    }
+//
+//                                    onSave()
+//                                } catch (e: Exception) {
+//                                    errorMessage = e.message ?: "Failed to save skills."
+//                                }
+//                            }
+//                        },
+//                        colors = ButtonDefaults.buttonColors(
+//                            backgroundColor = Color(0xFF487896),
+//                            contentColor = Color.White
+//                        )
+//                    ) {
+//                        Text("Save")
+//                    }
+//                }
+//            }
+//        }
+//    }
+//}
 
 
 
@@ -1188,8 +1149,6 @@ fun GmailLinkingDialog(
                                     if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
                                         Desktop.getDesktop().browse(uri)
                                     }
-                                } else {
-                                    errorMessage = "Invalid email or App Password. Please try again."
                                 }
                         }
                     )
@@ -1286,4 +1245,3 @@ fun GmailLinkingDialog(
         }
     }
 }
-

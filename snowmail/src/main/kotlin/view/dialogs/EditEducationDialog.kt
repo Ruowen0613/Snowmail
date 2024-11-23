@@ -53,7 +53,14 @@ fun EditEducationDialog(
     var gpaError by remember { mutableStateOf(false) }
 
     var expanded by remember { mutableStateOf(false) }
-    val degreeTypes = listOf("High School Diploma/GED", "Associate's Degree/College Diploma", "Bachelor's Degree", "Master's Degree", "Doctorate Degree", "Other")
+    val degreeTypes = listOf(
+        "High School Diploma/GED",
+        "Associate's Degree/College Diploma",
+        "Bachelor's Degree",
+        "Master's Degree",
+        "Doctorate Degree",
+        "Other"
+    )
 
     Dialog(onDismissRequest = onDismiss) {
         Surface(
@@ -72,8 +79,10 @@ fun EditEducationDialog(
                 // Delete icon
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
+                    Text("Edit Education", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
                     if (education != null) {
                         IconButton(
                             onClick = {
@@ -100,7 +109,6 @@ fun EditEducationDialog(
                     }
                 }
 
-                Text("Edit Education", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
                 Spacer(modifier = Modifier.height(8.dp))
 
                 // School Name
@@ -221,7 +229,12 @@ fun EditEducationDialog(
                 }
 
                 if (errorMessage.isNotEmpty()) {
-                    Text(text = errorMessage, color = Color.Red, textAlign = TextAlign.Center, modifier = Modifier.padding(10.dp))
+                    Text(
+                        text = errorMessage,
+                        color = Color.Red,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(10.dp)
+                    )
                 }
 
                 // Save and Cancel buttons
@@ -277,7 +290,10 @@ fun EditEducationDialog(
                                 }
                             }
                         },
-                        colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF487896), contentColor = Color.White)
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = Color(0xFF487896),
+                            contentColor = Color.White
+                        )
                     ) {
                         Text("Save")
                     }
@@ -286,3 +302,4 @@ fun EditEducationDialog(
         }
     }
 }
+

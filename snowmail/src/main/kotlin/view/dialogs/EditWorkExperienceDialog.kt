@@ -68,8 +68,10 @@ fun EditWorkExperienceDialog(
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
+                    Text("Edit Work Experience", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
                     if (experience != null) {
                         IconButton(
                             onClick = {
@@ -96,7 +98,6 @@ fun EditWorkExperienceDialog(
                     }
                 }
 
-                Text("Edit Work Experience", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
                 Spacer(modifier = Modifier.height(8.dp))
 
                 OutlinedTextField(

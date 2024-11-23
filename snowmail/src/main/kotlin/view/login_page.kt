@@ -1,5 +1,6 @@
 package ca.uwaterloo.view
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.*
@@ -24,6 +25,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
+import ca.uwaterloo.view.theme.AppTheme
 
 import integration.SupabaseClient
 
@@ -33,71 +35,60 @@ object UserSession {
 
 @Composable
 fun loginPage(NavigateToSignup: () -> Unit, NavigateToHome: () -> Unit) {
-    Column (
-        modifier = Modifier.fillMaxSize().padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,) {
-        Row {
-            Text(
-                "Job Hunting: ",
-                textAlign = TextAlign.Center,
-                fontSize = 30.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 12.dp),
-                color = Color.Black
-            )
-            Text(
-                "Tough",
-                textAlign = TextAlign.Center,
-                fontSize = 30.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 12.dp),
-                color = Color(0xff2b5dc7)
-            )
+    AppTheme {
+        Box (
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colors.background)
+        )  {
+            Column(
+                modifier = Modifier.fillMaxSize().padding(16.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Row { Spacer(modifier = Modifier.padding(60.dp)) }
+                Row {
+                    Text(
+                        "Job Hunting's ",
+                        textAlign = TextAlign.Center,
+                        fontSize = 40.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black,
+                        modifier = Modifier.padding(bottom = 12.dp)
+                    )
+                    Text(
+                        "Tough",
+                        textAlign = TextAlign.Center,
+                        fontSize = 40.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xff2b5dc7),
+                        modifier = Modifier.padding(bottom = 12.dp)
+                    )
+                }
+                Row {
+                    Text(
+                        "But You Don't Have To Do It ",
+                        textAlign = TextAlign.Center,
+                        fontSize = 40.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black
+                    )
+                    Text(
+                        "Alone!",
+                        textAlign = TextAlign.Center,
+                        fontSize = 40.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xff2b5dc7)
+                    )
+                }
+
+                Row { Spacer(modifier = Modifier.padding(20.dp)) }
+                Row(Modifier.fillMaxWidth()) { loginForm(NavigateToSignup, NavigateToHome) }
+            }
+
+
         }
-        Row {
-            Text(
-                "But you Do Not ",
-                textAlign = TextAlign.Center,
-                fontSize = 30.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 12.dp),
-                color = Color.Black
-            )
-            Text(
-                "Have",
-                textAlign = TextAlign.Center,
-                fontSize = 30.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 12.dp),
-                color = Color(0xff2b5dc7)
-            )
-        }
-        Row {
-            Text(
-                "to Do It ",
-                textAlign = TextAlign.Center,
-                fontSize = 30.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 12.dp),
-                color = Color.Black
-            )
-            Text(
-                "Alone!",
-                textAlign = TextAlign.Center,
-                fontSize = 30.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 12.dp),
-                color = Color(0xff2b5dc7)
-            )
-        }
-
-
-        Row(Modifier.fillMaxWidth()) { loginForm(NavigateToSignup, NavigateToHome) }
-    }
-
-
-}
+    }}
 
 
 @Composable
@@ -119,24 +110,27 @@ fun loginWithAccount(NavigateToSignup: () -> Unit, NavigateToHome: () -> Unit) {
     val signInController = SignInController(dbStorage.authRepository)
     var passwordVisible by remember { mutableStateOf(false) }
     Column (
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 160.dp).padding(vertical = 15.dp)){
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 400.dp).padding(vertical = 15.dp)
+    ) {
 
-        // email
+        // Email Adress
         Row { Text("Email Address") }
         Row(modifier = Modifier.fillMaxHeight(0.03f)) { Box{} }
         var email by remember { mutableStateOf("") }
-        Row { OutlinedTextField(value = email, onValueChange = { email = it }, modifier = Modifier.fillMaxWidth(), singleLine = true)}
+        Row {
+            OutlinedTextField(
+                value = email,
+                onValueChange = { email = it },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true
+            )
+        }
 
-        // password
+        // Passowrd
         Row(modifier = Modifier.fillMaxHeight(0.07f)) { Box{} }
         Row { Text("Password") }
         Row(modifier = Modifier.fillMaxHeight(0.03f)) { Box{} }
         var password by remember { mutableStateOf("") }
-//        Row {
-//            OutlinedTextField(
-//                value = password,
-//                onValueChange =  {password = it}, modifier = Modifier.fillMaxWidth(), singleLine = true,
-//                visualTransformation = PasswordVisualTransformation()) }
         Row {
             OutlinedTextField(
                 value = password,
@@ -183,22 +177,6 @@ fun loginWithAccount(NavigateToSignup: () -> Unit, NavigateToHome: () -> Unit) {
                             password = ""
                         }
                     }
-                    // if successful, navigate to home page
-//                    if (SUCCESS) {
-//                        NavigateToHome()
-//                    }
-//                    // if email doesn't exist, show and clear
-//                    else if (EMAILDOESNOTEXIST) {
-//                        errorMessage = "Email does not exist, please register first"
-//                        email = ""
-//                        password = ""
-//                    }
-//                    // if password and email does not match
-//                    else {
-//                        errorMessage = "Email and password do not match, please try again"
-//                        email = ""
-//                        password = ""
-//                    }
                 },
                 colors = ButtonDefaults.buttonColors(backgroundColor = Color(buttonColor))
             ) {

@@ -20,11 +20,13 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
+import ca.uwaterloo.view.theme.AppTheme
 
 
 // import ca.uwaterloo.persistence.DBStorage
 
 import integration.SupabaseClient
+import kotlinx.coroutines.runBlocking
 
 
 val fullPageColor = 0xFFebecf0
@@ -35,41 +37,45 @@ val buttonColor = 0xFF487896
 
 @Composable
 fun SignUpPage(NavigateToLogin: () -> Unit, NavigateToHome: () -> Unit) {
-    Box(Modifier.fillMaxSize().background(Color(fullPageColor)), contentAlignment = Alignment.Center) {
-        Column (horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()) {
-            Row { Spacer(modifier = Modifier.fillMaxHeight(0.05f)) }
-            Row {
-                Box(modifier = Modifier.fillMaxHeight(0.15f).background(Color(fullPageColor))) {
-                    Row {
-                        Text(
-                            text = "Join ",
-                            fontSize = 50.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.Black,
-                            fontFamily = FontFamily.Default
-                        )
-                        Text(
-                            text = "Snowmail!",
-                            fontSize = 50.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xff2b5dc7),
-                            fontFamily = FontFamily.Default
-                        )
-                    }
+
+    AppTheme {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colors.background)
+        ) {
+            Column(
+                modifier = Modifier.fillMaxSize().padding(16.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Row { Spacer(modifier = Modifier.padding(20.dp)) }
+                Row {
+                    Text(
+                        text = "Join ",
+                        fontSize = 50.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black,
+                        fontFamily = FontFamily.Default
+                    )
+                    Text(
+                        text = "Snowmail!",
+                        fontSize = 50.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xff2b5dc7),
+                        fontFamily = FontFamily.Default
+                    )
                 }
+
+                Row { Spacer(modifier = Modifier.padding(20.dp)) }
+                Row(Modifier.fillMaxHeight()) { RegisterForm(NavigateToLogin, NavigateToHome) }
+                Row { Spacer(modifier = Modifier.fillMaxHeight(0.01f)) }
             }
 
-            Row { Spacer(modifier = Modifier.fillMaxHeight(0.01f)) }
-            Row(Modifier.fillMaxHeight(0.93f)) { RegisterForm(NavigateToLogin, NavigateToHome) }
-            Row { Spacer(modifier = Modifier.fillMaxHeight(0.01f)) }
         }
-
     }
 
-
 }
-
-
 
 
 
@@ -80,12 +86,13 @@ fun RegisterForm(NavigateToLogin: () -> Unit, NavigateToHome: () -> Unit) {
     var passwordVisible by remember { mutableStateOf(false) }
     var confirmPasswordVisible by remember { mutableStateOf(false) }
 
-    Box (Modifier.fillMaxWidth(0.7f).fillMaxHeight().background(Color(formColor))) {
-        Row {
-            Column(Modifier.fillMaxWidth(0.1f)) { Box {} }
-            Column(horizontalAlignment = Alignment.Start, verticalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.fillMaxWidth(0.8f).fillMaxWidth()) {
+        // Row {
+            Column(
+                horizontalAlignment = Alignment.Start,
+                verticalArrangement = Arrangement.SpaceEvenly,
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 400.dp)
+            ) {
 
-                Row(modifier = Modifier.fillMaxHeight(0.03f)) {}
                 Row(modifier = Modifier.fillMaxWidth(0.95f).fillMaxHeight(0.06f)) {
                     Column(Modifier.fillMaxWidth(0.53f)) { Text("First Name", textAlign = TextAlign.Start) }
                     Column { Text(text = "Last Name", textAlign = TextAlign.End) }
@@ -118,14 +125,23 @@ fun RegisterForm(NavigateToLogin: () -> Unit, NavigateToHome: () -> Unit) {
                     }
                 }
 
-                Row(modifier = Modifier.fillMaxHeight(0.03f)) {}
+                // Email Address
+                Row(modifier = Modifier.fillMaxHeight(0.07f)) { Box{} }
                 Row { Text("Email Address") }
-                // email address input
-                Row (Modifier.fillMaxWidth()){ OutlinedTextField(value = email, onValueChange = { email = it }, singleLine = true, modifier = Modifier.fillMaxWidth()) }
+                Row(modifier = Modifier.fillMaxHeight(0.03f)) { Box{} }
+                Row {
+                    OutlinedTextField(
+                        value = email,
+                        onValueChange = { email = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true
+                    )
+                }
 
-                Row(modifier = Modifier.fillMaxHeight(0.03f)) {}
-                // password input
+                // Password
+                Row(modifier = Modifier.fillMaxHeight(0.07f)) { Box{} }
                 Row { Text("Password") }
+                Row(modifier = Modifier.fillMaxHeight(0.03f)) { Box{} }
                 Row {
                     OutlinedTextField(
                         value = password,
@@ -142,8 +158,10 @@ fun RegisterForm(NavigateToLogin: () -> Unit, NavigateToHome: () -> Unit) {
                     )
                 }
 
-                Row(modifier = Modifier.fillMaxHeight(0.03f)) {}
+                // Confirm Password
+                Row(modifier = Modifier.fillMaxHeight(0.07f)) { Box{} }
                 Row { Text("Confirm Password") }
+                Row(modifier = Modifier.fillMaxHeight(0.03f)) { Box{} }
                 Row {
                     OutlinedTextField(
                         value = passwordConfirm,
@@ -170,25 +188,20 @@ fun RegisterForm(NavigateToLogin: () -> Unit, NavigateToHome: () -> Unit) {
                 val errorInformation = true
                 var errorMessage by remember { mutableStateOf("") }
 
-                Row(modifier = Modifier.fillMaxHeight(0.03f)) {}
-                Row {
+                Row(modifier = Modifier.fillMaxHeight(0.07f)) {}
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                     // register button
                     Button(onClick = {
                         // if first name is missing
                         if (firstName.isEmpty())  errorMessage = "please fill in first name"
-
                         // if last name is missing
                         else if (lastName.isEmpty())  errorMessage = "please fill in last name"
-
                         // if email is missing
                         else if (email.isEmpty())  errorMessage = "please fill in email"
-
                         // if password is missing
                         else if (password.isEmpty())  errorMessage = "please fill in password"
-
                         // if password is too short
                         else if (password.length < 6) errorMessage = "Password is too short"
-
                         // if password is not confirmed
                         else if (password != passwordConfirm) errorMessage = "Passwords do not match"
 
@@ -203,7 +216,6 @@ fun RegisterForm(NavigateToLogin: () -> Unit, NavigateToHome: () -> Unit) {
 
 
                     },
-                        modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(backgroundColor = Color(buttonColor))) {
                         Text("Register", color = Color.White)
                     }
@@ -251,8 +263,7 @@ fun RegisterForm(NavigateToLogin: () -> Unit, NavigateToHome: () -> Unit) {
             }
             Column(Modifier.fillMaxWidth(0.3f)) { Box {} }
         }
-    }
-}
+// }
 
 
 

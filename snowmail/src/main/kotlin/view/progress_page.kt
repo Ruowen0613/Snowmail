@@ -32,6 +32,7 @@ import service.email
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import ca.uwaterloo.controller.ProfileController
+import ca.uwaterloo.view.theme.AppTheme
 import integration.OpenAIClient
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
@@ -96,60 +97,68 @@ fun JobProgressPage(
         isLoading = false
     }
 
-    MaterialTheme {
-        Column(
+
+
+    AppTheme {
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp)
-                .background(Color(0xFFF8FAFC))
+                .background(MaterialTheme.colors.background)
         ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+                    .background(Color(0xFFF8FAFC))
+            ) {
 
-            TopNavigationBar(
-                selectedTabIndex = selectedTabIndex,
-                onTabSelected = { index ->
-                    selectedTabIndex = index
-                    when (index) {
-                        0 -> NavigateToEmialGen()
-                        1 -> {}
-                        2 -> NavigateToDocuments()
-                        3 -> NavigateToProfile()
+                TopNavigationBar(
+                    selectedTabIndex = selectedTabIndex,
+                    onTabSelected = { index ->
+                        selectedTabIndex = index
+                        when (index) {
+                            0 -> NavigateToEmialGen()
+                            1 -> {}
+                            2 -> NavigateToDocuments()
+                            3 -> NavigateToProfile()
+                        }
                     }
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+
+                if (isLoading || progress == null) {
+                    JobStatusColumnsPlaceholder()
+                } else {
+                    JobStatusColumns(progress!!)
                 }
-            )
 
-            Spacer(modifier = Modifier.height(16.dp))
+                if (showDialog && emails.isNotEmpty()) {
+                    EmailDialog(
+                        emails = emails,
+                        emailIndex = emailIndex,
+                        userId = userId,
+                        progressController = progressController,
+                        onNextEmail = { emailIndex = (emailIndex + 1) % emails.size },
+                        onPreviousEmail = {
+                            emailIndex = if (emailIndex == 0) emails.size - 1 else emailIndex - 1
+                        },
+                        onClose = {
+                            showDialog = false
+                            emailIndex = 0
+                            refreshTrigger = !refreshTrigger
+                        }
+                    )
+                }
 
-
-            if (isLoading || progress == null) {
-                JobStatusColumnsPlaceholder()
-            } else {
-                JobStatusColumns(progress!!)
-            }
-
-            if (showDialog && emails.isNotEmpty()) {
-                EmailDialog(
-                    emails = emails,
-                    emailIndex = emailIndex,
-                    userId = userId,
-                    progressController = progressController,
-                    onNextEmail = { emailIndex = (emailIndex + 1) % emails.size },
-                    onPreviousEmail = {
-                        emailIndex = if (emailIndex == 0) emails.size - 1 else emailIndex - 1
-                    },
-                    onClose = {
-                        showDialog = false
-                        emailIndex = 0
-                        refreshTrigger = !refreshTrigger
-                    }
-                )
-            }
-
-            errorMessage?.let {
-                Text(
-                    text = it,
-                    color = Color.Red,
-                    modifier = Modifier.padding(8.dp)
-                )
+                errorMessage?.let {
+                    Text(
+                        text = it,
+                        color = Color.Red,
+                        modifier = Modifier.padding(8.dp)
+                    )
+                }
             }
         }
     }

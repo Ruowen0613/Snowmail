@@ -100,14 +100,24 @@ class JobApplicationRepository(private val supabase: SupabaseClient) : IJobAppli
 
     override suspend fun updateJobApplicationStatus(jobApplicationID: String, statusID: Int): Result<Boolean> {
         return try {
-            supabase.from("job_application_detail").update(
-                mapOf("app_status_id" to statusID)
-            ) {
-                filter {
-                    eq("app_id", jobApplicationID)
+            if (statusID == 5) {
+                supabase.from("job_application_detail").delete() {
+                    filter {
+                        eq("app_id", jobApplicationID)
+                    }
                 }
+                Result.success(true)
             }
-            Result.success(true)
+            else {
+                supabase.from("job_application_detail").update(
+                    mapOf("app_status_id" to statusID)
+                ) {
+                    filter {
+                        eq("app_id", jobApplicationID)
+                    }
+                }
+                Result.success(true)
+            }
         } catch (e: Exception) {
             println(e)
             Result.failure(Exception("Failed to update job application status"))
@@ -252,6 +262,34 @@ class JobApplicationRepository(private val supabase: SupabaseClient) : IJobAppli
         }
     }
 
+    override suspend fun getGmailPassword(userId: String): Result<String?> {
+        return try {
+            var password = supabase.from("user_profile").select(Columns.list("gmail_app_password")) {
+                filter {
+                    eq("user_id", userId)
+                }
+            }.decodeSingle<Map<String, String?>>().get("gmail_app_password")
+            Result.success(password)
+        } catch (e: Exception) {
+            println(e)
+            Result.failure(Exception("Failed to get gmail password"))
+        }
+    }
+
+    override suspend fun getGmailAccount(userId: String): Result<String?> {
+        return try {
+            var account = supabase.from("user_profile").select(Columns.list("linked_gmail_account")) {
+                filter {
+                    eq("user_id", userId)
+                }
+            }.decodeSingle<Map<String, String?>>().get("linked_gmail_account")
+            Result.success(account)
+        } catch (e: Exception) {
+            println(e)
+            Result.failure(Exception("Failed to get gmail account"))
+        }
+    }
+
 
 
 }
@@ -287,7 +325,12 @@ suspend fun main() {
     // get lastly refresh time
     // println(JobApplicationRepository.getRefreshTime("ed52b6c4-2ae8-4b58-bacd-adc00082a505"))
 
-    JobApplicationRepository.initializeRefreshTime("ed52b6c4-2ae8-4b58-bacd-adc00082a505")
+    // JobApplicationRepository.initializeRefreshTime("ed52b6c4-2ae8-4b58-bacd-adc00082a505")
+
+    // print(JobApplicationRepository.getGmailPassword("ed52b6c4-2ae8-4b58-bacd-adc00082a505"))
+    // print(JobApplicationRepository.getGmailPassword("dfe6d74d-24a5-4705-8ee6-13663dbd2f6f"))
+
+    print(JobApplicationRepository.getGmailAccount("ed52b6c4-2ae8-4b58-bacd-adc00082a505"))
 }
 
 

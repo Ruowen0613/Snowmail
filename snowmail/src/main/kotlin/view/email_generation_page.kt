@@ -538,19 +538,28 @@ fun EditableAlertDialog(
 
                 runBlocking {
                     try {
-                        var emailsendingController = SendEmailController(SupabaseClient().jobApplicationRepository)
-                        emailsendingController.send_email(
-                            senderEmail = senderEmail,
-                            password = senderPassword,
+                        var emailsendingController = SendEmailController(SupabaseClient().jobApplicationRepository, SupabaseClient().documentRepository)
+                        val returnMessage = emailsendingController.send_email(
                             recipient = recipientEmailAddy,
                             subject = emailSubject,
                             text = text,
-                            fileURLs = listOf(),
-                            fileNames = listOf(),
+                            // TO BE MODIFIED
+                            buckets = listOf(),
+                            documentsType = listOf<String>(),
+                            documentsName = listOf<String>(),
+                            // -----------
                             userID = userId,
                             jobTitle = jobTitle,
                             companyName = companyName
                         )
+                        // if success
+                        if (returnMessage == "Success") {
+                            // show success message
+                        } else if (returnMessage == "Missing Gmail Account or Password, please go to profile page and finish linking gmail account") {
+                            // show error message
+                        } else {
+                            // show error message Failed to send the email. Please verify that your linked email address and password are correct.
+                        }
                     } catch (e: Exception) {
                         println("Error sending email: ${e.message}")
                     }

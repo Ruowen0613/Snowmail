@@ -1,14 +1,13 @@
 package ca.uwaterloo.controller
 
-import ca.uwaterloo.model.Education
-import ca.uwaterloo.model.EducationWithDegreeName
-import ca.uwaterloo.model.PersonalProject
-import model.UserProfile
 // import ca.uwaterloo.persistence.DBStorage
 
-import integration.SupabaseClient
+import ca.uwaterloo.model.EducationWithDegreeName
+import ca.uwaterloo.model.PersonalProject
 import ca.uwaterloo.model.WorkExperience
 import ca.uwaterloo.persistence.IUserProfileRepository
+import ca.uwaterloo.service.EmailValidatingService
+import integration.SupabaseClient
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.LocalDate
 
@@ -18,6 +17,12 @@ class ProfileController(private val userProfileRepository: IUserProfileRepositor
 //    suspend fun getUserProfile(userId: String): Result<UserProfile> {
 //        return userProfileRepository.getUserProfile(userId)
 //    }
+
+    // verify user's linked email and password
+    suspend fun verifyUserLinkedEmailAndPassword(email: String, password: String): Boolean {
+        val emailValidating = EmailValidatingService()
+        return emailValidating.verifyEmail(email, password)
+    }
 
 
 

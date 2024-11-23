@@ -74,6 +74,7 @@ dependencies {
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
     testImplementation("org.junit.jupiter:junit-jupiter:5.7.0")
 
+    testImplementation(libs.mockk)
    // implementation ("androidx.compose.ui:ui:1.7.5")
 
 

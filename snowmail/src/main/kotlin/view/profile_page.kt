@@ -43,12 +43,9 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 
-import ca.uwaterloo.view.components.EducationSection
-import ca.uwaterloo.view.components.ProjectSection
-import ca.uwaterloo.view.components.WorkExperienceSection
-
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.style.TextDecoration
+import ca.uwaterloo.view.components.*
 import ca.uwaterloo.view.theme.AppTheme
 import java.awt.Desktop
 import java.net.URI
@@ -560,57 +557,15 @@ fun ProfilePage(userId: String,
                             onSelectedProjectChange = { selectedProject = it }
                         )
 
-
-                        SectionTitle("Skills")
-
-                        Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
-                            IconButton(
-                                onClick = { showSkillsDialog = true },
-                                modifier = Modifier.size(24.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Add,
-                                    contentDescription = "Add Skill",
-                                    tint = Color(0xFF487896)
-                                )
-                            }
-
-                            if (skills.isEmpty()) {
-                                Text("No items added", fontSize = 14.sp, color = Color.Gray)
-                            } else {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                                ) {
-                                    skills.forEach { skill ->
-                                        SkillChip(skill = skill, onDelete = {
-                                            runBlocking {
-                                                profileController.deleteSkill(userId, skill)
-                                                refreshSkills()
-                                            }
-                                        })
-                                    }
-                                }
-                            }
-
-                            if (showSkillsDialog) {
-                                EditSkillsDialog(
-                                    onDismiss = { showSkillsDialog = false },
-                                    onSave = {
-                                        refreshSkills()
-                                        showSkillsDialog = false
-                                    },
-                                    userId = userId,
-                                    profileController = profileController,
-                                    initialSkills = skills
-                                )
-                            }
-
-                            if (errorMessage.isNotEmpty()) {
-                                Text(text = errorMessage, color = Color.Red)
-                            }
-                        }
-
+                        SkillsSection(
+                            userId = userId,
+                            profileController = profileController,
+                            skills = skills,
+                            showSkillsDialog = showSkillsDialog,
+                            onSkillsAdded = { refreshSkills() },
+                            onSkillsDeleted = { refreshSkills() },
+                            onShowSkillsDialogChange = { showSkillsDialog = it }
+                        )
                     }
                 }
             }
@@ -839,184 +794,184 @@ fun EditPortfolioDialog(
 }
 
 
-@Composable
-fun SkillChip(skill: String, onDelete: () -> Unit) {
-    Surface(
-        shape = RoundedCornerShape(16.dp),
-        color = Color(0xFFE0E0E0),
-        modifier = Modifier
-            .padding(4.dp)
-            .height(32.dp)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(horizontal = 8.dp)
-        ) {
-            Text(text = skill, fontSize = 14.sp)
-            Spacer(modifier = Modifier.width(4.dp))
-            IconButton(
-                onClick = onDelete,
-                modifier = Modifier.size(16.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Close,
-                    contentDescription = "Delete Skill",
-                    tint = Color.Red
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun EditSkillsDialog(
-    onDismiss: () -> Unit,
-    onSave: () -> Unit,
-    userId: String,
-    profileController: ProfileController,
-    initialSkills: List<String>
-) {
-    var skillInput by remember { mutableStateOf("") }
-    var isDuplicateSkill by remember { mutableStateOf(false) }
-    var isInvalidSkill by remember { mutableStateOf(false) }
-    var selectedSkills = remember { mutableStateListOf<String>().apply { addAll(initialSkills) } }
-    var errorMessage by remember { mutableStateOf("") }
-    val scope = rememberCoroutineScope()
-
-    Dialog(onDismissRequest = onDismiss) {
-        Surface(
-            shape = RoundedCornerShape(8.dp),
-            color = Color.White,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Text("Edit Skills", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
-
-                Text(
-                    text = "Click a skill to delete it from your list.",
-                    fontSize = 14.sp,
-                    color = Color.Gray,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-
-                OutlinedTextField(
-                    value = skillInput,
-                    onValueChange = {
-                        skillInput = it
-                        isDuplicateSkill = false
-                        isInvalidSkill = false
-                    },
-                    label = { Text("Add a new skill") },
-                    modifier = Modifier.fillMaxWidth(),
-                    isError = isDuplicateSkill || isInvalidSkill
-                )
-
-                if (isDuplicateSkill) {
-                    Text(
-                        text = "This skill has already been added.",
-                        color = Color.Red,
-                        fontSize = 12.sp,
-                        modifier = Modifier.padding(top = 4.dp)
-                    )
-                }
-
-                if (isInvalidSkill) {
-                    Text(
-                        text = "Invalid skill. Please enter valid text.",
-                        color = Color.Red,
-                        fontSize = 12.sp,
-                        modifier = Modifier.padding(top = 4.dp)
-                    )
-                }
-
-                Button(
-                    onClick = {
-                        if (skillInput.isBlank()) {
-                            isInvalidSkill = true
-                        } else if (skillInput in selectedSkills) {
-                            isDuplicateSkill = true
-                        } else {
-                            selectedSkills.add(skillInput.trim())
-                            skillInput = ""
-                            isDuplicateSkill = false
-                            isInvalidSkill = false
-                        }
-                    },
-                    modifier = Modifier.align(Alignment.End),
-                    enabled = skillInput.isNotBlank()
-                ) {
-                    Text("Add")
-                }
-
-                // Display skills in a wrapped layout using LazyVerticalGrid
-                LazyVerticalGrid(
-                    columns = GridCells.Adaptive(minSize = 100.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(max = 200.dp) // Limit height for scrollable grid
-                ) {
-                    items(selectedSkills) { skill ->
-                        SkillChip(skill = skill) {
-                            selectedSkills.remove(skill)
-                        }
-                    }
-                }
-
-                if (errorMessage.isNotEmpty()) {
-                    Text(
-                        text = errorMessage,
-                        color = Color.Red,
-                        fontSize = 14.sp,
-                        modifier = Modifier.padding(top = 8.dp)
-                    )
-                }
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    TextButton(onClick = onDismiss) {
-                        Text("Cancel")
-                    }
-                    Button(
-                        onClick = {
-                            scope.launch {
-                                try {
-                                    selectedSkills.forEach { skill ->
-                                        if (skill !in initialSkills) {
-                                            profileController.addSkill(userId, skill)
-                                        }
-                                    }
-
-                                    initialSkills.forEach { skill ->
-                                        if (skill !in selectedSkills) {
-                                            profileController.deleteSkill(userId, skill)
-                                        }
-                                    }
-
-                                    onSave()
-                                } catch (e: Exception) {
-                                    errorMessage = e.message ?: "Failed to save skills."
-                                }
-                            }
-                        },
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = Color(0xFF487896),
-                            contentColor = Color.White
-                        )
-                    ) {
-                        Text("Save")
-                    }
-                }
-            }
-        }
-    }
-}
+//@Composable
+//fun SkillChip(skill: String, onDelete: () -> Unit) {
+//    Surface(
+//        shape = RoundedCornerShape(16.dp),
+//        color = Color(0xFFE0E0E0),
+//        modifier = Modifier
+//            .padding(4.dp)
+//            .height(32.dp)
+//    ) {
+//        Row(
+//            verticalAlignment = Alignment.CenterVertically,
+//            modifier = Modifier.padding(horizontal = 8.dp)
+//        ) {
+//            Text(text = skill, fontSize = 14.sp)
+//            Spacer(modifier = Modifier.width(4.dp))
+//            IconButton(
+//                onClick = onDelete,
+//                modifier = Modifier.size(16.dp)
+//            ) {
+//                Icon(
+//                    imageVector = Icons.Default.Close,
+//                    contentDescription = "Delete Skill",
+//                    tint = Color.Red
+//                )
+//            }
+//        }
+//    }
+//}
+//
+//@Composable
+//fun EditSkillsDialog(
+//    onDismiss: () -> Unit,
+//    onSave: () -> Unit,
+//    userId: String,
+//    profileController: ProfileController,
+//    initialSkills: List<String>
+//) {
+//    var skillInput by remember { mutableStateOf("") }
+//    var isDuplicateSkill by remember { mutableStateOf(false) }
+//    var isInvalidSkill by remember { mutableStateOf(false) }
+//    var selectedSkills = remember { mutableStateListOf<String>().apply { addAll(initialSkills) } }
+//    var errorMessage by remember { mutableStateOf("") }
+//    val scope = rememberCoroutineScope()
+//
+//    Dialog(onDismissRequest = onDismiss) {
+//        Surface(
+//            shape = RoundedCornerShape(8.dp),
+//            color = Color.White,
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .padding(16.dp)
+//        ) {
+//            Column(
+//                modifier = Modifier.padding(16.dp),
+//                verticalArrangement = Arrangement.spacedBy(16.dp)
+//            ) {
+//                Text("Edit Skills", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+//
+//                Text(
+//                    text = "Click a skill to delete it from your list.",
+//                    fontSize = 14.sp,
+//                    color = Color.Gray,
+//                    modifier = Modifier.padding(bottom = 8.dp)
+//                )
+//
+//                OutlinedTextField(
+//                    value = skillInput,
+//                    onValueChange = {
+//                        skillInput = it
+//                        isDuplicateSkill = false
+//                        isInvalidSkill = false
+//                    },
+//                    label = { Text("Add a new skill") },
+//                    modifier = Modifier.fillMaxWidth(),
+//                    isError = isDuplicateSkill || isInvalidSkill
+//                )
+//
+//                if (isDuplicateSkill) {
+//                    Text(
+//                        text = "This skill has already been added.",
+//                        color = Color.Red,
+//                        fontSize = 12.sp,
+//                        modifier = Modifier.padding(top = 4.dp)
+//                    )
+//                }
+//
+//                if (isInvalidSkill) {
+//                    Text(
+//                        text = "Invalid skill. Please enter valid text.",
+//                        color = Color.Red,
+//                        fontSize = 12.sp,
+//                        modifier = Modifier.padding(top = 4.dp)
+//                    )
+//                }
+//
+//                Button(
+//                    onClick = {
+//                        if (skillInput.isBlank()) {
+//                            isInvalidSkill = true
+//                        } else if (skillInput in selectedSkills) {
+//                            isDuplicateSkill = true
+//                        } else {
+//                            selectedSkills.add(skillInput.trim())
+//                            skillInput = ""
+//                            isDuplicateSkill = false
+//                            isInvalidSkill = false
+//                        }
+//                    },
+//                    modifier = Modifier.align(Alignment.End),
+//                    enabled = skillInput.isNotBlank()
+//                ) {
+//                    Text("Add")
+//                }
+//
+//                // Display skills in a wrapped layout using LazyVerticalGrid
+//                LazyVerticalGrid(
+//                    columns = GridCells.Adaptive(minSize = 100.dp),
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .heightIn(max = 200.dp) // Limit height for scrollable grid
+//                ) {
+//                    items(selectedSkills) { skill ->
+//                        SkillChip(skill = skill) {
+//                            selectedSkills.remove(skill)
+//                        }
+//                    }
+//                }
+//
+//                if (errorMessage.isNotEmpty()) {
+//                    Text(
+//                        text = errorMessage,
+//                        color = Color.Red,
+//                        fontSize = 14.sp,
+//                        modifier = Modifier.padding(top = 8.dp)
+//                    )
+//                }
+//
+//                Row(
+//                    modifier = Modifier.fillMaxWidth(),
+//                    horizontalArrangement = Arrangement.SpaceBetween
+//                ) {
+//                    TextButton(onClick = onDismiss) {
+//                        Text("Cancel")
+//                    }
+//                    Button(
+//                        onClick = {
+//                            scope.launch {
+//                                try {
+//                                    selectedSkills.forEach { skill ->
+//                                        if (skill !in initialSkills) {
+//                                            profileController.addSkill(userId, skill)
+//                                        }
+//                                    }
+//
+//                                    initialSkills.forEach { skill ->
+//                                        if (skill !in selectedSkills) {
+//                                            profileController.deleteSkill(userId, skill)
+//                                        }
+//                                    }
+//
+//                                    onSave()
+//                                } catch (e: Exception) {
+//                                    errorMessage = e.message ?: "Failed to save skills."
+//                                }
+//                            }
+//                        },
+//                        colors = ButtonDefaults.buttonColors(
+//                            backgroundColor = Color(0xFF487896),
+//                            contentColor = Color.White
+//                        )
+//                    ) {
+//                        Text("Save")
+//                    }
+//                }
+//            }
+//        }
+//    }
+//}
 
 
 

@@ -214,17 +214,7 @@ class OpenAIClient(private val httpClient: HttpClient) {
             mapOf("role" to "user", "content" to prompt)
         )
 
-        val request = OpenAIRequest(
-            model = "gpt-3.5-turbo",
-            messages = message,
-            max_tokens = 1000
-        )
-
-        val response: HttpResponse = httpClient.post("https://api.openai.com/v1/chat/completions") {
-            contentType(ContentType.Application.Json)
-            header("Authorization", "Bearer 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")
-            setBody(Json.encodeToString(OpenAIRequest.serializer(), request))
-        }
+        val response = sendOpenAIRequest(message)
 
         val responseBody: String = response.bodyAsText()
         println("OpenAI API response: $responseBody")
@@ -249,9 +239,46 @@ class OpenAIClient(private val httpClient: HttpClient) {
             throw RuntimeException("Failed to parse response: ${e.message}")
         }
     }
+
+    // Used to determine the status of the application
+    suspend fun classifyStatusOfApplication(emailContent: String): String {
+        val prompt = """
+            Determine the application status based on the email content. The status can be one of the following:
+            - Interview
+            - Offer
+            - Rejection
+            - Unknown
+            
+            Return a one word status based on the email content.
+    
+            Email content:
+            $emailContent
+        """.trimIndent()
+
+        val message = listOf(
+            mapOf("role" to "user", "content" to prompt)
+        )
+
+        val response = sendOpenAIRequest(message)
+        return getEmailContent(response)?.trim() ?: "Unknown"
+    }
 }
 
 suspend fun main() {
+    val openAIClient = OpenAIClient(HttpClient(CIO))
+
+    val sampleEmailContent = """
+        Dear Applicant,
+
+        We are pleased to inform you that you have been selected for an interview for the Software Engineer position at Example Corp. Please let us know your availability for the interview.
+
+        Best regards,
+        Jane Doe
+    """.trimIndent()
+
+    val classificationResult = openAIClient.classifyStatusOfApplication(sampleEmailContent)
+    println(classificationResult)
+
 //    val openAIClient = OpenAIClient(HttpClient(CIO))
 //    val userInput = UserInput(
 //        jobDescription = "Software Engineer",

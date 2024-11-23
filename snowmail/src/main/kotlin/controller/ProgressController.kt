@@ -3,6 +3,7 @@ package  ca.uwaterloo.controller
 import ca.uwaterloo.persistence.IJobApplicationRepository
 import ca.uwaterloo.persistence.IJobApplicationRepository.JobProgress
 import ca.uwaterloo.persistence.IJobApplicationRepository.Progress
+import integration.OpenAIClient
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
@@ -11,7 +12,7 @@ import persistence.JobApplicationRepository
 import service.email
 import service.searchEmails
 
-class ProgressController(private val jobApplicationRepository: IJobApplicationRepository) {
+class ProgressController(private val jobApplicationRepository: IJobApplicationRepository, private val openAIClient: OpenAIClient) {
 
     // getProgress function for listing all information Progress page needs
     // what is returned in this function?
@@ -41,6 +42,12 @@ class ProgressController(private val jobApplicationRepository: IJobApplicationRe
         jobApplicationRepository.updateRefreshTime(userId)
         return jobApplicationRepository.getProgress(userId).getOrNull()!!
     }
+
+   // Determine the application status of the application using an LLM
+    suspend fun classifyApplicationStatus(emailContent: String): String {
+        return openAIClient.classifyStatusOfApplication(emailContent)
+    }
+
 
 
     // return all new emails from last refresh time to now

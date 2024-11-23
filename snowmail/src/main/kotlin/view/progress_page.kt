@@ -32,6 +32,9 @@ import service.email
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import ca.uwaterloo.controller.ProfileController
+import integration.OpenAIClient
+import io.ktor.client.*
+import io.ktor.client.engine.cio.*
 
 
 @Composable
@@ -42,7 +45,8 @@ fun JobProgressPage(
     NavigateToEmialGen: () -> Unit
 ) {
     val dbStorage = SupabaseClient()
-    val progressController = ProgressController(dbStorage.jobApplicationRepository)
+    val openAIClient = OpenAIClient(HttpClient(CIO))
+    val progressController = ProgressController(dbStorage.jobApplicationRepository, openAIClient)
     val profileController = ProfileController(dbStorage.userProfileRepository)
 
     var selectedTabIndex by remember { mutableStateOf(1) }

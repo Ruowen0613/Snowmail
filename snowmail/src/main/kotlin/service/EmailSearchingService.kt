@@ -12,7 +12,8 @@ val this_port = 993
 data class email (
     val senderEmail: String,
     val subject: String,
-    val text: String
+    val text: String,
+    val attachLink: String
 )
 
 fun searchEmails(userAccount: String, userPassword: String,
@@ -51,6 +52,7 @@ fun searchEmails(userAccount: String, userPassword: String,
             if (recruiterEmails.contains(emailAddress!!)) {
                 val content = message.content
                 var text = ""
+                var link = ""
                 val attachments = mutableListOf<InputStream>()
 
                 if (content is String) {
@@ -71,7 +73,7 @@ fun searchEmails(userAccount: String, userPassword: String,
                 } else {
                     subject = message.subject
                 }
-                val item = email(emailAddress, subject, text)
+                val item = email(emailAddress, subject, text, link)
                 result.add(item)
             }
         }

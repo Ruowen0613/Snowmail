@@ -18,7 +18,7 @@ val host = "smtp.gmail.com"
 val port = 587
 
 
-fun sendEmail(email: email) {
+fun sendEmail(email: email): Boolean {
 
     // properties
     val properties = Properties().apply {
@@ -78,9 +78,10 @@ fun sendEmail(email: email) {
 
         message.setContent(multipart)
         Transport.send(message)
+        return true
 
     } catch (e: Exception) {
-        e.printStackTrace()
+        return false
     }
 
 }

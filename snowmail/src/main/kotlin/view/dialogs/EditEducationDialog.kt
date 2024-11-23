@@ -164,7 +164,7 @@ fun EditEducationDialog(
                     value = gpa,
                     onValueChange = {
                         gpa = it
-                        gpaError = it.toFloatOrNull() == null && it.isNotEmpty()
+                        gpaError = it.isEmpty()
                     },
                     label = { Text("GPA") },
                     isError = gpaError,

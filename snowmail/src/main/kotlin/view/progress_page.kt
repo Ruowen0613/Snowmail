@@ -22,13 +22,6 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import kotlinx.coroutines.launch
 
-import androidx.compose.foundation.text.ClickableText
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.SpanStyle
-import java.awt.Desktop
-import java.net.URI
-
 import ca.uwaterloo.controller.ProgressController
 import ca.uwaterloo.persistence.IJobApplicationRepository
 import integration.SupabaseClient
@@ -39,8 +32,6 @@ import service.email
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import ca.uwaterloo.controller.ProfileController
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.rememberScrollState
 
 
 @Composable
@@ -335,9 +326,6 @@ fun EmailDialog(
     var selectedStatus by remember { mutableStateOf<Int?>(null) }
     var appliedJobs by remember { mutableStateOf<List<Pair<IJobApplicationRepository.JobProgress, String>>>(emptyList()) }
     val coroutineScope = rememberCoroutineScope()
-    var showDialog by remember { mutableStateOf(false) }
-    var attachLinks by remember { mutableStateOf<List<String>>(emptyList()) }
-
 
     LaunchedEffect(userId) {
         appliedJobs = progressController.getAllAppliedJobs(userId, )
@@ -383,85 +371,13 @@ fun EmailDialog(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                //attachLinks = emails[emailIndex].attachLink
-                // Hardcoded attachLinks for demonstration
-                attachLinks = listOf("https://www.google.com", "https://www.youtube.com")
-
-                if (attachLinks.isNotEmpty()) {
-                    Button(
-                        onClick = { showDialog = true },
-                        modifier = Modifier.padding(vertical = 8.dp),
-                        colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF487896))
-                    ) {
-                        Text(text = "View Attached Files",
-                        color = Color.White,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold)
-                    }
-                }
-
-                if (showDialog) {
-                    AlertDialog(
-                        onDismissRequest = { showDialog = false },
-                        title = {
-                            Text(
-                                text = "Attached Files",
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 16.sp
-                            )
-                        },
-                        text = {
-                            Column {
-                                if (attachLinks.isNotEmpty()) {
-                                    attachLinks.forEach { link ->
-                                        ClickableText(
-                                            text = AnnotatedString(
-                                                text = link,
-                                                spanStyle = SpanStyle(textDecoration = TextDecoration.Underline) // Underline for hyperlink
-                                            ),
-                                            onClick = {
-                                                // Open the link in the default browser
-                                                if (Desktop.isDesktopSupported()) {
-                                                    try {
-                                                        Desktop.getDesktop().browse(URI(link))
-                                                    } catch (e: Exception) {
-                                                        e.printStackTrace() // Handle invalid URLs or errors
-                                                    }
-                                                }
-                                            },
-                                            modifier = Modifier.padding(vertical = 4.dp)
-                                        )
-                                    }
-                                } else {
-                                    Text(
-                                        text = "No attached files available.",
-                                        modifier = Modifier.padding(vertical = 8.dp),
-                                        style = MaterialTheme.typography.body2
-                                    )
-                                }
-                            }
-                        },
-                        confirmButton = {
-                            TextButton(
-                                onClick = { showDialog = false }
-                            ) {
-                                Text(text = "Close")
-                            }
-                        }
-                    )
-                }
-
-
-
                 // Job Status Selection
                 Text("If there has been a change in the status of your job application, please select the appropriate options below:", fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .horizontalScroll(rememberScrollState()),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    val statuses = listOf("APPLIED", "INTERVIEWING", "OFFER", "OTHER", "REJECTED")
+                    val statuses = listOf("APPLIED", "INTERVIEWING", "OFFER", "OTHER")
                     statuses.forEachIndexed { index, status ->
                         Button(
                             onClick = { selectedStatus = index },

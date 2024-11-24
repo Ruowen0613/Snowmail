@@ -57,12 +57,12 @@ fun ProjectSection(
                             Column {
                                 Text(
                                     text = project.projectName,
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.Bold
+                                    fontSize = 14.sp,
+                                    color = Color.Black
                                 )
                                 Text(
                                     text = project.description ?: "",
-                                    fontSize = 14.sp,
+                                    fontSize = 12.sp,
                                     color = Color.Gray
                                 )
                             }

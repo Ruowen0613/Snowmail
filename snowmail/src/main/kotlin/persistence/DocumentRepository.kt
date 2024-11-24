@@ -60,4 +60,39 @@ class DocumentRepository(private val supabase: SupabaseClient) : IDocumentReposi
         }
     }
 
+    override suspend fun uploadEmailAttachment(fileName: String, inputStream: InputStream): Result<String> {
+        return try {
+            val tempFile = File.createTempFile("attachment", ".tmp")
+            inputStream.use { input ->
+                tempFile.outputStream().use { output ->
+                    input.copyTo(output, bufferSize = 8 * 1024) // 8 KB buffer
+                }
+            }
+
+            val path = "email_attachments/$fileName"
+            storage.from("user_documents").upload(path, tempFile.readBytes())
+            val url = storage.from("user_documents").createSignedUrl(path, 20.minutes)
+            tempFile.delete()
+            Result.success(url)
+        } catch (e: Exception) {
+            println(e.message)
+            Result.failure(Exception("Error uploading document: ${e.message}"))
+        }
+    }
+
+    override suspend fun deleteAttachments(files: List<String>): Result<String> {
+        return try {
+            for (file in files) {
+                val path = "email_attachments/$file"
+                println(path)
+                storage.from("user_documents").delete(path)
+            }
+            Result.success("Attachments deleted successfully.")
+        } catch (e: Exception) {
+            println(e.message)
+            Result.failure(Exception("Error deleting attachments: ${e.message}"))
+        }
+    }
+
+
 }

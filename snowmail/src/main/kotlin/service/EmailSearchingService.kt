@@ -1,6 +1,6 @@
 package service
 
-import java.io.InputStream
+import ca.uwaterloo.persistence.DocumentRepository
 import java.util.*
 import javax.mail.*
 
@@ -13,12 +13,13 @@ data class email (
     val senderEmail: String,
     val subject: String,
     val text: String,
-    val attachLink: String
+    val fileNames: List<String>,
+    val attachLink: List<String>
 )
 
-fun searchEmails(userAccount: String, userPassword: String,
+suspend fun searchEmails(userAccount: String, userPassword: String,
                  last_refresh_time: Date,
-                 recruiterEmails: List<String>): List<email> {
+                 recruiterEmails: List<String>, documentRepository: DocumentRepository): List<email> {
 
     val properties = Properties().apply {
         put("mail.imap.host", this_host)
@@ -52,8 +53,9 @@ fun searchEmails(userAccount: String, userPassword: String,
             if (recruiterEmails.contains(emailAddress!!)) {
                 val content = message.content
                 var text = ""
-                var link = ""
-                val attachments = mutableListOf<InputStream>()
+                val attachmentLinks = mutableListOf<String>()
+                val fileNames = mutableListOf<String>()
+
 
                 if (content is String) {
                     text = content
@@ -63,7 +65,14 @@ fun searchEmails(userAccount: String, userPassword: String,
                         if (bodyPart.isMimeType("text/plain")) {
                             text += bodyPart.content
                         } else if (Part.ATTACHMENT.equals(bodyPart.disposition, ignoreCase = true)) {
-                            attachments.add(bodyPart.inputStream)
+                            val attachmentStream = bodyPart.inputStream ?: continue
+                            var fileName = bodyPart.fileName ?: "unknown"
+                            fileName = fileName.replace("\\s".toRegex(), "")
+                            println(fileName)
+                            val url = documentRepository.uploadEmailAttachment(fileName, attachmentStream).getOrNull()!!
+                            attachmentLinks.add(url)
+                            fileNames.add(fileName)
+
                         }
                     }
                 }
@@ -73,7 +82,8 @@ fun searchEmails(userAccount: String, userPassword: String,
                 } else {
                     subject = message.subject
                 }
-                val item = email(emailAddress, subject, text, link)
+                val item = email(emailAddress, subject, text, fileNames, attachmentLinks)
+                println(item)
                 result.add(item)
             }
         }

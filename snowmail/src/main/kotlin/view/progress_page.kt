@@ -1,42 +1,43 @@
 package ca.uwaterloo.view
 
-import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.ApplicationScope
-import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.application
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.runtime.*
-import kotlinx.coroutines.launch
-
-import ca.uwaterloo.controller.ProgressController
-import ca.uwaterloo.persistence.IJobApplicationRepository
-import integration.SupabaseClient
-import androidx.compose.foundation.lazy.items
-import kotlinx.coroutines.runBlocking
-import model.JobApplication
-import service.email
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import ca.uwaterloo.controller.ProfileController
+import ca.uwaterloo.controller.ProgressController
+import ca.uwaterloo.persistence.DocumentRepository
+import ca.uwaterloo.persistence.IJobApplicationRepository
 import ca.uwaterloo.view.theme.AppTheme
 import integration.OpenAIClient
+import integration.SupabaseClient
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
-import androidx.compose.foundation.horizontalScroll
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import service.email
+import java.awt.Desktop
+import java.net.URI
 
 
 @Composable
@@ -80,7 +81,7 @@ fun JobProgressPage(
             errorMessage = error.message ?: "Failed to retrieve user app password"
         }
 
-        val getEmailResult = runCatching { progressController.getNewEmails(userId, linkedEmail, appPassword) }
+        val getEmailResult = runCatching { progressController.getNewEmails(userId, linkedEmail, appPassword, dbStorage.documentRepository) }
         val getProgressResult = runCatching { progressController.getProgress(userId) }
 
         getEmailResult.onSuccess { emailList ->
@@ -145,6 +146,7 @@ fun JobProgressPage(
                         onPreviousEmail = {
                             emailIndex = if (emailIndex == 0) emails.size - 1 else emailIndex - 1
                         },
+                        documentRepository = dbStorage.documentRepository,
                         onClose = {
                             showDialog = false
                             emailIndex = 0
@@ -332,6 +334,7 @@ fun EmailDialog(
     emailIndex: Int,
     userId: String,
     progressController: ProgressController,
+    documentRepository: DocumentRepository,
     onNextEmail: () -> Unit,
     onPreviousEmail: () -> Unit,
     onClose: () -> Unit
@@ -340,6 +343,8 @@ fun EmailDialog(
     var selectedStatus by remember { mutableStateOf<Int?>(null) }
     var appliedJobs by remember { mutableStateOf<List<Pair<IJobApplicationRepository.JobProgress, String>>>(emptyList()) }
     val coroutineScope = rememberCoroutineScope()
+    var showDialog by remember { mutableStateOf(false) }
+    var attachLinks by remember { mutableStateOf<List<String>>(emptyList()) }
     val statuses = listOf("APPLIED", "INTERVIEWING", "OFFER", "OTHER", "REJECTED")
 
     LaunchedEffect(userId) {
@@ -392,13 +397,13 @@ fun EmailDialog(
                             } catch (e: Exception) {
                                 "OTHER"
                             }
-                            val normalizedStatus = when (classifiedStatus.trim().uppercase()) {
-                                "OFFER" -> "OFFER"
-                                "REJECTION" -> "REJECTED"
-                                "INTERVIEW" -> "INTERVIEWING"
-                                else -> "APPLIED"
-                            }
-                            selectedStatus = statuses.indexOf(normalizedStatus).takeIf { it >= 0 } ?: 0
+//                            val normalizedStatus = when (classifiedStatus.trim().uppercase()) {
+//                                "OFFER" -> "OFFER"
+//                                "REJECTION" -> "REJECTED"
+//                                "INTERVIEW" -> "INTERVIEWING"
+//                                else -> "APPLIED"
+//                            }
+                            selectedStatus = statuses.indexOf(classifiedStatus).takeIf { it >= 0 } ?: 0
                         }
                     }
 
@@ -407,19 +412,84 @@ fun EmailDialog(
 
                     Spacer(modifier = Modifier.height(5.dp))
 
-                    // Job Status Selection
-                    Text(
-                        text = "If there has been a change in the status of your job application, please select the appropriate options below:",
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 14.sp
-                    )
 
+                    attachLinks = emails[emailIndex].attachLink
+
+                    if (attachLinks.isNotEmpty()) {
+                        Button(
+                            onClick = { showDialog = true },
+                            modifier = Modifier.padding(vertical = 8.dp),
+                            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF487896))
+                        ) {
+                            Text(text = "View Attached Files",
+                                color = Color.White,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold)
+                        }
+                    }
+
+                    if (showDialog) {
+                        AlertDialog(
+                            onDismissRequest = { showDialog = false },
+                            title = {
+                                Text(
+                                    text = "Attached Files",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 16.sp
+                                )
+                            },
+                            text = {
+                                Column {
+                                    if (attachLinks.isNotEmpty()) {
+                                        attachLinks.forEach { link ->
+                                            ClickableText(
+                                                text = AnnotatedString(
+                                                    text = link,
+                                                    spanStyle = SpanStyle(textDecoration = TextDecoration.Underline) // Underline for hyperlink
+                                                ),
+                                                onClick = {
+                                                    // Open the link in the default browser
+                                                    if (Desktop.isDesktopSupported()) {
+                                                        try {
+                                                            Desktop.getDesktop().browse(URI(link))
+                                                        } catch (e: Exception) {
+                                                            e.printStackTrace() // Handle invalid URLs or errors
+                                                        }
+                                                    }
+                                                },
+                                                modifier = Modifier.padding(vertical = 4.dp)
+                                            )
+                                        }
+                                    } else {
+                                        Text(
+                                            text = "No attached files available.",
+                                            modifier = Modifier.padding(vertical = 8.dp),
+                                            style = MaterialTheme.typography.body2
+                                        )
+                                    }
+                                }
+                            },
+                            confirmButton = {
+                                TextButton(
+                                    onClick = {
+                                        showDialog = false
+                                    }
+                                ) {
+                                    Text(text = "Close")
+                                }
+                            }
+                        )
+                    }
+
+                    // Job Status Selection
+                    Text("Snowmail has analyzed this email and automatically assigned the most likely status to your job application. If this is incorrect, you can manually select the appropriate status from the options below:", fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .horizontalScroll(rememberScrollState()),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
+                        val statuses = listOf("APPLIED", "INTERVIEWING", "OFFER", "OTHER", "REJECTED")
                         statuses.forEachIndexed { index, status ->
                             Button(
                                 onClick = { selectedStatus = index },
@@ -433,6 +503,7 @@ fun EmailDialog(
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
+
 
                     // Job Title Selection
                     Text(
@@ -493,6 +564,12 @@ fun EmailDialog(
                                 } else {
                                     onClose()
                                 }
+                                runBlocking {
+                                    println(emails)
+                                    println(emails[emailIndex].fileNames)
+                                    progressController.deleteAttachments(emails[emailIndex].fileNames, documentRepository)
+                                }
+
                             }
                         }
                     },

@@ -244,12 +244,14 @@ class OpenAIClient(private val httpClient: HttpClient) {
     suspend fun classifyStatusOfApplication(emailContent: String): String {
         val prompt = """
             Determine the application status based on the email content. The status can be one of the following:
-            - Interview
-            - Offer
-            - Rejection
-            - Unknown
+            - APPLIED
+            - INTERVIEWING
+            - OFFER
+            - OTHER
+            - REJECTED
             
-            Return a one word status based on the email content.
+            You can only reply with one of the five words listed above based on the email content, and make sure it is uppercase.
+            If the email content is inconclusive, you can reply with "OTHER".
     
             Email content:
             $emailContent

@@ -1,14 +1,10 @@
 package  ca.uwaterloo.controller
 
+import ca.uwaterloo.persistence.DocumentRepository
 import ca.uwaterloo.persistence.IJobApplicationRepository
 import ca.uwaterloo.persistence.IJobApplicationRepository.JobProgress
 import ca.uwaterloo.persistence.IJobApplicationRepository.Progress
 import integration.OpenAIClient
-import io.github.jan.supabase.auth.Auth
-import io.github.jan.supabase.createSupabaseClient
-import io.github.jan.supabase.postgrest.Postgrest
-import io.github.jan.supabase.storage.Storage
-import persistence.JobApplicationRepository
 import service.email
 import service.searchEmails
 
@@ -52,14 +48,14 @@ class ProgressController(private val jobApplicationRepository: IJobApplicationRe
 
     // return all new emails from last refresh time to now
     // return value is List<Email>
-    suspend fun getNewEmails(userId: String, linkedEmail: String, appPassword: String): List<email> {
+    suspend fun getNewEmails(userId: String, linkedEmail: String, appPassword: String, documentRepository: DocumentRepository): List<email> {
         // get all recruiter emails
         val recruiterEmails = jobApplicationRepository.getAllRecruiterEmailAddress(userId)
         // get last refresh time
         val lastRefreshTime = jobApplicationRepository.getRefreshTime(userId).getOrNull()!!
         // TO BE ADDED: REMOVE HARDCODE EMAIL AND GMAIL PASSWORD
         // search emails
-        val emails = searchEmails(linkedEmail, appPassword, lastRefreshTime, recruiterEmails)
+        val emails = searchEmails(linkedEmail, appPassword, lastRefreshTime, recruiterEmails, documentRepository)
         return emails
     }
 
@@ -75,6 +71,11 @@ class ProgressController(private val jobApplicationRepository: IJobApplicationRe
     suspend fun modifyStatus(JobApplicationID: String, newStatus: Int) {
         jobApplicationRepository.updateJobApplicationStatus(JobApplicationID, newStatus)
     }
+
+    suspend fun deleteAttachments(files: List<String>, documentRepository: DocumentRepository) {
+        documentRepository.deleteAttachments(files)
+    }
+
 
 }
 

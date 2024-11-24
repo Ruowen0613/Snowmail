@@ -36,6 +36,7 @@ import ca.uwaterloo.view.theme.AppTheme
 import integration.OpenAIClient
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
+import androidx.compose.foundation.horizontalScroll
 
 
 @Composable
@@ -339,19 +340,25 @@ fun EmailDialog(
     var selectedStatus by remember { mutableStateOf<Int?>(null) }
     var appliedJobs by remember { mutableStateOf<List<Pair<IJobApplicationRepository.JobProgress, String>>>(emptyList()) }
     val coroutineScope = rememberCoroutineScope()
+    val statuses = listOf("APPLIED", "INTERVIEWING", "OFFER", "OTHER", "REJECTED")
 
     LaunchedEffect(userId) {
-        appliedJobs = progressController.getAllAppliedJobs(userId, )
+        appliedJobs = progressController.getAllAppliedJobs(userId)
     }
-
-    val scrollState = rememberScrollState()
 
     AlertDialog(
         onDismissRequest = onClose,
+        modifier = Modifier
+            .padding(horizontal = 16.dp, vertical = 32.dp),
         title = {
-            Box(modifier = Modifier.fillMaxWidth()) {
+            // Fixed title with space before the text
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp)
+            ) {
                 Text(
-                    text = "Job Application Update: Email ${emailIndex + 1} of ${emails.size}",
+                    text = "   Job Application Update: Email ${emailIndex + 1} of ${emails.size}", // Add space before text
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
                     modifier = Modifier.align(Alignment.CenterStart)
@@ -369,58 +376,103 @@ fun EmailDialog(
             }
         },
         text = {
-            Column(
+
+            Box(
                 modifier = Modifier
-                    .verticalScroll(scrollState)
-                    .padding(8.dp)
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
             ) {
-                Text(
-                    text = emails[emailIndex].subject,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 14.sp,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-                Text(text = emails[emailIndex].text)
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Job Status Selection
-                Text("If there has been a change in the status of your job application, please select the appropriate options below:", fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
+                Column(
+                    modifier = Modifier.padding(8.dp)
                 ) {
-                    val statuses = listOf("APPLIED", "INTERVIEWING", "OFFER", "OTHER")
-                    statuses.forEachIndexed { index, status ->
-                        Button(
-                            onClick = { selectedStatus = index },
-                            colors = ButtonDefaults.buttonColors(backgroundColor = if (selectedStatus == index) Color(0xFF487896) else Color.LightGray)
-                        ) {
-                            Text(status, color = if (selectedStatus == index) Color.White else Color.Black)
+                    Spacer(modifier = Modifier.height(32.dp))
+                    // Email Subject
+                    Text(
+                        text = emails[emailIndex].subject,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 14.sp,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+
+                    // Classify application status
+                    LaunchedEffect(emails[emailIndex].text) {
+                        coroutineScope.launch {
+                            val classifiedStatus = try {
+                                progressController.classifyApplicationStatus(emails[emailIndex].text)
+                            } catch (e: Exception) {
+                                "OTHER"
+                            }
+                            val normalizedStatus = when (classifiedStatus.trim().uppercase()) {
+                                "OFFER" -> "OFFER"
+                                "REJECTION" -> "REJECTED"
+                                "INTERVIEW" -> "INTERVIEWING"
+                                else -> "APPLIED"
+                            }
+                            selectedStatus = statuses.indexOf(normalizedStatus).takeIf { it >= 0 } ?: 0
                         }
                     }
-                }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                    // Email Content
+                    Text(text = emails[emailIndex].text)
 
-                // Job Title Selection with scrolling support
-                Text("Please select the title for this job:", fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(max = 200.dp) // Set a max height with scrolling if overflow
-                ) {
-                    items(appliedJobs) { (job, jobId) ->
-                        Button(
-                            onClick = { selectedJobId = jobId },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 4.dp),
-                            colors = ButtonDefaults.buttonColors(backgroundColor = if (selectedJobId == jobId) Color(0xFF487896) else Color.LightGray)
-                        ) {
-                            Text("${job.jobTitle} - ${job.companyName}", color = if (selectedJobId == jobId) Color.White else Color.Black)
+                    Spacer(modifier = Modifier.height(5.dp))
+
+                    // Job Status Selection
+                    Text(
+                        text = "If there has been a change in the status of your job application, please select the appropriate options below:",
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 14.sp
+                    )
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        statuses.forEachIndexed { index, status ->
+                            Button(
+                                onClick = { selectedStatus = index },
+                                colors = ButtonDefaults.buttonColors(
+                                    backgroundColor = if (selectedStatus == index) MaterialTheme.colors.primary else Color.LightGray
+                                )
+                            ) {
+                                Text(status, color = if (selectedStatus == index) Color.White else Color.Black)
+                            }
                         }
                     }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Job Title Selection
+                    Text(
+                        text = "Please select the title for this job:",
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 14.sp
+                    )
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(max = 200.dp)
+                    ) {
+                        items(appliedJobs) { (job, jobId) ->
+                            Button(
+                                onClick = { selectedJobId = jobId },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 4.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    backgroundColor = if (selectedJobId == jobId) MaterialTheme.colors.primary else Color.LightGray
+                                )
+                            ) {
+                                Text(
+                                    text = "${job.jobTitle} - ${job.companyName}",
+                                    color = if (selectedJobId == jobId) Color.White else Color.Black
+                                )
+                            }
+                        }
+                    }
+                        Spacer(modifier = Modifier.height(16.dp))
                 }
             }
         },
@@ -434,7 +486,7 @@ fun EmailDialog(
                 if (emailIndex > 0) {
                     Button(
                         onClick = onPreviousEmail,
-                        colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF487896))
+                        colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary)
                     ) {
                         Text("Back", color = Color.White)
                     }
@@ -454,7 +506,9 @@ fun EmailDialog(
                             }
                         }
                     },
-                    colors = ButtonDefaults.buttonColors(backgroundColor = if (selectedJobId != null && selectedStatus != null) Color(0xFF487896) else Color.Gray),
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = if (selectedJobId != null && selectedStatus != null) MaterialTheme.colors.primary else Color.Gray
+                    ),
                     enabled = selectedJobId != null && selectedStatus != null
                 ) {
                     Text("Save", color = Color.White)
@@ -463,4 +517,3 @@ fun EmailDialog(
         }
     )
 }
-

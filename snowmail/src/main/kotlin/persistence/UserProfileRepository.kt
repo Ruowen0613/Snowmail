@@ -10,6 +10,7 @@ import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
+import io.github.jan.supabase.postgrest.query.Order
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalDate
@@ -349,7 +350,7 @@ class UserProfileRepository(private val supabase: SupabaseClient) : IUserProfile
         }
     }
 
-
+    //get education experiences order by time
     override suspend fun getEducation(userId: String): Result<List<EducationWithDegreeName>> {
         return try {
             // fetch education records from db based on userid
@@ -358,6 +359,7 @@ class UserProfileRepository(private val supabase: SupabaseClient) : IUserProfile
                     filter {
                         eq("user_id", userId)
                     }
+                    order("start_date", Order.DESCENDING)
                 }
                 .decodeList<Education>()
 
@@ -497,6 +499,7 @@ class UserProfileRepository(private val supabase: SupabaseClient) : IUserProfile
                     filter {
                         eq("user_id", userId)
                     }
+                    order("start_date", Order.DESCENDING)
                 }
                 .decodeList<WorkExperience>()
             Result.success(workExperience)

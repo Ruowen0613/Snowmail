@@ -255,11 +255,21 @@ class UserProfileRepositoryTest {
         val education = result.getOrNull()
         val expectedEducation = listOf(
             EducationWithDegreeName(
+                id = 1,
+                userId = userId,
+                degreeName = "Bachelor's Degree",
+                major = "Computer Science",
+                gpa = 5f,
+                startDate = LocalDate.parse("2022-09-01"),
+                endDate = LocalDate.parse("2027-06-01"),
+                institutionName = "University of Waterloo"
+            ),
+            EducationWithDegreeName(
                 id = 19,
                 userId = userId,
                 degreeName = "High School Diploma/GED",
                 major = "Education",
-                gpa = 100f,
+                gpa = 98f,
                 startDate = LocalDate.parse("2019-09-01"),
                 endDate = LocalDate.parse("2022-06-01"),
                 institutionName = "NJYZ"
@@ -273,16 +283,6 @@ class UserProfileRepositoryTest {
                 startDate = LocalDate.parse("2000-02-01"),
                 endDate = LocalDate.parse("2000-03-01"),
                 institutionName = "MIT"
-            ),
-            EducationWithDegreeName(
-                id = 1,
-                userId = userId,
-                degreeName = "Bachelor's Degree",
-                major = "Computer Science",
-                gpa = 5f,
-                startDate = LocalDate.parse("2022-09-01"),
-                endDate = LocalDate.parse("2027-06-01"),
-                institutionName = "University of Waterloo"
             )
         )
         assertEquals(expectedEducation, education, "User's education should match the expected value")

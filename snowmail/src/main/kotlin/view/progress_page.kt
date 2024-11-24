@@ -363,16 +363,6 @@ fun EmailDialog(
                     fontSize = 16.sp,
                     modifier = Modifier.align(Alignment.CenterStart)
                 )
-                IconButton(
-                    onClick = onClose,
-                    modifier = Modifier.align(Alignment.TopEnd)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = "Close",
-                        tint = Color.Gray
-                    )
-                }
             }
         },
         text = {

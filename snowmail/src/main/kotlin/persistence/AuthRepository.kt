@@ -1,10 +1,14 @@
 package ca.uwaterloo.persistence
 
+import ca.uwaterloo.model.Education
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.auth.OtpType
 import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.providers.builtin.OTP
 import model.UserProfile
 import io.github.jan.supabase.postgrest.from
+import io.github.jan.supabase.postgrest.query.Columns
 
 
 class AuthRepository(private val supabase: SupabaseClient) : IAuthRepository{
@@ -84,4 +88,53 @@ class AuthRepository(private val supabase: SupabaseClient) : IAuthRepository{
             "Error during sign-out: ${e.message}"
         }
     }
+
+    // Send OTP to the user's email for passwordless login
+    // Sign in with email and OTP
+// Send OTP
+    override suspend fun sendOtpToEmail(email: String): Result<Boolean> {
+        return try {
+            // Check if the email exists in the user_profile table
+            val existingUser = supabase.from("user_profile")
+                .select {
+                    filter {
+                        eq("email", email)
+                    }
+                }
+                .decodeSingleOrNull<UserProfile>()
+
+            if (existingUser == null) {
+                // If the email does not exist in user_profile, return an error
+                return Result.failure(Exception("This email hasn't been registered, please sign up."))
+            }
+            supabase.auth.signInWith(OTP) {
+                this.email = email
+            }
+            Result.success(true) // OTP successfully sent
+        } catch (e: Exception) {
+            Result.failure(Exception("Failed to send OTP: ${e.message}"))
+        }
+    }
+
+    // Verify OTP
+    override suspend fun verifyEmailOtp(email: String, token: String): Result<String> {
+        return try {
+            // Verify the token
+            supabase.auth.verifyEmailOtp(
+                email = email,
+                token = token,
+                type = OtpType.Email.EMAIL
+            )
+
+            // Retrieve the user session after successful OTP verification
+            val user = supabase.auth.currentUserOrNull()
+                ?: return Result.failure(Exception("Session not created after OTP verification."))
+
+            Result.success(user.id) // Return user ID
+        } catch (e: Exception) {
+            Result.failure(Exception("Failed to verify OTP: ${e.message}"))
+        }
+    }
+
+
 }

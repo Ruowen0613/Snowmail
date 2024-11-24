@@ -233,6 +233,24 @@ fun main() = runBlocking<Unit> {
 //    }
 
 
+    //Test sending OTP to email
+//    val result = dbStorage.authRepository.sendOtpToEmail(email)
+//    result.onSuccess { userId ->
+//        println("OTP sent successfully. User ID: $userId")
+//    }.onFailure { error ->
+//        println("Error sending OTP: ${error.message}")
+//    }
+
+
+
+    //test sign in with otp
+//    val otp = "951286"
+//    val result = dbStorage.authRepository.verifyEmailOtp(email, otp)
+//    result.onSuccess {
+//        println("Sign in with OTP successful.")
+//    }.onFailure { error ->
+//        println("Error signing in with OTP: ${error.message}")
+//    }
 
 }
 

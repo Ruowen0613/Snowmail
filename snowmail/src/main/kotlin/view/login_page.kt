@@ -1,6 +1,9 @@
 package ca.uwaterloo.view
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.*
@@ -25,6 +28,10 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.input.pointer.*
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.window.Dialog
 import ca.uwaterloo.view.theme.AppTheme
 
 import integration.SupabaseClient
@@ -104,18 +111,20 @@ fun loginForm(NavigateToSignup: () -> Unit, NavigateToHome: () -> Unit) {
 }
 
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun loginWithAccount(NavigateToSignup: () -> Unit, NavigateToHome: () -> Unit) {
     val dbStorage = SupabaseClient()
     val signInController = SignInController(dbStorage.authRepository)
     var passwordVisible by remember { mutableStateOf(false) }
+    var showOtpLoginDialog by remember { mutableStateOf(false) }
     Column (
         modifier = Modifier.fillMaxWidth().padding(horizontal = 400.dp).padding(vertical = 15.dp)
     ) {
 
         // Email Adress
-        Row { Text("Email Address") }
-        Row(modifier = Modifier.fillMaxHeight(0.03f)) { Box{} }
+        Row { Text("Email Address", fontSize = 16.sp) }
+        Spacer(modifier = Modifier.height(8.dp)) // Increased spacing
         var email by remember { mutableStateOf("") }
         Row {
             OutlinedTextField(
@@ -127,9 +136,9 @@ fun loginWithAccount(NavigateToSignup: () -> Unit, NavigateToHome: () -> Unit) {
         }
 
         // Passowrd
-        Row(modifier = Modifier.fillMaxHeight(0.07f)) { Box{} }
-        Row { Text("Password") }
-        Row(modifier = Modifier.fillMaxHeight(0.03f)) { Box{} }
+        Spacer(modifier = Modifier.height(24.dp)) // Increased spacing
+        Row { Text("Password", fontSize = 16.sp) }
+        Spacer(modifier = Modifier.height(8.dp))
         var password by remember { mutableStateOf("") }
         Row {
             OutlinedTextField(
@@ -149,7 +158,7 @@ fun loginWithAccount(NavigateToSignup: () -> Unit, NavigateToHome: () -> Unit) {
             )
         }
 
-        Row(modifier = Modifier.fillMaxHeight(0.07f)) { Box{} }
+        Spacer(modifier = Modifier.height(24.dp))
         // potential error message shown
         var errorMessage by remember { mutableStateOf("") }
         if (errorMessage.isNotEmpty()) {
@@ -160,6 +169,7 @@ fun loginWithAccount(NavigateToSignup: () -> Unit, NavigateToHome: () -> Unit) {
 
 //        val SUCCESS = false
 //        val EMAILDOESNOTEXIST = false
+        Spacer(modifier = Modifier.height(16.dp))
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
             Button(
                 onClick = {
@@ -184,11 +194,39 @@ fun loginWithAccount(NavigateToSignup: () -> Unit, NavigateToHome: () -> Unit) {
             }
         }
 
-        Row(modifier = Modifier.fillMaxHeight(0.07f)) { Box{} }
-        // forgot your password?
-        ClickableText(AnnotatedString("Forgot Your Password?"), onClick = {})
+        // Forgot your password with hover effect
+        Spacer(modifier = Modifier.height(24.dp)) // Increased spacing
+        var isHovered by remember { mutableStateOf(false) }
+        ClickableText(
+            text = AnnotatedString("Forgot Your Password?"),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .pointerMoveFilter(
+                    onEnter = {
+                        isHovered = true
+                        true
+                    },
+                    onExit = {
+                        isHovered = false
+                        true
+                    }
+                ),
+            onClick = { showOtpLoginDialog = true },
+            style = LocalTextStyle.current.copy(
+                fontSize = 16.sp,
+                color = if (isHovered) Color.Gray else Color.Black
+            )
+        )
 
 
+
+        if (showOtpLoginDialog) {
+            signinWithOtpPage(
+                onDismiss = { showOtpLoginDialog = false },
+                NavigateToHome = NavigateToHome
+            )
+        }
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text("Don't have an account?")
@@ -200,7 +238,103 @@ fun loginWithAccount(NavigateToSignup: () -> Unit, NavigateToHome: () -> Unit) {
     }
 }
 
+@Composable
+fun signinWithOtpPage(onDismiss: () -> Unit, NavigateToHome: () -> Unit) {
+    val dbStorage = SupabaseClient()
+    val signInController = SignInController(dbStorage.authRepository)
 
+    var email by remember { mutableStateOf("") }
+    var otp by remember { mutableStateOf("") }
+    var isOtpSent by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
+
+    Dialog(onDismissRequest = { onDismiss() }) {
+        Surface(
+            modifier = Modifier.padding(16.dp),
+            shape = MaterialTheme.shapes.medium,
+            elevation = 8.dp
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    "Sign in with One Time Password (OTP) via Email",
+                    style = MaterialTheme.typography.h6,
+                    fontWeight = FontWeight.Bold
+                )
+
+                // Email input
+                if (!isOtpSent) {
+                    OutlinedTextField(
+                        value = email,
+                        onValueChange = { email = it },
+                        label = { Text("Email Address") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Button(
+                        onClick = {
+                            runBlocking {
+                                val otpResult = signInController.sendOtpToEmail(email)
+                                otpResult.onSuccess {
+                                    isOtpSent = true
+                                }.onFailure { error ->
+                                    errorMessage = error.message ?: "Failed to send OTP."
+                                }
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Send OTP")
+                    }
+                } else {
+                    // OTP input
+                    OutlinedTextField(
+                        value = otp,
+                        onValueChange = { otp = it },
+                        label = { Text("Enter one time password") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Button(
+                        onClick = {
+                            runBlocking {
+                                val verifyResult = signInController.signInUserWithOTP(email, otp)
+                                verifyResult.onSuccess { userId ->
+                                    UserSession.userId = userId // Save the user ID to session
+                                    NavigateToHome() // Navigate to home page
+                                    onDismiss()
+                                }.onFailure { error ->
+                                    errorMessage = error.message ?: "Failed to verify OTP."
+                                }
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Verify OTP")
+                    }
+                }
+
+                if (errorMessage.isNotEmpty()) {
+                    Text(
+                        text = errorMessage,
+                        color = Color.Red,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
+                }
+
+                TextButton(onClick = { onDismiss() }) {
+                    Text("Cancel")
+                }
+            }
+        }
+    }
+}
 
 @Composable
 fun loginWithGmail() {

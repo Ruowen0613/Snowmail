@@ -16,6 +16,17 @@ class SignInController(private val authRepository: IAuthRepository) {
     suspend fun logoutUser(): String {
         return authRepository.signOutUser()
     }
+
+    //Send OTP to the user's email1
+    suspend fun sendOtpToEmail(email: String): Result<Boolean> {
+        return authRepository.sendOtpToEmail(email)
+    }
+
+    //Sign in the user with email and OTP
+    suspend fun signInUserWithOTP(email: String, otp: String): Result<String> {
+        return authRepository.verifyEmailOtp(email, otp)
+    }
+
 }
 
 fun main() = runBlocking<Unit> {

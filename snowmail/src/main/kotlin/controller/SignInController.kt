@@ -27,6 +27,22 @@ class SignInController(private val authRepository: IAuthRepository) {
         return authRepository.verifyEmailOtp(email, otp)
     }
 
+    //send reset password email
+    suspend fun sendResetPasswordEmail(email: String): Result<Boolean> {
+        return SupabaseClient().authRepository.sendResetPasswordEmail(email)
+    }
+
+    //reset password
+    suspend fun resetPassword(newPassword: String): Result<Boolean> {
+        return SupabaseClient().authRepository.resetPassword(newPassword)
+    }
+
+    //parse and import session
+    suspend fun parseAndImportSession(url: String): Result<Boolean> {
+        return SupabaseClient().authRepository.parseAndImportSession(url)
+    }
+
+
 }
 
 fun main() = runBlocking<Unit> {

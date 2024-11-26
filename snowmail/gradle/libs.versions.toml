@@ -45,6 +45,10 @@ supabase-auth = { group = "io.github.jan-tennert.supabase", name = "auth-kt" }
 supabase-realtime = { group = "io.github.jan-tennert.supabase", name = "realtime-kt" }
 supabase-storage = { group = "io.github.jan-tennert.supabase", name = "storage-kt", version.ref = "supabase-storage" }
 ktor-client-cio = { group = "io.ktor", name = "ktor-client-cio", version.ref = "ktor-client" }
+ktor-server-netty = { group = "io.ktor", name = "ktor-server-netty", version.ref = "ktor-client" }
+ktor-server-core = { group = "io.ktor", name = "ktor-server-core", version.ref = "ktor-client" }
+ktor-server-content-negotiation = { group = "io.ktor", name = "ktor-server-content-negotiation", version.ref = "ktor-client" }
+ktor-serialization-kotlinx-json = { group = "io.ktor", name = "ktor-serialization-kotlinx-json", version.ref = "ktor-client" }
 pdfbox = { group = "org.apache.pdfbox", name = "pdfbox", version.ref = "pdfbox" }
 
 [plugins]

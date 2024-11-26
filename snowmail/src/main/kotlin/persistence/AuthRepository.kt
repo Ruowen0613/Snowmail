@@ -5,6 +5,7 @@ import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.OtpType
 import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.parseSessionFromUrl
 import io.github.jan.supabase.auth.providers.builtin.OTP
 import model.UserProfile
 import io.github.jan.supabase.postgrest.from
@@ -136,5 +137,41 @@ class AuthRepository(private val supabase: SupabaseClient) : IAuthRepository{
         }
     }
 
+    override suspend fun sendResetPasswordEmail(email: String): Result<Boolean> {
+        return try {
+            supabase.auth.resetPasswordForEmail(
+                email = email,
+                redirectUrl = "http://localhost:8080/auth-callback"
+            )
+            Result.success(true)
+        } catch (e: Exception) {
+            Result.failure(Exception("Failed to send recovery email: ${e.message}"))
+        }
+    }
+
+    override suspend fun resetPassword(newPassword: String): Result<Boolean> {
+        return try {
+            supabase.auth.updateUser {
+                password = newPassword
+            }
+            Result.success(true)
+        } catch (error: Exception) {
+            Result.failure(Exception("Failed to update password: ${error.message}"))
+        }
+    }
+
+    override suspend fun parseAndImportSession(url: String): Result<Boolean> {
+        return try {
+            // Use Supabase's helper to parse the session from the URL
+            val session = supabase.auth.parseSessionFromUrl(url)
+
+            // Import the session into Supabase
+            supabase.auth.importSession(session)
+
+            Result.success(true)
+        } catch (e: Exception) {
+            Result.failure(Exception("Failed to parse and import session: ${e.message}"))
+        }
+    }
 
 }

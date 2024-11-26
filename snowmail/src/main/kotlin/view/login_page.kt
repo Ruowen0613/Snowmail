@@ -33,6 +33,7 @@ import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.window.Dialog
 import ca.uwaterloo.view.theme.AppTheme
+import androidx.compose.material.icons.filled.Check
 
 import integration.SupabaseClient
 
@@ -95,7 +96,8 @@ fun loginPage(NavigateToSignup: () -> Unit, NavigateToHome: () -> Unit) {
 
 
         }
-    }}
+    }
+}
 
 
 @Composable
@@ -118,6 +120,7 @@ fun loginWithAccount(NavigateToSignup: () -> Unit, NavigateToHome: () -> Unit) {
     val signInController = SignInController(dbStorage.authRepository)
     var passwordVisible by remember { mutableStateOf(false) }
     var showOtpLoginDialog by remember { mutableStateOf(false) }
+    var showForgotPasswordDialog by remember { mutableStateOf(false) }
     Column (
         modifier = Modifier.fillMaxWidth().padding(horizontal = 400.dp).padding(vertical = 15.dp)
     ) {
@@ -165,6 +168,27 @@ fun loginWithAccount(NavigateToSignup: () -> Unit, NavigateToHome: () -> Unit) {
             Text(text = errorMessage, color = Color.Red, textAlign = TextAlign.Center, modifier = Modifier.padding(10.dp))
         }
 
+        // Forgot Password Link
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(
+                "Forgot Password?",
+                color = Color.Blue,
+                textDecoration = TextDecoration.Underline,
+                modifier = Modifier.clickable { showForgotPasswordDialog = true }
+            )
+        }
+
+        // Forgot Password Dialog
+        if (showForgotPasswordDialog) {
+            ForgotPasswordDialog(
+                onDismiss = { showForgotPasswordDialog = false },
+                signInController = signInController
+            )
+        }
+
         // sign in button
 
 //        val SUCCESS = false
@@ -194,11 +218,10 @@ fun loginWithAccount(NavigateToSignup: () -> Unit, NavigateToHome: () -> Unit) {
             }
         }
 
-        // Forgot your password with hover effect
         Spacer(modifier = Modifier.height(24.dp)) // Increased spacing
         var isHovered by remember { mutableStateOf(false) }
         ClickableText(
-            text = AnnotatedString("Forgot Your Password?"),
+            text = AnnotatedString("Sign in with OTP"),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
@@ -237,6 +260,186 @@ fun loginWithAccount(NavigateToSignup: () -> Unit, NavigateToHome: () -> Unit) {
         }
     }
 }
+
+@Composable
+fun ForgotPasswordDialog(onDismiss: () -> Unit, signInController: SignInController) {
+    var email by remember { mutableStateOf("") }
+    var statusMessage by remember { mutableStateOf("") }
+
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            modifier = Modifier.padding(16.dp),
+            shape = MaterialTheme.shapes.medium,
+            elevation = 8.dp
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    "Forgot Password",
+                    style = MaterialTheme.typography.h6,
+                    fontWeight = FontWeight.Bold
+                )
+
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    label = { Text("Email Address") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                if (statusMessage.isNotEmpty()) {
+                    Text(statusMessage, color = if (statusMessage.startsWith("Success")) Color.Gray else Color.Red)
+                }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    TextButton(onClick = onDismiss) {
+                        Text("Cancel")
+                    }
+                    Button(onClick = {
+                        runBlocking {
+                            val result = signInController.sendResetPasswordEmail(email)
+                            if (result.isSuccess) {
+                                statusMessage = "Success: Check your email for reset instructions!"
+                            } else {
+                                statusMessage = "Failed: Could not send email."
+                            }
+                        }
+                    }) {
+                        Text("Send Email")
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+@Composable
+fun ResetPasswordPage(callbackUrl: String, NavigateToHome: () -> Unit) {
+    var newPassword by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
+    var passwordVisible by remember { mutableStateOf(false) }
+    var confirmPasswordVisible by remember { mutableStateOf(false) }
+    var resetResult by remember { mutableStateOf<Result<Boolean>?>(null) }
+    var errorMessage by remember { mutableStateOf("") }
+
+    LaunchedEffect(callbackUrl) {
+        resetResult = SupabaseClient().authRepository.parseAndImportSession(callbackUrl)
+    }
+
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        if (resetResult == null) {
+            Text("Loading session...")
+        } else if (resetResult?.isSuccess == true) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth(0.5f)
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    "Reset Password",
+                    style = MaterialTheme.typography.h5,
+                    modifier = Modifier.padding(bottom = 24.dp)
+                )
+
+                // New Password
+                OutlinedTextField(
+                    value = newPassword,
+                    onValueChange = { newPassword = it },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text("New Password") },
+                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    trailingIcon = {
+                        TextButton(onClick = { passwordVisible = !passwordVisible }) {
+                            Text(if (passwordVisible) "Hide" else "Show", color = Color.Gray)
+                        }
+                    }
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Confirm Password
+                OutlinedTextField(
+                    value = confirmPassword,
+                    onValueChange = { confirmPassword = it },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text("Confirm Password") },
+                    visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    trailingIcon = {
+                        if (newPassword == confirmPassword && newPassword.isNotEmpty()) {
+                            Icon(
+                                imageVector = Icons.Filled.Check,
+                                contentDescription = "Passwords match",
+                                tint = Color.Green
+                            )
+                        } else {
+                            TextButton(onClick = { confirmPasswordVisible = !confirmPasswordVisible }) {
+                                Text(if (confirmPasswordVisible) "Hide" else "Show", color = Color.Gray)
+                            }
+                        }
+                    }
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Error Message
+                if (errorMessage.isNotEmpty()) {
+                    Text(
+                        text = errorMessage,
+                        color = Color.Red,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                }
+
+                // Update Password Button
+                Button(
+                    onClick = {
+                        if (newPassword != confirmPassword) {
+                            errorMessage = "Passwords do not match."
+                        } else if (newPassword.isEmpty()) {
+                            errorMessage = "Password cannot be empty."
+                        } else if (newPassword.length < 6) {
+                            errorMessage = "Password is too short."
+                        } else {
+                            errorMessage = ""
+                            runBlocking {
+                                val result = SupabaseClient().authRepository.resetPassword(newPassword)
+                                if (result.isSuccess) {
+                                    NavigateToHome()
+                                } else {
+                                    errorMessage = result.exceptionOrNull()?.message ?: "Failed to reset password."
+                                }
+                            }
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Update Password")
+                }
+            }
+        } else {
+            Text(
+                "Failed to reset password: ${resetResult?.exceptionOrNull()?.message}",
+                color = MaterialTheme.colors.error
+            )
+        }
+    }
+}
+
 
 @Composable
 fun signinWithOtpPage(onDismiss: () -> Unit, NavigateToHome: () -> Unit) {
@@ -288,7 +491,7 @@ fun signinWithOtpPage(onDismiss: () -> Unit, NavigateToHome: () -> Unit) {
                         },
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("Send OTP")
+                        Text("Send Temporary Password")
                     }
                 } else {
                     // OTP input
@@ -375,7 +578,7 @@ fun WebsitePage2() {
     }
 }
 
-
+//
 fun main() {
     application {
         Window(onCloseRequest = ::exitApplication) {

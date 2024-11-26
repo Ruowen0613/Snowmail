@@ -21,6 +21,11 @@ dependencies {
     implementation(compose.desktop.currentOs)
     implementation(libs.json)
     implementation(libs.ktor.client.cio)
+    implementation(libs.ktor.server.netty)
+    implementation(libs.ktor.server.core)
+    implementation(libs.ktor.server.content.negotiation)
+    implementation(libs.ktor.serialization.kotlinx.json)
+
 //    implementation(libs.ktor.client.core) // Core Ktor client
 //    implementation(libs.ktor.client.cio) // CIO engine for Ktor client
 //    implementation(libs.ktor.client.content.negotiation) // Content negotiation
@@ -33,13 +38,13 @@ dependencies {
 //    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
 //    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
 
-    implementation("io.ktor:ktor-server-netty:2.3.4")
-    implementation("io.ktor:ktor-client-cio:2.3.4")
-    implementation("io.ktor:ktor-client-core:2.3.4")
-    implementation("io.ktor:ktor-client-content-negotiation:2.3.4")
-    implementation("io.ktor:ktor-client-serialization:2.3.4")
-    implementation("io.ktor:ktor-client-plugins:2.3.4")
-    implementation("io.ktor:ktor-client-logging:2.3.4") // Add this line for logging
+//    implementation("io.ktor:ktor-server-netty:2.3.4")
+//    implementation("io.ktor:ktor-client-cio:2.3.4")
+//    implementation("io.ktor:ktor-client-core:2.3.4")
+//    implementation("io.ktor:ktor-client-content-negotiation:2.3.4")
+//    implementation("io.ktor:ktor-client-serialization:2.3.4")
+//    implementation("io.ktor:ktor-client-plugins:2.3.4")
+//    implementation("io.ktor:ktor-client-logging:2.3.4")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
 
@@ -97,6 +102,21 @@ compose.desktop {
 
             macOS {
                 iconFile.set(project.file("src/main/resources/Icon.icns"))
+//                infoPlist {
+//                    extraKeysRawXml = """
+//                        <key>CFBundleURLTypes</key>
+//                        <array>
+//                            <dict>
+//                                <key>CFBundleURLSchemes</key>
+//                                <array>
+//                                    <string>snowmail</string>
+//                                </array>
+//                                <key>CFBundleURLName</key>
+//                                <string>com.uwaterloo.snowmail</string>
+//                            </dict>
+//                        </array>
+//                    """
+//                }
             }
         }
 

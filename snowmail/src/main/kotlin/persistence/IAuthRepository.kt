@@ -8,4 +8,7 @@ interface IAuthRepository {
     suspend fun signOutUser(): String
     suspend fun sendOtpToEmail(email: String): Result<Boolean>
     suspend fun verifyEmailOtp(email: String, token: String): Result<String>
+    suspend fun sendResetPasswordEmail(email: String): Result<Boolean>
+    suspend fun resetPassword(newPassword: String): Result<Boolean>
+    suspend fun parseAndImportSession(url: String): Result<Boolean>
 }

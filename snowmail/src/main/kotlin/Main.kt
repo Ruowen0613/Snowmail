@@ -1,5 +1,3 @@
-package ca.uwaterloo
-
 import androidx.compose.runtime.*
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
@@ -7,6 +5,7 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.application
 import ca.uwaterloo.service.ParserService
+import ca.uwaterloo.service.startHttpCallbackServer
 import ca.uwaterloo.view.*
 import ca.uwaterloo.view.theme.AppTheme
 import integration.OpenAIClient
@@ -24,15 +23,33 @@ fun main() {
     // Initialize the EmailGenerationService
     val emailGenerationService = EmailGenerationService(openAIClient, parserService)
 
+    val resetPasswordUrl = mutableStateOf<String?>(null)
+
+    startHttpCallbackServer { fullUrl ->
+        println("Received HTTP callback URL: $fullUrl")
+        resetPasswordUrl.value = fullUrl
+    }
 
     application {
         AppTheme {
-            Window(onCloseRequest = ::exitApplication, title = "Snowmail", state = WindowState(size = DpSize(1200.dp, 800.dp))) {
-                websitePage()
+            Window(
+                onCloseRequest = ::exitApplication,
+                title = "Snowmail",
+                state = WindowState(size = DpSize(1200.dp, 800.dp))
+            ) {
+                if (resetPasswordUrl.value != null) {
+                    ResetPasswordPage(
+                        callbackUrl = resetPasswordUrl.value!!,
+                        NavigateToHome = { resetPasswordUrl.value = null }
+                    )
+                } else {
+                    websitePage()
+                }
             }
         }
     }
 }
+
 
 
 @Composable

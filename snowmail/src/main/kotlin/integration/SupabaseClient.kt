@@ -235,23 +235,49 @@ fun main() = runBlocking<Unit> {
 
     //Test sending OTP to email
 //    val result = dbStorage.authRepository.sendOtpToEmail(email)
-//    result.onSuccess { userId ->
-//        println("OTP sent successfully. User ID: $userId")
+//    result.onSuccess {
+//        println("OTP sent successfully.")
 //    }.onFailure { error ->
 //        println("Error sending OTP: ${error.message}")
 //    }
-
+//
 
 
     //test sign in with otp
-//    val otp = "951286"
+//    val otp = "905450"
 //    val result = dbStorage.authRepository.verifyEmailOtp(email, otp)
+//    //return user id
 //    result.onSuccess {
-//        println("Sign in with OTP successful.")
+//        println("Sign in with OTP successful: $it")
 //    }.onFailure { error ->
 //        println("Error signing in with OTP: ${error.message}")
 //    }
 
+    //reset password
+//    val newPassword = "Wrw54321"
+//    val result = dbStorage.authRepository.resetPassword(newPassword)
+//    result.onSuccess {
+//        println("Password reset successful.")
+//    }.onFailure { error ->
+//        println("Error resetting password: ${error.message}")
+//    }
+
+    //test sign in
+//    val result = dbStorage.authRepository.signInUser(email, password)
+//    result.onSuccess {
+//        println("Sign in successful: $it")
+//    }.onFailure { error ->
+//        println("Error signing in: ${error.message}")
+//    }
+
+    //test parseAndImportSession
+//    val url = "http://localhost:8080/auth-callback#access_token=eyJhbGciOiJIUzI1NiIsImtpZCI6InZVc1VINHpPQzFHMDltNHEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2d3bmxuZ3l2a3hkcG9kZW5weXlqLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJjOTQ5OGVlYy1hYzE3LTRhM2YtOGQ5MS02MWVmYmEzZjcyNzciLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzMyNjAzNzU0LCJpYXQiOjE3MzI2MDAxNTQsImVtYWlsIjoid3J3MDQwNjEzQGdtYWlsLmNvbSIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiXX0sInVzZXJfbWV0YWRhdGEiOnsiZW1haWwiOiJ3cncwNDA2MTNAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJwaG9uZV92ZXJpZmllZCI6ZmFsc2UsInN1YiI6ImM5NDk4ZWVjLWFjMTctNGEzZi04ZDkxLTYxZWZiYTNmNzI3NyJ9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6Im90cCIsInRpbWVzdGFtcCI6MTczMjYwMDE1NH1dLCJzZXNzaW9uX2lkIjoiNWNhOTZmNzItODhhNC00YzAwLWJmZWYtZGIzNGZkYTc1MWQ1IiwiaXNfYW5vbnltb3VzIjpmYWxzZX0._xpl51wdRsWXBf_FVrlrdFUiskK2gj3g1e-Mo-ho5UI&expires_at=1732603754&expires_in=3600&refresh_token=qX0-lgU4eAu9BEV7jLaU0Q&token_type=bearer&type=recovery"
+//    val result = dbStorage.authRepository.parseAndImportSession(url)
+//    result.onSuccess {
+//        println("Session imported successfully.")
+//    }.onFailure { error ->
+//        println("Error importing session: ${error.message}")
+//    }
 }
 
 

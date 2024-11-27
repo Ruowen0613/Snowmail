@@ -154,6 +154,24 @@ class JobApplicationRepository(private val supabase: SupabaseClient) : IJobAppli
         }
     }
 
+    override suspend fun getRecruiterID(recruiterEmail: String): Result<Int> {
+        return try {
+            var idList = supabase.from("recruiter").select {
+                filter {
+                    eq("email", recruiterEmail)
+                }
+            }.decodeList<Recruiter>()
+            if (idList.isNotEmpty()) {
+                Result.success(idList[0].recruiterID!!)
+            } else {
+                Result.failure(Exception("Recruiter not found"))
+            }
+        } catch (e: Exception) {
+            println(e)
+            Result.failure(Exception("Failed to get recruiter ID"))
+        }
+    }
+
 
     override suspend fun getProgress(userId: String): Result<IJobApplicationRepository.Progress> {
 
@@ -211,6 +229,28 @@ class JobApplicationRepository(private val supabase: SupabaseClient) : IJobAppli
         val AllJobs = supabase.from("job_application_detail").select() {
             filter {
                 eq("user_id", userId)
+            }
+        }.decodeList<JobApplication>()
+        var result = mutableListOf<Pair<IJobApplicationRepository.JobProgress, String>>()
+        for (job in AllJobs) {
+            val item = IJobApplicationRepository.JobProgress(job.jobTitle, job.companyName, getRecruiterEmail(job.recruiterEmailID).getOrNull()!!)
+            result.add(Pair(item, job.appID!!))
+        }
+        return Result.success(result)
+    }
+
+
+
+
+
+    override suspend fun getCorrespondJobs(
+        userId: String,
+        email: String
+    ): Result<List<Pair<IJobApplicationRepository.JobProgress, String>>> {
+        val AllJobs = supabase.from("job_application_detail").select() {
+            filter {
+                eq("user_id", userId)
+                eq("recruiter_email_id", getRecruiterID(email).getOrNull()!!)
             }
         }.decodeList<JobApplication>()
         var result = mutableListOf<Pair<IJobApplicationRepository.JobProgress, String>>()
@@ -292,6 +332,8 @@ class JobApplicationRepository(private val supabase: SupabaseClient) : IJobAppli
 
 
 
+
+
 }
 
 
@@ -331,6 +373,10 @@ suspend fun main() {
     // print(JobApplicationRepository.getGmailPassword("dfe6d74d-24a5-4705-8ee6-13663dbd2f6f"))
 
     print(JobApplicationRepository.getGmailAccount("ed52b6c4-2ae8-4b58-bacd-adc00082a505"))
+
+    print(JobApplicationRepository.getRecruiterID("irishuang1105@gmail.com"))
+
+    print(JobApplicationRepository.getCorrespondJobs("ed52b6c4-2ae8-4b58-bacd-adc00082a505", "irishuang1105@gmail.com"))
 }
 
 

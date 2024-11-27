@@ -104,7 +104,7 @@ suspend fun main() {
     // print(c.send_email(recipient, subject, text, listOf(), listOf(), listOf(), "d372e24a-44a3-4cd3-8ce6-25dcfd7e1d92", jobTitle, companyName))
     // incorrect password
     // print(c.send_email(recipient, subject, text, listOf(bucket), listOf(documentType), listOf(documentName), userID, jobTitle, companyName))
-    print(c.send_email(recipient, subject, text, listOf(), listOf(), listOf(), "eaa8015c-6af7-441d-9037-3654ab821f84", jobTitle, companyName))
+    print(c.send_email(recipient, subject, text, listOf("user_documents", "user_documents"), listOf("Resume", "Resume"), listOf("CS341lec21.pdf", "CS346-11-01-Docker.pdf"), userID, jobTitle, companyName))
 
 }
 

@@ -149,7 +149,7 @@ fun GeneratedEmailAlertDialog(
                                         recipient = recipientEmailAddy,
                                         subject = emailSubject,
                                         text = text,
-                                        buckets = listOf("user_documents"),
+                                        buckets = List(attachedDocuments.size) { "user_documents" },
                                         documentsType = attachedDocuments.map { it.second },
                                         documentsName = attachedDocuments.map { it.first },
                                         userID = userId,

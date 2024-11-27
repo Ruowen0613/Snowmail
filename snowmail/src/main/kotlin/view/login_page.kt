@@ -112,7 +112,6 @@ fun loginForm(NavigateToSignup: () -> Unit, NavigateToHome: () -> Unit) {
 }
 
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun loginWithAccount(NavigateToSignup: () -> Unit, NavigateToHome: () -> Unit) {
     val dbStorage = SupabaseClient()
@@ -210,35 +209,13 @@ fun loginWithAccount(NavigateToSignup: () -> Unit, NavigateToHome: () -> Unit) {
         }
 
         Spacer(modifier = Modifier.height(24.dp))
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 4.dp),
-            horizontalAlignment = Alignment.Start
-        ) {
-
-            // Forgot Your Password Section
-            var isHovered by remember { mutableStateOf(false) }
-            ClickableText(
-                text = AnnotatedString("Forgot Your Password?"),
-                modifier = Modifier
-                    .pointerMoveFilter(
-                        onEnter = {
-                            isHovered = true
-                            true
-                        },
-                        onExit = {
-                            isHovered = false
-                            true
-                        }
-                    ),
-                onClick = { showOtpLoginDialog = true },
-                style = LocalTextStyle.current.copy(
-                    fontSize = 14.sp,
-                    color = if (isHovered) Color.Gray else Color.Black
-                )
-            )
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text("Forgot your password?")
+            Spacer(modifier = Modifier.width(8.dp))
+            TextButton(onClick = { showOtpLoginDialog = true }) {
+                Text("Sign in with OTP", color = Color(buttonColor))
+            }
+        }
 
             if (showOtpLoginDialog) {
                 signinWithOtpPage(
@@ -287,7 +264,7 @@ fun signinWithOtpPage(onDismiss: () -> Unit, NavigateToHome: () -> Unit) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    "Sign in with One Time Password (OTP) via Email",
+                    "Sign in with Temporary Password via Email",
                     style = MaterialTheme.typography.h6,
                     fontWeight = FontWeight.Bold
                 )
@@ -309,20 +286,20 @@ fun signinWithOtpPage(onDismiss: () -> Unit, NavigateToHome: () -> Unit) {
                                 otpResult.onSuccess {
                                     isOtpSent = true
                                 }.onFailure { error ->
-                                    errorMessage = error.message ?: "Failed to send OTP."
+                                    errorMessage = error.message ?: "Failed to send Temporary Password."
                                 }
                             }
                         },
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("Send OTP")
+                        Text("Send Temporary Password")
                     }
                 } else {
                     // OTP input
                     OutlinedTextField(
                         value = otp,
                         onValueChange = { otp = it },
-                        label = { Text("Enter one time password") },
+                        label = { Text("Enter temporary password") },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -336,13 +313,13 @@ fun signinWithOtpPage(onDismiss: () -> Unit, NavigateToHome: () -> Unit) {
                                     NavigateToHome() // Navigate to home page
                                     onDismiss()
                                 }.onFailure { error ->
-                                    errorMessage = error.message ?: "Failed to verify OTP."
+                                    errorMessage = error.message ?: "Failed to verify temporary password."
                                 }
                             }
                         },
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("Verify OTP")
+                        Text("Verify Temporary Password")
                     }
                 }
 

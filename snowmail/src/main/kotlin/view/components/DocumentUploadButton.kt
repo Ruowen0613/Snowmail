@@ -84,7 +84,34 @@ fun DocumentUploadButton(documentController: DocumentController) {
                         result.onSuccess {
                             println("Upload successful: $it")
                         }.onFailure { error ->
-                            println("Error uploading document: ${error.message}")
+                            println("Error uploading document: ${error.message}; check after error message to see if handling is successful")
+                            // check if the file already exists, if it does, delete it and re-upload
+                            if (error.message?.contains("already exists") == true) {
+                                val deleteResult = documentController.deleteDocument(
+                                    bucket = "user_documents",
+                                    userId = UserSession.userId ?: "DefaultUserId",
+                                    documentType = documentType,
+                                    documentName = file.name
+                                )
+                                deleteResult.onSuccess {
+                                    println("Existing document deleted: $it")
+                                    // Re-upload the document
+                                    val reuploadResult = documentController.uploadDocument(
+                                        bucket = "user_documents",
+                                        userId = UserSession.userId ?: "DefaultUserId",
+                                        documentType = documentType,
+                                        documentName = file.name,
+                                        file = file
+                                    )
+                                    reuploadResult.onSuccess {
+                                        println("Re-upload successful: $it")
+                                    }.onFailure { reuploadError ->
+                                        println("Error re-uploading document: ${reuploadError.message}")
+                                    }
+                                }.onFailure { deleteError ->
+                                    println("Error deleting existing document: ${deleteError.message}")
+                                }
+                            }
                         }
                     }
                 }

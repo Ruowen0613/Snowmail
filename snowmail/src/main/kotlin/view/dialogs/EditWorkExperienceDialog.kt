@@ -19,9 +19,8 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 
 
@@ -90,9 +89,8 @@ fun EditWorkExperienceDialog(
                             }
                         ) {
                             Icon(
-                                imageVector = Icons.Default.Delete,
-                                contentDescription = "Delete Work Experience",
-                                tint = Color(0xFFBE0303)
+                                painter = painterResource("TrashIcon.svg"),
+                                contentDescription = "Delete"
                             )
                         }
                     }

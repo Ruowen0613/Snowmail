@@ -377,16 +377,6 @@ fun ProfilePage(userId: String,
 
                             Spacer(modifier = Modifier.weight(0.1f))
 
-                            IconButton(
-                                onClick = { EditContactDialog = true },
-                                modifier = Modifier.size(14.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Edit,
-                                    contentDescription = "Edit",
-                                    tint = Color(0xFF487896)
-                                )
-                            }
                         }
 
 
@@ -416,21 +406,17 @@ fun ProfilePage(userId: String,
 
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         Spacer(modifier = Modifier.width(8.dp))
+                                    }
 
-        //                                Text(
-        //                                    text = "Resume.pdf",
-        //                                    modifier = Modifier
-        //                                        .padding(end = 32.dp)
-        //                                        .clickable {
-        //                                            // Add the action to open the resume file
-        //                                        },
-        //                                    style = MaterialTheme.typography.body1.copy(
-        //                                        fontSize = 14.sp,
-        //                                        color = Color(0xFF2669A0)
-        //                                    )
-        //                                )
+                                    IconButton(onClick = { EditContactDialog = true }) {
+                                        Icon(
+                                            imageVector = Icons.Default.Edit,
+                                            contentDescription = "Edit Contact",
+                                            tint = Color.Gray
+                                        )
                                     }
                                 }
+
                             }
                         }
 

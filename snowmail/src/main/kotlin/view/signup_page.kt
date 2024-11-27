@@ -20,6 +20,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.ui.res.painterResource
 import ca.uwaterloo.view.theme.AppTheme
 
 
@@ -53,14 +54,14 @@ fun SignUpPage(NavigateToLogin: () -> Unit, NavigateToHome: () -> Unit) {
                 Row {
                     Text(
                         text = "Join ",
-                        fontSize = 50.sp,
+                        fontSize = 40.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.Black,
                         fontFamily = FontFamily.Default
                     )
                     Text(
                         text = "Snowmail!",
-                        fontSize = 50.sp,
+                        fontSize = 40.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xff2b5dc7),
                         fontFamily = FontFamily.Default
@@ -151,8 +152,19 @@ fun RegisterForm(NavigateToLogin: () -> Unit, NavigateToHome: () -> Unit) {
                         visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                         trailingIcon = {
                             TextButton(onClick = { passwordVisible = !passwordVisible }) {
-                                Text(if (passwordVisible) "Hide" else "Show",
-                                    color = Color.Gray)
+                                if (passwordVisible) {
+                                    Icon(
+                                        painter = painterResource("VisibilityOff.svg"),
+                                        contentDescription = "Hide password",
+                                        tint = Color.Gray
+                                    )
+                                } else {
+                                    Icon(
+                                        painter = painterResource("Visibility.svg"),
+                                        contentDescription = "Show password",
+                                        tint = Color.Gray
+                                    )
+                                }
                             }
                         }
                     )
@@ -177,8 +189,19 @@ fun RegisterForm(NavigateToLogin: () -> Unit, NavigateToHome: () -> Unit) {
                                 )
                             } else {
                                 TextButton(onClick = { confirmPasswordVisible = !confirmPasswordVisible }) {
-                                    Text(if (confirmPasswordVisible) "Hide" else "Show",
-                                    color = Color.Gray)
+                                    if (confirmPasswordVisible) {
+                                        Icon(
+                                            painter = painterResource("VisibilityOff.svg"),
+                                            contentDescription = "Hide password",
+                                            tint = Color.Gray
+                                        )
+                                    } else {
+                                        Icon(
+                                            painter = painterResource("Visibility.svg"),
+                                            contentDescription = "Show password",
+                                            tint = Color.Gray
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -228,19 +251,24 @@ fun RegisterForm(NavigateToLogin: () -> Unit, NavigateToHome: () -> Unit) {
                     Text(text = errorMessage, color = Color.Red, textAlign = TextAlign.Center, modifier = Modifier.padding(10.dp))
                 }
 
+                Spacer(modifier = Modifier.height(24.dp))
+
                 Row(modifier = Modifier.fillMaxHeight(0.03f)) {}
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("Already have an account?")
-                    // navigate to login page
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("Already have an account?",
+                        style = MaterialTheme.typography.body1.copy(fontSize = 14.sp))
                     TextButton(onClick = { navigateLoginPage(NavigateToLogin) }) {
-                        Text("Sign in", color = Color(buttonColor))
+                        Text("Sign in", color = Color(buttonColor), style = MaterialTheme.typography.body1.copy(fontSize = 14.sp))
                     }
                 }
 
-                Row(modifier = Modifier.fillMaxHeight(0.03f)) {}
-                Row { Divider() }
+                //Row(modifier = Modifier.fillMaxHeight(0.03f)) {}
+                //Row { Divider() }
 
-                Row(modifier = Modifier.fillMaxHeight(0.03f)) {}
+                //Row(modifier = Modifier.fillMaxHeight(0.03f)) {}
                 //Row (horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()){ Text(text = "Or register with") }
 
 

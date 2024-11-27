@@ -5,10 +5,14 @@ package ca.uwaterloo.view
 //import androidx.compose.material3.*
 //import kotlinx.serialization.Serializable
 
+//import ca.uwaterloo.view.components.FetchUserProfileData
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
+import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,7 +21,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
-import ca.uwaterloo.controller.DocumentController
 import ca.uwaterloo.controller.ProfileController
 import ca.uwaterloo.model.EducationWithDegreeName
 import ca.uwaterloo.model.WorkExperience
@@ -25,17 +28,13 @@ import ca.uwaterloo.service.ParserService
 import ca.uwaterloo.view.components.DocumentSelectionDropdownButton
 import ca.uwaterloo.view.components.EmailGenInputField
 import ca.uwaterloo.view.components.EmailGenerationButton
-//import ca.uwaterloo.view.components.FetchUserProfileData
 import ca.uwaterloo.view.dialogs.GeneratedEmailAlertDialog
 import ca.uwaterloo.view.theme.AppTheme
 import controller.EmailGenerationController
-import controller.SendEmailController
 import integration.OpenAIClient
 import integration.SupabaseClient
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
-import kotlinx.coroutines.runBlocking
-import model.GeneratedEmail
 import model.UserInput
 import model.UserProfile
 import service.EmailGenerationService
@@ -43,8 +42,12 @@ import java.io.File
 
 
 @Composable
-fun EmailGenerationPage(userId: String, NavigateToDocuments: () -> Unit, NavigateToProfile: () -> Unit,
-                        NavigateToProgress: () -> Unit
+fun EmailGenerationPage(
+    userId: String,
+    NavigateToDocuments: () -> Unit,
+    NavigateToProfile: () -> Unit,
+    NavigateToProgress: () -> Unit,
+    NavigateToLogin: () -> Unit
 ) {
     var selectedTabIndex by remember { mutableStateOf(0) }
     var emailContent by remember { mutableStateOf("") }
@@ -148,7 +151,8 @@ fun EmailGenerationPage(userId: String, NavigateToDocuments: () -> Unit, Navigat
                             2 -> navigateOtherPage(NavigateToDocuments)
                             3 -> navigateOtherPage(NavigateToProfile)
                         }
-                    }
+                    },
+                    NavigateToLogin = NavigateToLogin
                 )
 
                 Spacer(modifier = Modifier.height(64.dp))
@@ -297,7 +301,7 @@ fun main() {
     application {
         Window(onCloseRequest = ::exitApplication) {
             var currentPage by remember { mutableStateOf("") }
-            EmailGenerationPage("a365a4c4-6427-4461-8cb4-2850fab8ac8c",{ currentPage = "profilePage"}, { currentPage = "profilePage"}, { currentPage = "profilePage"})
+            EmailGenerationPage("a365a4c4-6427-4461-8cb4-2850fab8ac8c",{ currentPage = "profilePage"}, { currentPage = "profilePage"}, { currentPage = "profilePage"}, { currentPage = "login"})
         }
     }
 }

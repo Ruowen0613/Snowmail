@@ -49,9 +49,9 @@ fun websitePage() {
         "welcome3" -> WelcomePage3 ({ currentPage = "signup"}, {currentPage = "login"}, {currentPage = "welcome4"})
         "welcome4" -> WelcomePage4 ({ currentPage = "signup"}, {currentPage = "login"})
         "profilePage" -> ProfilePage(UserSession.userId ?: "DefaultUserId", { currentPage = "documentPage"}, { currentPage = "emailgeneration"}, { currentPage = "progressPage"}, {currentPage = "login"})
-        "emailgeneration" -> EmailGenerationPage(UserSession.userId ?: "DefaultUserId", { currentPage = "documentPage"}, { currentPage = "profilePage"}, { currentPage = "progressPage"})
-        "progressPage" -> JobProgressPage(UserSession.userId ?: "DefaultUserId", { currentPage = "documentPage"}, { currentPage = "profilePage"}, { currentPage = "emailgeneration"})
-        "documentPage" -> DocumentPage({ currentPage = "emailgeneration"}, { currentPage = "profilePage"}, { currentPage = "progressPage"})
+        "emailgeneration" -> EmailGenerationPage(UserSession.userId ?: "DefaultUserId", { currentPage = "documentPage"}, { currentPage = "profilePage"}, { currentPage = "progressPage"}, { currentPage = "login"})
+        "progressPage" -> JobProgressPage(UserSession.userId ?: "DefaultUserId", { currentPage = "documentPage"}, { currentPage = "profilePage"}, { currentPage = "emailgeneration"}, { currentPage = "login"})
+        "documentPage" -> DocumentPage({ currentPage = "emailgeneration"}, { currentPage = "profilePage"}, { currentPage = "progressPage"}, { currentPage = "login"})
     }
 }
 

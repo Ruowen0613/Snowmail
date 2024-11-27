@@ -1,62 +1,40 @@
 package ca.uwaterloo.view
 
-import androidx.compose.foundation.*
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.foundation.background
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.window.Dialog
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.foundation.text.ClickableText
-
-import kotlinx.datetime.LocalDate
-import androidx.compose.material.icons.filled.Delete
-import kotlinx.datetime.Clock
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
-
 import ca.uwaterloo.controller.ProfileController
 import ca.uwaterloo.controller.SignInController
-
-import integration.SupabaseClient
 import ca.uwaterloo.model.EducationWithDegreeName
-import ca.uwaterloo.model.WorkExperience
 import ca.uwaterloo.model.PersonalProject
-
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.launch
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-
-import androidx.compose.ui.text.*
-import androidx.compose.ui.text.style.TextDecoration
-import ca.uwaterloo.view.components.*
-import ca.uwaterloo.view.theme.AppTheme
-import ca.uwaterloo.service.EmailValidatingService
+import ca.uwaterloo.model.WorkExperience
+import ca.uwaterloo.view.components.EducationSection
+import ca.uwaterloo.view.components.ProjectSection
+import ca.uwaterloo.view.components.SkillsSection
+import ca.uwaterloo.view.components.WorkExperienceSection
 import ca.uwaterloo.view.dialogs.EditContactDialog
 import ca.uwaterloo.view.dialogs.EditPortfolioDialog
 import ca.uwaterloo.view.dialogs.GmailLinkingDialog
-import java.awt.Desktop
-import java.net.URI
+import ca.uwaterloo.view.theme.AppTheme
+import integration.SupabaseClient
+import kotlinx.coroutines.runBlocking
 
 @Composable
 fun ProfilePage(userId: String,
-                NavigateToDocuments: () -> Unit, NavigateToEmialGen: () -> Unit,
+                NavigateToDocuments: () -> Unit, NavigateToEmailGen: () -> Unit,
                 NavigateToProgress: () -> Unit,  NavigateToLogin: () -> Unit) {
     val dbStorage = SupabaseClient()
     val profileController = ProfileController(dbStorage.userProfileRepository)
@@ -298,31 +276,32 @@ fun ProfilePage(userId: String,
                     onTabSelected = { index ->
                         selectedTabIndex = index
                         when (index) {
-                            0 -> navigateOtherPage(NavigateToEmialGen)
+                            0 -> navigateOtherPage(NavigateToEmailGen)
                             1 -> navigateOtherPage(NavigateToProgress)
                             2 -> navigateOtherPage(NavigateToDocuments)
                             3 -> {}
                         }
-                    }
+                    },
+                    NavigateToLogin = NavigateToLogin
                 )
 
-                Button(
-                    onClick = {
-                        NavigateToLogin()
-                        runBlocking {
-                            signInController.logoutUser()
-                        }
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        backgroundColor = Color.White, // White background
-                        contentColor = Color(0xFF487896) // Text color
-                    ),
-                    modifier = Modifier
-                        .align(Alignment.End)
-                        .padding(top = 16.dp, end = 16.dp) // Add spacing from the edges
-                ) {
-                    Text("Sign Out", fontWeight = FontWeight.Bold)
-                }
+//                Button(
+//                    onClick = {
+//                        NavigateToLogin()
+//                        runBlocking {
+//                            signInController.logoutUser()
+//                        }
+//                    },
+//                    colors = ButtonDefaults.buttonColors(
+//                        backgroundColor = Color.White, // White background
+//                        contentColor = Color(0xFF487896) // Text color
+//                    ),
+//                    modifier = Modifier
+//                        .align(Alignment.End)
+//                        .padding(top = 16.dp, end = 16.dp) // Add spacing from the edges
+//                ) {
+//                    Text("Sign Out", fontWeight = FontWeight.Bold)
+//                }
 
                 Row(
                     modifier = Modifier

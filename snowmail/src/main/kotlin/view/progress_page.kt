@@ -11,7 +11,6 @@ import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.runtime.*
@@ -45,7 +44,8 @@ fun JobProgressPage(
     userId: String,
     NavigateToDocuments: () -> Unit,
     NavigateToProfile: () -> Unit,
-    NavigateToEmialGen: () -> Unit
+    NavigateToEmialGen: () -> Unit,
+    NavigateToLogin: () -> Unit
 ) {
     val dbStorage = SupabaseClient()
     val openAIClient = OpenAIClient(HttpClient(CIO))
@@ -124,7 +124,8 @@ fun JobProgressPage(
                             2 -> NavigateToDocuments()
                             3 -> NavigateToProfile()
                         }
-                    }
+                    },
+                    NavigateToLogin = NavigateToLogin
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))

@@ -303,6 +303,8 @@ fun ProfilePage(userId: String,
 //                    Text("Sign Out", fontWeight = FontWeight.Bold)
 //                }
 
+                Spacer(modifier = Modifier.height(16.dp))
+
                 Row(
                     modifier = Modifier
                         .fillMaxWidth(0.8f)

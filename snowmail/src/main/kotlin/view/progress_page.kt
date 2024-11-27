@@ -23,6 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import ca.uwaterloo.controller.ProfileController
 import ca.uwaterloo.controller.ProgressController
 import ca.uwaterloo.persistence.DocumentRepository
@@ -32,12 +33,8 @@ import integration.OpenAIClient
 import integration.SupabaseClient
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import service.email
-import java.awt.Desktop
-import java.net.URI
-
+import ca.uwaterloo.view.dialogs.EmailDialog
 
 @Composable
 fun JobProgressPage(
@@ -68,37 +65,71 @@ fun JobProgressPage(
         isLoading = true
         val getLinkedEmailResult = profileController.getUserLinkedGmailAccount(userId)
         val getAppPasswardResult = profileController.getUserGmailAppPassword(userId)
+        try {
 
-        getLinkedEmailResult.onSuccess { result ->
-            linkedEmail = result
-        }.onFailure { error ->
-            errorMessage = error.message ?: "Failed to retrieve user linked email"
+            getLinkedEmailResult.onSuccess { result ->
+                linkedEmail = result
+            }.onFailure { error ->
+                errorMessage = error.message ?: "Failed to retrieve user linked email"
+            }
+
+            getAppPasswardResult.onSuccess { result ->
+                appPassword = result
+            }.onFailure { error ->
+                errorMessage = error.message ?: "Failed to retrieve user app password"
+            }
+
+            val getEmailResult = runCatching {
+                progressController.getNewEmails(
+                    userId,
+                    linkedEmail,
+                    appPassword,
+                    dbStorage.documentRepository
+                )
+            }
+            val getProgressResult = runCatching { progressController.getProgress(userId) }
+
+            getEmailResult.onSuccess { emailList ->
+                emails = emailList
+                if (emails.isNotEmpty()) showDialog = true
+            }.onFailure { error ->
+                errorMessage = error.message ?: "Failed to retrieve user emails"
+            }
+
+            getProgressResult.onSuccess { result ->
+                progress = result
+            }.onFailure { error ->
+                errorMessage = error.message ?: "Failed to retrieve user progress"
+            }
+        } catch (e: Exception) {
+            errorMessage = e.message ?: "An unexpected error occurred"
+        } finally {
+            isLoading = false // Always reset `isLoading` in the `finally` block
         }
-
-        getAppPasswardResult.onSuccess { result ->
-            appPassword = result
-        }.onFailure { error ->
-            errorMessage = error.message ?: "Failed to retrieve user app password"
-        }
-
-        val getEmailResult = runCatching { progressController.getNewEmails(userId, linkedEmail, appPassword, dbStorage.documentRepository) }
-        val getProgressResult = runCatching { progressController.getProgress(userId) }
-
-        getEmailResult.onSuccess { emailList ->
-            emails = emailList
-            if (emails.isNotEmpty()) showDialog = true
-        }.onFailure { error ->
-            errorMessage = error.message ?: "Failed to retrieve user emails"
-        }
-
-        getProgressResult.onSuccess { result ->
-            progress = result
-        }.onFailure { error ->
-            errorMessage = error.message ?: "Failed to retrieve user progress"
-        }
-        isLoading = false
     }
 
+    if (isLoading) {
+        Dialog(onDismissRequest = { isLoading = false }) {
+            Surface(
+                shape = RoundedCornerShape(8.dp),
+                color = MaterialTheme.colors.surface,
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    CircularProgressIndicator()
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text("Please wait while we check for any new emails related to your job applications. This process may take up to 10 seconds.")
+
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+            }
+        }
+    }
 
 
     AppTheme {
@@ -144,9 +175,6 @@ fun JobProgressPage(
                         userId = userId,
                         progressController = progressController,
                         onNextEmail = { emailIndex = (emailIndex + 1) % emails.size },
-                        onPreviousEmail = {
-                            emailIndex = if (emailIndex == 0) emails.size - 1 else emailIndex - 1
-                        },
                         documentRepository = dbStorage.documentRepository,
                         onClose = {
                             showDialog = false
@@ -326,262 +354,4 @@ fun JobCard(position: String, company: String, recruiterEmail: String) {
             Text(text = recruiterEmail, color = Color.Gray, fontSize = 12.sp)
         }
     }
-}
-
-
-@Composable
-fun EmailDialog(
-    emails: List<email>,
-    emailIndex: Int,
-    userId: String,
-    progressController: ProgressController,
-    documentRepository: DocumentRepository,
-    onNextEmail: () -> Unit,
-    onPreviousEmail: () -> Unit,
-    onClose: () -> Unit
-) {
-    var selectedJobId by remember { mutableStateOf<String?>(null) }
-    var selectedStatus by remember { mutableStateOf<Int?>(null) }
-    var appliedJobs by remember { mutableStateOf<List<Pair<IJobApplicationRepository.JobProgress, String>>>(emptyList()) }
-    val coroutineScope = rememberCoroutineScope()
-    var showDialog by remember { mutableStateOf(false) }
-    var attachLinks by remember { mutableStateOf<List<String>>(emptyList()) }
-    val statuses = listOf("APPLIED", "INTERVIEWING", "OFFER", "OTHER", "REJECTED")
-
-    LaunchedEffect(userId) {
-        appliedJobs = progressController.getAllAppliedJobs(userId)
-    }
-
-    AlertDialog(
-        onDismissRequest = onClose,
-        modifier = Modifier
-            .padding(horizontal = 16.dp, vertical = 32.dp),
-        title = {
-            // Fixed title with space before the text
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 8.dp)
-            ) {
-                Text(
-                    text = "   Job Application Update: Email ${emailIndex + 1} of ${emails.size}", // Add space before text
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp,
-                    modifier = Modifier.align(Alignment.CenterStart)
-                )
-            }
-        },
-        text = {
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .verticalScroll(rememberScrollState())
-            ) {
-                Column(
-                    modifier = Modifier.padding(8.dp)
-                ) {
-                    Spacer(modifier = Modifier.height(32.dp))
-                    // Email Subject
-                    Text(
-                        text = emails[emailIndex].subject,
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 14.sp,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-
-                    // Classify application status
-                    LaunchedEffect(emails[emailIndex].text) {
-                        coroutineScope.launch {
-                            val classifiedStatus = try {
-                                progressController.classifyApplicationStatus(emails[emailIndex].text)
-                            } catch (e: Exception) {
-                                "OTHER"
-                            }
-//                            val normalizedStatus = when (classifiedStatus.trim().uppercase()) {
-//                                "OFFER" -> "OFFER"
-//                                "REJECTION" -> "REJECTED"
-//                                "INTERVIEW" -> "INTERVIEWING"
-//                                else -> "APPLIED"
-//                            }
-                            selectedStatus = statuses.indexOf(classifiedStatus).takeIf { it >= 0 } ?: 0
-                        }
-                    }
-
-                    // Email Content
-                    Text(text = emails[emailIndex].text)
-
-                    Spacer(modifier = Modifier.height(5.dp))
-
-
-                    attachLinks = emails[emailIndex].attachLink
-
-                    if (attachLinks.isNotEmpty()) {
-                        Button(
-                            onClick = { showDialog = true },
-                            modifier = Modifier.padding(vertical = 8.dp),
-                            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF487896))
-                        ) {
-                            Text(text = "View Attached Files",
-                                color = Color.White,
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Bold)
-                        }
-                    }
-
-                    if (showDialog) {
-                        AlertDialog(
-                            onDismissRequest = { showDialog = false },
-                            title = {
-                                Text(
-                                    text = "Attached Files",
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 16.sp
-                                )
-                            },
-                            text = {
-                                Column {
-                                    if (attachLinks.isNotEmpty()) {
-                                        attachLinks.forEach { link ->
-                                            ClickableText(
-                                                text = AnnotatedString(
-                                                    text = link,
-                                                    spanStyle = SpanStyle(textDecoration = TextDecoration.Underline) // Underline for hyperlink
-                                                ),
-                                                onClick = {
-                                                    // Open the link in the default browser
-                                                    if (Desktop.isDesktopSupported()) {
-                                                        try {
-                                                            Desktop.getDesktop().browse(URI(link))
-                                                        } catch (e: Exception) {
-                                                            e.printStackTrace() // Handle invalid URLs or errors
-                                                        }
-                                                    }
-                                                },
-                                                modifier = Modifier.padding(vertical = 4.dp)
-                                            )
-                                        }
-                                    } else {
-                                        Text(
-                                            text = "No attached files available.",
-                                            modifier = Modifier.padding(vertical = 8.dp),
-                                            style = MaterialTheme.typography.body2
-                                        )
-                                    }
-                                }
-                            },
-                            confirmButton = {
-                                TextButton(
-                                    onClick = {
-                                        showDialog = false
-                                    }
-                                ) {
-                                    Text(text = "Close")
-                                }
-                            }
-                        )
-                    }
-
-                    // Job Status Selection
-                    Text("Snowmail has analyzed this email and automatically assigned the most likely status to your job application. If this is incorrect, you can manually select the appropriate status from the options below:", fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .horizontalScroll(rememberScrollState()),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        val statuses = listOf("APPLIED", "INTERVIEWING", "OFFER", "OTHER", "REJECTED")
-                        statuses.forEachIndexed { index, status ->
-                            Button(
-                                onClick = { selectedStatus = index },
-                                colors = ButtonDefaults.buttonColors(
-                                    backgroundColor = if (selectedStatus == index) MaterialTheme.colors.primary else Color.LightGray
-                                )
-                            ) {
-                                Text(status, color = if (selectedStatus == index) Color.White else Color.Black)
-                            }
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-
-                    // Job Title Selection
-                    Text(
-                        text = "Please select the title for this job:",
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 14.sp
-                    )
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .heightIn(max = 200.dp)
-                    ) {
-                        items(appliedJobs) { (job, jobId) ->
-                            Button(
-                                onClick = { selectedJobId = jobId },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 4.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    backgroundColor = if (selectedJobId == jobId) MaterialTheme.colors.primary else Color.LightGray
-                                )
-                            ) {
-                                Text(
-                                    text = "${job.jobTitle} - ${job.companyName}",
-                                    color = if (selectedJobId == jobId) Color.White else Color.Black
-                                )
-                            }
-                        }
-                    }
-                        Spacer(modifier = Modifier.height(16.dp))
-                }
-            }
-        },
-        buttons = {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp),
-                horizontalArrangement = Arrangement.End
-            ) {
-                if (emailIndex > 0) {
-                    Button(
-                        onClick = onPreviousEmail,
-                        colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary)
-                    ) {
-                        Text("Back", color = Color.White)
-                    }
-                    Spacer(modifier = Modifier.width(8.dp))
-                }
-
-                Button(
-                    onClick = {
-                        if (selectedJobId != null && selectedStatus != null) {
-                            coroutineScope.launch {
-                                progressController.modifyStatus(selectedJobId!!, selectedStatus!! + 1)
-                                if (emailIndex + 1 < emails.size) {
-                                    onNextEmail()
-                                } else {
-                                    onClose()
-                                }
-                                runBlocking {
-                                    println(emails)
-                                    println(emails[emailIndex].fileNames)
-                                    progressController.deleteAttachments(emails[emailIndex].fileNames, documentRepository)
-                                }
-
-                            }
-                        }
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        backgroundColor = if (selectedJobId != null && selectedStatus != null) MaterialTheme.colors.primary else Color.Gray
-                    ),
-                    enabled = selectedJobId != null && selectedStatus != null
-                ) {
-                    Text("Save", color = Color.White)
-                }
-            }
-        }
-    )
 }

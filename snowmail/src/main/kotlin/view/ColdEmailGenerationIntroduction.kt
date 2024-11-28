@@ -40,10 +40,12 @@ fun main() {
 }
 
 @Composable
-fun ColdEmailGenerationIntroduction(NavigateToSignup: () -> Unit,
-                 NavigateToLogin: () -> Unit,
-                 NavigateToIntroductionPage: () -> Unit,
-                 NavigateToWelcomePage3: () -> Unit ) {
+fun ColdEmailGenerationIntroduction (
+    NavigateToSignup: () -> Unit,
+    NavigateToLogin: () -> Unit,
+    NavigateToIntroductionPage: () -> Unit,
+    NavigateToJobApplicationProgressIntroduction: () -> Unit
+) {
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
@@ -115,7 +117,7 @@ fun ColdEmailGenerationIntroduction(NavigateToSignup: () -> Unit,
                 modifier = Modifier
                     .fillMaxWidth() // Makes the box take the full width
                     .padding(16.dp) // Adds padding around the box
-                    .clickable(onClick = NavigateToWelcomePage3) // Makes the box clickable
+                    .clickable(onClick = NavigateToJobApplicationProgressIntroduction) // Makes the box clickable
                     .clip(RoundedCornerShape(16.dp))
                     //.border(BorderStroke(2.dp, Color.LightGray))
                     .background(

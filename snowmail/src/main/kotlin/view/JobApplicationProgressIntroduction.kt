@@ -5,31 +5,23 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toComposeImageBitmap
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
-import java.io.File
-import javax.imageio.ImageIO
-import androidx.compose.ui.draw.alpha
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.layout.ContentScale
 
 @Composable
-fun WebsitePageWelcome4() {
+fun WebsitePageWelcome3() {
     var currentPage by remember { mutableStateOf("welcome") }
 
     when (currentPage) {
@@ -48,10 +40,12 @@ fun main() {
 }
 
 @Composable
-fun WelcomePage4(
-    NavigateToSignup: () -> Unit,
-    NavigateToLogin: () -> Unit,
-    NavigateToIntroductionPage: () -> Unit) {
+fun JobApplicationProgressIntroduction(
+        NavigateToSignup: () -> Unit,
+        NavigateToLogin: () -> Unit,
+        NavigateToIntroductionPage: () -> Unit,
+        NavigateToWelcomePage4: () -> Unit
+    ) {
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
@@ -99,6 +93,7 @@ fun WelcomePage4(
             }
         }
 
+
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -120,8 +115,9 @@ fun WelcomePage4(
             Box(
                 modifier = Modifier
                     .fillMaxWidth() // Makes the box take the full width
+                    .padding(16.dp) // Adds padding around the box
+                    .clickable(onClick = NavigateToWelcomePage4) // Makes the box clickable
                     .clip(RoundedCornerShape(16.dp))
-                    .clickable(onClick = NavigateToIntroductionPage) // Makes the box clickable
                     //.border(BorderStroke(2.dp, Color.LightGray))
                     .background(
                         color = Color(240 / 255f, 232 / 255f, 232 / 255f, 0.2f), // Background color
@@ -145,17 +141,17 @@ fun WelcomePage4(
                         modifier = Modifier
                             .fillMaxWidth(0.3f)
                     ) {
-                        Text(text = "Send Cold Emails Directly",
+                        Text(text = "Job Application Progress",
                             fontWeight = FontWeight.Bold,
                             style = MaterialTheme.typography.h4,
                             textAlign = TextAlign.Center)
-                        Text("No need for external tools––manage your emails in one place")
+                        Text("Track your job applications, follow-up emails, and responses")
                     }
 
                     Spacer(modifier = Modifier.width(8.dp))
 
                     Image(
-                        painter = painterResource("esendss.png"),
+                        painter = painterResource("progss.png"),
                         contentDescription = null,
                         //contentScale = ContentScale.Crop
                     )

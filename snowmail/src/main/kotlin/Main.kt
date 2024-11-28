@@ -46,8 +46,8 @@ fun websitePage() {
         "welcome" -> WelcomePage ({ currentPage = "signup"}, {currentPage = "login"}, {currentPage = "introductionPage"})
         "introductionPage" -> IntroductionPage ({ currentPage = "signup"}, {currentPage = "login"}, {currentPage = "welcome"}, {currentPage = "coldEmailGenerationIntroduction"}, {currentPage = "jobApplicationProgressIntroduction"}, {currentPage = "sendEmailsDirectlyIntroduction"})
         "coldEmailGenerationIntroduction" -> ColdEmailGenerationIntroduction ({ currentPage = "signup"}, {currentPage = "login"}, {currentPage = "introductionPage"}, {currentPage = "jobApplicationProgressIntroduction"})
-        "jobApplicationProgressIntroduction" -> WelcomePage3 ({ currentPage = "signup"}, {currentPage = "login"}, {currentPage = "introductionPage"}, {currentPage = "sendEmailsDirectlyIntroduction"})
-        "sendEmailsDirectlyIntroduction" -> WelcomePage4 ({ currentPage = "signup"}, {currentPage = "login"}, {currentPage = "introductionPage"})
+        "jobApplicationProgressIntroduction" -> JobApplicationProgressIntroduction ({ currentPage = "signup"}, {currentPage = "login"}, {currentPage = "introductionPage"}, {currentPage = "sendEmailsDirectlyIntroduction"})
+        "sendEmailsDirectlyIntroduction" -> SendEmailsDirectlyIntroduction ({ currentPage = "signup"}, {currentPage = "login"}, {currentPage = "introductionPage"})
 
         "profilePage" -> ProfilePage(UserSession.userId ?: "DefaultUserId", { currentPage = "documentPage"}, { currentPage = "emailgeneration"}, { currentPage = "progressPage"}, {currentPage = "login"})
         "emailgeneration" -> EmailGenerationPage(UserSession.userId ?: "DefaultUserId", { currentPage = "documentPage"}, { currentPage = "profilePage"}, { currentPage = "progressPage"}, { currentPage = "login"})

@@ -123,7 +123,7 @@ fun JobProgressPage(
                 ) {
                     CircularProgressIndicator()
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text("Please wait while we check for any new emails related to your job applications. This process may take up to 10 seconds.")
+                    Text("Please wait while we check for any new emails related to your job applications. This process may take 10-60 seconds.")
 
                     Spacer(modifier = Modifier.height(8.dp))
                 }

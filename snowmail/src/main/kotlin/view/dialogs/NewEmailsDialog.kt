@@ -59,13 +59,14 @@ fun EmailDialog(
     var showDialog by remember { mutableStateOf(false) }
     var attachLinks by remember { mutableStateOf<List<String>>(emptyList()) }
     val statuses = listOf("APPLIED", "INTERVIEWING", "OFFER", "OTHER", "REJECTED")
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(emailIndex, userId) {
         appliedJobs = progressController.getCorrespondJobs(userId, emails[emailIndex].senderEmail)
     }
 
 
-    Dialog(onDismissRequest = onClose) {
+    Dialog(onDismissRequest = {}) {
         Surface(
             modifier = Modifier
                 .fillMaxWidth(2f)
@@ -241,6 +242,7 @@ fun EmailDialog(
                             fontWeight = FontWeight.SemiBold,
                             fontSize = 14.sp
                         )
+
                         LazyColumn(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -277,21 +279,13 @@ fun EmailDialog(
                         .padding(8.dp),
                     horizontalArrangement = Arrangement.End
                 ) {
-//                    if (emailIndex > 0) {
-//                        Button(
-//                            onClick = onPreviousEmail,
-//                            colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary)
-//                        ) {
-//                            Text("Back", color = Color.White)
-//                        }
-//                        Spacer(modifier = Modifier.width(8.dp))
-//                    }
                     Button(
                         onClick = {
-                            if (selectedJobId != null && selectedStatus != null) {
+                           if (selectedJobId != null && selectedStatus != null) {
                                 coroutineScope.launch {
                                     progressController.modifyStatus(selectedJobId!!, selectedStatus!! + 1)
                                     if (emailIndex + 1 < emails.size) {
+                                        selectedJobId = null
                                         onNextEmail()
                                     } else {
                                         onClose()
@@ -306,7 +300,9 @@ fun EmailDialog(
                                     }
 
                                 }
-                            }
+                            } else  {
+                               errorMessage = "Please select a status and a job title before proceeding."
+                           }
                         },
                         colors = ButtonDefaults.buttonColors(
                             backgroundColor = if (selectedJobId != null && selectedStatus != null) MaterialTheme.colors.primary else Color.Gray

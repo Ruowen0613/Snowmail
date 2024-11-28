@@ -71,6 +71,8 @@ class OpenAIClient(private val httpClient: HttpClient) {
             $resumeText
             
             Send a job application email to the recruiter, $recruiterName, that is personalized, formal, and aligned with my profile, skills, and experience as they relate to the job description provided. 
+            Try to highlight the most relevant skills and experiences from my resume that match the job description, and if the job description is vague, focus on general skills and experiences that are applicable to the role.
+            Make sure to keep the email professional and concise, avoiding overly casual language or excessive detail.
         """.trimIndent()
     }
 
@@ -138,7 +140,7 @@ class OpenAIClient(private val httpClient: HttpClient) {
                     - A welcome with "Hi" or "Hello", followed up the recruiter's name 
                     - Always specify the subject with "Subject:" followed by the subject of the email
                     - A formal closing with the applicant's name and something like "Best regards" or "Sincerely"
-                    Keep the tone professional and succinct, avoiding overly casual language or excessive detail.
+                    - Keep the tone professional and succinct, avoiding overly casual language or excessive detail.
                     
                     Real Example of a Job Application Email:
                     Subject: Software Engineer Internship Opportunities at Coinbase

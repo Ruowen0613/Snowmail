@@ -5,28 +5,21 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toComposeImageBitmap
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
-import java.io.File
-import javax.imageio.ImageIO
-import androidx.compose.ui.draw.alpha
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.layout.ContentScale
 
 @Composable
 fun WebsitePageWelcome1() {
@@ -48,7 +41,13 @@ fun main() {
 }
 
 @Composable
-fun WelcomePage1(NavigateToSignup: () -> Unit, NavigateToLogin: () -> Unit, NavigateToWelcomePage2: () -> Unit, NavigateToWelcomePage3: () -> Unit, NavigateToWelcomePage4: () -> Unit) {
+fun IntroductionPage(
+    NavigateToSignup: () -> Unit,
+    NavigateToLogin: () -> Unit,
+    NavigateToWelcomePage: () -> Unit,
+    NavigateToWelcomePage2: () -> Unit,
+    NavigateToWelcomePage3: () -> Unit,
+    NavigateToWelcomePage4: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -56,34 +55,43 @@ fun WelcomePage1(NavigateToSignup: () -> Unit, NavigateToLogin: () -> Unit, Navi
             .padding(50.dp)
     ) {
         Row(
-            horizontalArrangement = Arrangement.End,
-
+            horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
                 .fillMaxWidth()
-                //.align(Alignment.TopEnd)
-                .padding(top = 16.dp, end = 16.dp)
-                //.border(BorderStroke(2.dp, Color.Gray)),
+                .padding(top = 16.dp, start = 16.dp, end = 16.dp)
         ) {
             Button(
-                onClick = NavigateToLogin,
+                onClick = NavigateToWelcomePage,
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = Color.White,
                     contentColor = Color(0xFF12A1C0)
                 )
             ) {
-                Text("Log in")
+                Text("Back")
             }
 
-            Spacer(modifier = Modifier.width(8.dp))
+            Row {
+                Button(
+                    onClick = NavigateToLogin,
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = Color.White,
+                        contentColor = Color(0xFF12A1C0)
+                    )
+                ) {
+                    Text("Log in")
+                }
 
-            Button(
-                onClick = NavigateToSignup,
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = Color(0xFF487896),
-                    contentColor = Color.White
-                )
-            ) {
-                Text("Sign Up")
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Button(
+                    onClick = NavigateToSignup,
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = Color(0xFF487896),
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text("Sign Up")
+                }
             }
         }
 
@@ -144,7 +152,7 @@ fun WelcomePage1(NavigateToSignup: () -> Unit, NavigateToLogin: () -> Unit, Navi
                     modifier = Modifier
                         //.fillMaxWidth() // Makes the box take the full width
                         //.padding(16.dp) // Adds padding around the box
-                        .clickable(onClick = NavigateToWelcomePage2) // Makes the box clickable
+                        .clickable(onClick = NavigateToWelcomePage3) // Makes the box clickable
                         .clip(RoundedCornerShape(16.dp))
                         //.border(BorderStroke(2.dp, Color.LightGray))
                         .background(
@@ -171,7 +179,7 @@ fun WelcomePage1(NavigateToSignup: () -> Unit, NavigateToLogin: () -> Unit, Navi
                modifier = Modifier
                    //.fillMaxWidth() // Makes the box take the full width
                    //.padding(16.dp) // Adds padding around the box
-                   .clickable(onClick = NavigateToWelcomePage2) // Makes the box clickable
+                   .clickable(onClick = NavigateToWelcomePage4) // Makes the box clickable
                    .clip(RoundedCornerShape(16.dp))
                    .background(
                        color = Color(240 / 255f, 232 / 255f, 232 / 255f, 0.2f), // Background color

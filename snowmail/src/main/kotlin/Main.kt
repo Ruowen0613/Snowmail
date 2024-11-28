@@ -43,11 +43,12 @@ fun websitePage() {
     when (currentPage) {
         "login" -> loginPage ({ currentPage = "signup" }, {currentPage = "profilePage"})
         "signup" -> SignUpPage ({ currentPage = "login"}, { currentPage = "login"})
-        "welcome" -> WelcomePage ({ currentPage = "signup"}, {currentPage = "login"}, {currentPage = "welcome1"})
-        "welcome1" -> WelcomePage1 ({ currentPage = "signup"}, {currentPage = "login"}, {currentPage = "welcome2"}, {currentPage = "welcome3"}, {currentPage = "welcome4"})
-        "welcome2" -> WelcomePage2 ({ currentPage = "signup"}, {currentPage = "login"}, {currentPage = "welcome3"})
-        "welcome3" -> WelcomePage3 ({ currentPage = "signup"}, {currentPage = "login"}, {currentPage = "welcome4"})
-        "welcome4" -> WelcomePage4 ({ currentPage = "signup"}, {currentPage = "login"})
+        "welcome" -> WelcomePage ({ currentPage = "signup"}, {currentPage = "login"}, {currentPage = "introductionPage"})
+        "introductionPage" -> IntroductionPage ({ currentPage = "signup"}, {currentPage = "login"}, {currentPage = "welcome"}, {currentPage = "coldEmailGenerationIntroduction"}, {currentPage = "jobApplicationProgressIntroduction"}, {currentPage = "sendEmailsDirectlyIntroduction"})
+        "coldEmailGenerationIntroduction" -> ColdEmailGenerationIntroduction ({ currentPage = "signup"}, {currentPage = "login"}, {currentPage = "introductionPage"}, {currentPage = "jobApplicationProgressIntroduction"})
+        "jobApplicationProgressIntroduction" -> WelcomePage3 ({ currentPage = "signup"}, {currentPage = "login"}, {currentPage = "introductionPage"}, {currentPage = "sendEmailsDirectlyIntroduction"})
+        "sendEmailsDirectlyIntroduction" -> WelcomePage4 ({ currentPage = "signup"}, {currentPage = "login"}, {currentPage = "introductionPage"})
+
         "profilePage" -> ProfilePage(UserSession.userId ?: "DefaultUserId", { currentPage = "documentPage"}, { currentPage = "emailgeneration"}, { currentPage = "progressPage"}, {currentPage = "login"})
         "emailgeneration" -> EmailGenerationPage(UserSession.userId ?: "DefaultUserId", { currentPage = "documentPage"}, { currentPage = "profilePage"}, { currentPage = "progressPage"}, { currentPage = "login"})
         "progressPage" -> JobProgressPage(UserSession.userId ?: "DefaultUserId", { currentPage = "documentPage"}, { currentPage = "profilePage"}, { currentPage = "emailgeneration"}, { currentPage = "login"})

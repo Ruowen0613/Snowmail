@@ -48,7 +48,12 @@ fun main() {
 }
 
 @Composable
-fun WelcomePage3(NavigateToSignup: () -> Unit, NavigateToLogin: () -> Unit,NavigateToWelcomePage4: () -> Unit ) {
+fun WelcomePage3(
+        NavigateToSignup: () -> Unit,
+        NavigateToLogin: () -> Unit,
+        NavigateToIntroductionPage: () -> Unit,
+        NavigateToWelcomePage4: () -> Unit
+    ) {
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
@@ -56,30 +61,43 @@ fun WelcomePage3(NavigateToSignup: () -> Unit, NavigateToLogin: () -> Unit,Navig
             .padding(50.dp)
     ) {
         Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(top = 16.dp, end = 16.dp)
+                .fillMaxWidth()
+                .padding(top = 16.dp, start = 16.dp, end = 16.dp)
         ) {
             Button(
-                onClick = NavigateToLogin,
+                onClick = NavigateToIntroductionPage,
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = Color.White,
                     contentColor = Color(0xFF12A1C0)
                 )
             ) {
-                Text("Log in")
+                Text("Back")
             }
 
-            Spacer(modifier = Modifier.width(8.dp))
+            Row {
+                Button(
+                    onClick = NavigateToLogin,
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = Color.White,
+                        contentColor = Color(0xFF12A1C0)
+                    )
+                ) {
+                    Text("Log in")
+                }
 
-            Button(
-                onClick = NavigateToSignup,
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = Color(0xFF487896),
-                    contentColor = Color.White
-                )
-            ) {
-                Text("Sign Up")
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Button(
+                    onClick = NavigateToSignup,
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = Color(0xFF487896),
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text("Sign Up")
+                }
             }
         }
 

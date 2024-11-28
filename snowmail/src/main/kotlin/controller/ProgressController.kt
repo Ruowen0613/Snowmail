@@ -41,8 +41,9 @@ class ProgressController(private val jobApplicationRepository: IJobApplicationRe
     //     recruiterEmail = job.recruiterEmail
 
     suspend fun getProgress(userId: String): Progress {
+        val progress = jobApplicationRepository.getProgress(userId).getOrNull()!!
         jobApplicationRepository.updateRefreshTime(userId)
-        return jobApplicationRepository.getProgress(userId).getOrNull()!!
+        return progress
     }
 
    // Determine the application status of the application using an LLM

@@ -11,14 +11,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.graphics.Color
 import ca.uwaterloo.controller.DocumentController
 import androidx.compose.ui.window.AwtWindow
+import androidx.compose.ui.window.Dialog
 import java.awt.FileDialog
 import java.awt.Frame
 import java.io.File
 import ca.uwaterloo.view.UserSession
 
 @Composable
-
-
 fun DocumentUploadButton(documentController: DocumentController) {
     val coroutineScope = rememberCoroutineScope()
     var selectedFile by remember { mutableStateOf<File?>(null) }
@@ -58,22 +57,21 @@ fun DocumentUploadButton(documentController: DocumentController) {
         }
 
         if (showFileDialog) {
+            val fileDialog = remember {
+                FileDialog(Frame(), "Select PDF", FileDialog.LOAD).apply {
+                    isVisible = true
+                }
+            }
+            selectedFile = fileDialog.file?.let { File(fileDialog.directory, it) }
+            println("selectedFile: $selectedFile")
             showFileDialog = false
-            AwtWindow(
-                create = {
-                    FileDialog(Frame(), "Select a file", FileDialog.LOAD).apply {
-                        isVisible = true
-                        selectedFile = file?.let { File(directory, it) }
-                    }
-                },
-                dispose = FileDialog::dispose
-            )
         }
 
         LaunchedEffect(selectedFile) {
             selectedFile?.let { file ->
                 selectedDocumentType?.let { documentType ->
                     coroutineScope.launch {
+                        println("entered coroutine to upload document")
                         val result = documentController.uploadDocument(
                             bucket = "user_documents",
                             userId = UserSession.userId ?: "DefaultUserId",

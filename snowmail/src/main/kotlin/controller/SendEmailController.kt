@@ -44,10 +44,12 @@ class SendEmailController(private val jobApplicationRepository: IJobApplicationR
         }
         val senderEmail = jobApplicationRepository.getGmailAccount(userID).getOrNull()
         val password = jobApplicationRepository.getGmailPassword(userID).getOrNull()
+        if (senderEmail == "" || password == "") {
+            return "Missing Gmail Account or Password, please go to profile page and finish linking gmail account"
+        }
         if (senderEmail == null || password == null) {
             return "Missing Gmail Account or Password, please go to profile page and finish linking gmail account"
         }
-
         val Email = email(senderEmail, password, recipient, subject, text, fileURLs, documentsName)
 
         if (!sendEmail(Email)) {
@@ -55,7 +57,7 @@ class SendEmailController(private val jobApplicationRepository: IJobApplicationR
         }
 
         // update last refresh time if necessary
-        jobApplicationRepository.updateRefreshTime(userID)
+        jobApplicationRepository.initializeRefreshTime(userID)
 
         // save job application
         jobApplicationRepository.createJobApplication(

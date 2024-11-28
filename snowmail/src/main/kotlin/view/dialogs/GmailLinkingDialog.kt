@@ -213,7 +213,7 @@ fun GmailLinkingDialog(
 
                                 val emailValidatingService = EmailValidatingService()
                                 coroutineScope.launch {
-                                    val isValid = emailValidatingService.verifyEmail(account, password)
+                                    val isValid = profileController.verifyUserLinkedEmailAndPassword(account, password)
                                     if (isValid) {
                                         errorMessage = ""
                                         successMessage = true

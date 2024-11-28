@@ -24,6 +24,7 @@ import javax.imageio.ImageIO
 import androidx.compose.ui.draw.alpha
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.layout.ContentScale
 
@@ -51,7 +52,8 @@ fun WelcomePage4(NavigateToSignup: () -> Unit, NavigateToLogin: () -> Unit,) {
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .background(MaterialTheme.colors.background)
+            .padding(50.dp)
     ) {
         Row(
             modifier = Modifier
@@ -103,11 +105,15 @@ fun WelcomePage4(NavigateToSignup: () -> Unit, NavigateToLogin: () -> Unit,) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth() // Makes the box take the full width
-                    .padding(16.dp) // Adds padding around the box
+                    .clip(RoundedCornerShape(16.dp))
+                    //.border(BorderStroke(2.dp, Color.LightGray))
                     .background(
-                        color = Color(0xFFfaf4eb), // Background color
-                        shape = RoundedCornerShape(16.dp) // Rounded corners
-                    ),
+                        color = Color(240 / 255f, 232 / 255f, 232 / 255f, 0.2f), // Background color
+                    )
+                    //.height(220.dp)
+                    //.width(370.dp)
+                    .border(BorderStroke(2.dp, Color.LightGray), RoundedCornerShape(16.dp))
+                    .padding(16.dp), // Padding inside the box
                 //.padding(16.dp), // Padding inside the box
                 contentAlignment = Alignment.Center // Centers the text inside the box
             ) {
@@ -132,19 +138,11 @@ fun WelcomePage4(NavigateToSignup: () -> Unit, NavigateToLogin: () -> Unit,) {
 
                     Spacer(modifier = Modifier.width(8.dp))
 
-                    Box(
-                        modifier = Modifier
-                            //.fillMaxWidth() // Makes the box take the full width
-                            .padding(16.dp) // Adds padding around the box
-                            .background(
-                                color = Color.LightGray, // Background color
-                                shape = RoundedCornerShape(16.dp) // Rounded corners
-                            )
-                            .padding(16.dp), // Padding inside the box
-                        contentAlignment = Alignment.Center // Centers the text inside the box
-                    ) {
-                        Text("screenshot of ui")
-                    }
+                    Image(
+                        painter = painterResource("esendss.png"),
+                        contentDescription = null,
+                        //contentScale = ContentScale.Crop
+                    )
 
                 }
             }

@@ -36,7 +36,7 @@ import ca.uwaterloo.view.theme.AppTheme
 import controller.EmailGenerationController
 import integration.OpenAIClient
 import io.ktor.client.*
-import io.ktor.client.engine.cio.*
+//import io.ktor.client.engine.cio.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import model.GeneratedEmail
@@ -59,16 +59,22 @@ fun AttachDocumentDialog(
 
     val coroutineScope = rememberCoroutineScope()
 
+    val allDocs = remember { mutableStateListOf<Pair<String, String>>() }
+    var isLoading by remember { mutableStateOf(true) }
+
     LaunchedEffect(Unit) {
         coroutineScope.launch {
+
             documentTypes.forEach { documentType ->
                 val result = documentController.listDocuments("user_documents", UserSession.userId ?: "DefaultUserId", documentType)
                 result.onSuccess { docs ->
-                    documents.addAll(docs.map { doc -> Pair(doc, documentType) })
+                    allDocs.addAll(docs.map { doc -> Pair(doc, documentType) })
                 }.onFailure { error ->
                     println("Error listing documents: ${error.message}")
                 }
             }
+            documents.addAll(allDocs)
+            isLoading = false
         }
     }
 
@@ -76,24 +82,33 @@ fun AttachDocumentDialog(
         onDismissRequest = onDismissRequest,
         title = { Text("Attach Documents") },
         text = {
-            Column {
-                documents.forEach { document ->
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Checkbox(
-                            checked = selectedDocuments.contains(document),
-                            onCheckedChange = { isChecked ->
-                                if (isChecked) {
-                                    selectedDocuments.add(document)
-                                } else {
-                                    selectedDocuments.remove(document)
+            if (isLoading) {
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            } else {
+                Column {
+                    documents.forEach { document ->
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Checkbox(
+                                checked = selectedDocuments.contains(document),
+                                onCheckedChange = { isChecked ->
+                                    if (isChecked) {
+                                        selectedDocuments.add(document)
+                                    } else {
+                                        selectedDocuments.remove(document)
+                                    }
                                 }
-                            }
-                        )
-                        Text(document.first)
-                        Text(" type: " + document.second)
+                            )
+                            Text(document.first)
+                            Text(" type: " + document.second)
+                        }
                     }
                 }
             }

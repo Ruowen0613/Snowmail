@@ -216,13 +216,13 @@ fun RegisterForm(NavigateToLogin: () -> Unit, NavigateToHome: () -> Unit) {
                     // register button
                     Button(onClick = {
                         // if first name is missing
-                        if (firstName.isEmpty())  errorMessage = "please fill in first name"
+                        if (firstName.isEmpty())  errorMessage = "Please fill in first name"
                         // if last name is missing
-                        else if (lastName.isEmpty())  errorMessage = "please fill in last name"
+                        else if (lastName.isEmpty())  errorMessage = "Please fill in last name"
                         // if email is missing
-                        else if (email.isEmpty())  errorMessage = "please fill in email"
+                        else if (email.isEmpty())  errorMessage = "Please fill in email"
                         // if password is missing
-                        else if (password.isEmpty())  errorMessage = "please fill in password"
+                        else if (password.isEmpty())  errorMessage = "Please fill in password"
                         // if password is too short
                         else if (password.length < 6) errorMessage = "Password is too short"
                         // if password is not confirmed

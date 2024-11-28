@@ -70,13 +70,15 @@ fun DocDropdownRow(documentType: String, documentController: DocumentController)
     var expanded by remember { mutableStateOf(false) }
     var documentList by remember { mutableStateOf<List<String>>(emptyList()) }
     val coroutineScope = rememberCoroutineScope()
+    var i by remember { mutableStateOf(0) }
 
-    LaunchedEffect(expanded) {
-        if (expanded) {
+    LaunchedEffect(expanded, i) {
+        if (expanded|| documentList.isEmpty()) {
             coroutineScope.launch {
                 val result = documentController.listDocuments("user_documents", UserSession.userId ?: "DefaultUserId", documentType)
                 result.onSuccess { documents ->
                     documentList = documents
+                    i++
                 }.onFailure { error ->
                     println("Error listing documents: ${error.message}")
                 }

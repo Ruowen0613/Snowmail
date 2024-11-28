@@ -37,7 +37,6 @@ fun EmailGenerationButton(
     selectedDocument: String?
 ) {
     var emailContent by remember { mutableStateOf("") }
-    var showDialog by remember { mutableStateOf(false) }
     var rFile by remember { mutableStateOf<File?>(null) }
 
     Button(

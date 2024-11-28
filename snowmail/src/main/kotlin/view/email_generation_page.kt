@@ -8,7 +8,9 @@ package ca.uwaterloo.view
 //import ca.uwaterloo.view.components.FetchUserProfileData
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
@@ -18,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
@@ -52,6 +55,7 @@ fun EmailGenerationPage(
     var selectedTabIndex by remember { mutableStateOf(0) }
     var emailContent by remember { mutableStateOf("") }
     var showDialog by remember { mutableStateOf(false) }
+    var showGmailLinkPrompt by remember { mutableStateOf(false) }
     var selectedDocument by remember { mutableStateOf<String?>(null) }
   //  val coroutineScope = rememberCoroutineScope()
     val httpClient = HttpClient(CIO)
@@ -115,7 +119,7 @@ fun EmailGenerationPage(
             gotWorkExperience = workExperienceList
         }.onFailure { error ->
             println("Error retrieving user work experience: ${error.message}")
-            gotWorkExperience = emptyList() // 返回空列表或根据需要处理错误
+            gotWorkExperience = emptyList()
         }
     }
 
@@ -135,9 +139,11 @@ fun EmailGenerationPage(
                 .fillMaxSize()
                 .background(MaterialTheme.colors.background)
         ) {
+            val scrollState = rememberScrollState()
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .verticalScroll(scrollState)
                     .padding(16.dp)
                     .background(Color(0xFFF8FAFC))
             ) {
@@ -154,6 +160,35 @@ fun EmailGenerationPage(
                     },
                     NavigateToLogin = NavigateToLogin
                 )
+
+
+                // Check Gmail account and app password using LaunchedEffect
+                LaunchedEffect(Unit) {
+                    val gmailAccountResult = profileController.getUserLinkedGmailAccount(userId)
+                    val appPasswordResult = profileController.getUserGmailAppPassword(userId)
+
+                    gmailAccountResult.onSuccess { gmailAccount ->
+                        appPasswordResult.onSuccess { appPassword ->
+                            if (gmailAccount.isEmpty() || appPassword.isEmpty()) {
+                                showGmailLinkPrompt = true
+                            }
+                        }
+                    }
+                }
+
+                // Conditionally show the prompt at the top of the page
+                if (showGmailLinkPrompt) {
+                    Text(
+                        text = "* Please link your Gmail account on the Profile page before sending emails from this page.",
+                        style = MaterialTheme.typography.body1,
+                        color = Color.Red,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        textAlign = TextAlign.Start
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
 
                 Spacer(modifier = Modifier.height(64.dp))
                 Box(

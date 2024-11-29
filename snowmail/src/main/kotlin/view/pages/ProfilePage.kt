@@ -546,7 +546,7 @@ fun SectionTitle(title: String) {
     )
 }
 
-//This is the style for profile details
+// This is the style for profile details
 @Composable
 fun ProfileDetail(label: String, value: String) {
     Row {

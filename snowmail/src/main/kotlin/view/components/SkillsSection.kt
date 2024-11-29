@@ -40,7 +40,7 @@ fun SkillsSection(
             Icon(
                 imageVector = Icons.Default.Add,
                 contentDescription = "Add Skill",
-                tint = Color(0xFF487896)
+                tint = MaterialTheme.colors.primary
             )
         }
 

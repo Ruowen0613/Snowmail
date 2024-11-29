@@ -59,10 +59,10 @@ fun DocumentPage(NavigateToEmailGen: () -> Unit, NavigateToProfile: () -> Unit,
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 1000.dp)
+                    .padding(end = 100.dp)
                     .padding(16.dp)
                     .background(Color.Transparent),
-                horizontalArrangement = Arrangement.Start,
+                horizontalArrangement = Arrangement.End,
             ) {
                 DocumentUploadButton(documentController)
             }

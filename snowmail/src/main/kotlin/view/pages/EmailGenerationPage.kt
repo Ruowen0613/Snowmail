@@ -13,9 +13,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import ca.uwaterloo.controller.ProfileController
@@ -182,7 +184,7 @@ fun EmailGenerationPage(
                     Spacer(modifier = Modifier.height(16.dp))
                 }
 
-                Spacer(modifier = Modifier.height(64.dp))
+                Spacer(modifier = Modifier.height(45.dp))
                 Box(
                     modifier = Modifier.fillMaxWidth(),
                     contentAlignment = Alignment.Center
@@ -228,99 +230,115 @@ fun EmailGenerationPage(
                                 label = "Recruiter Email"
                             )
                         }
-                        Spacer(modifier = Modifier.height(15.dp))
+
+                        Spacer(modifier = Modifier.height(25.dp))
+
                         Row(
                             horizontalArrangement = Arrangement.Center,
+                            modifier = Modifier.fillMaxWidth()
                         ) {
-                            DocumentSelectionDropdownButton(
-                                userId = userId,
-                                selectedDocument = selectedDocument,
-                                onDocumentSelected = { document ->
-                                    selectedDocument = document
-                                }
-                            )
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(
+                                    text = "Select a document for email generation",
+                                    color = MaterialTheme.colors.secondary,
+                                    modifier = Modifier.padding(bottom = 5.dp)
+                                )
+                                DocumentSelectionDropdownButton(
+                                    userId = userId,
+                                    selectedDocument = selectedDocument,
+                                    onDocumentSelected = { document ->
+                                        selectedDocument = document
+                                    }
+                                )
+                            }
                         }
                     }
                 }
-                Spacer(modifier = Modifier.height(15.dp))
-                Row(
-                    horizontalArrangement = Arrangement.Center,
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(32.dp)) // Rounded corners
-                        .background(Color.White) // White background
-                        .padding(32.dp)
+
+                Spacer(modifier = Modifier.height(25.dp))
+
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
                 ) {
-                    TextField(
-                        value = descriptionInput,
-                        onValueChange = { descriptionInput = it },
-                        label = { Text("Job Description") },
+                    Row(
+                        horizontalArrangement = Arrangement.Center,
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .height(200.dp),
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
-                            focusedLabelColor = Color.Transparent,
-                            //unfocusedLabelColor = Color.Transparent,
-                            focusedBorderColor = Color.Transparent,
-                            unfocusedBorderColor = Color.Transparent
+                            .shadow(8.dp, shape = RoundedCornerShape(15.dp))
+                            .clip(RoundedCornerShape(15.dp))
+                            .background(Color.White)
+                            .padding(15.dp)
+                    ) {
+                        TextField(
+                            value = descriptionInput,
+                            onValueChange = { descriptionInput = it },
+                            label = { Text("Job Description") },
+                            modifier = Modifier
+                                .width(700.dp)
+                                .height(300.dp),
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                focusedLabelColor = Color.Transparent,
+                                focusedBorderColor = Color.Transparent,
+                                unfocusedBorderColor = Color.Transparent
+                            )
                         )
-                    )
+                    }
                 }
-                Spacer(modifier = Modifier.height(64.dp))
+
+
+                Spacer(modifier = Modifier.height(60.dp))
+
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp),
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    EmailGenerationButton(
-                        emailGenerationController = emailGenerationController,
-                        userInput = userInput,
-                        userProfile = userProfile,
-                        gotEducation = gotEducation,
-                        gotWorkExperience = gotWorkExperience,
-                        gotSkills = gotSkills,
-                        resumeFile = resumeFile,
-                        onEmailGenerated = { emailContent = it },
-                        onShowDialog = { showDialog = it },
-                        infoSource = "profile",
-                        enabled = true,
-                        userId = userId,
-                        selectedDocument = selectedDocument
-                    )
-
-                    Spacer(modifier = Modifier.width(30.dp))
-
-                    EmailGenerationButton(
-                        emailGenerationController = emailGenerationController,
-                        userInput = userInput,
-                        userProfile = userProfile,
-                        gotEducation = gotEducation,
-                        gotWorkExperience = gotWorkExperience,
-                        gotSkills = gotSkills,
-                        resumeFile = resumeFile,
-                        onEmailGenerated = { emailContent = it },
-                        onShowDialog = { showDialog = it },
-                        infoSource = "resume",
-                        enabled = selectedDocument != null,
-                        userId = userId,
-                        selectedDocument = selectedDocument
-                    )
-
-
-                    if (showDialog) {
-                        GeneratedEmailAlertDialog(
-                            userId = userId,
-                            onDismissRequest = { showDialog = false },
-                            title = "Generated Email",
-                            initialText = emailContent,
-                            reciepientAddress = recruiterEmailInput,
-                            jobTitle = jobtitleInput,
-                            companyName = companyInput,
-                            onConfirm = { newText ->
-                                emailContent = newText
-                                showDialog = false
-                            }
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = "Click a button to generate an email",
+                            color = MaterialTheme.colors.secondary,
+                            modifier = Modifier.padding(bottom = 5.dp)
                         )
+
+                        Row(
+                            horizontalArrangement = Arrangement.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            EmailGenerationButton(
+                                emailGenerationController = emailGenerationController,
+                                userInput = userInput,
+                                userProfile = userProfile,
+                                gotEducation = gotEducation,
+                                gotWorkExperience = gotWorkExperience,
+                                gotSkills = gotSkills,
+                                resumeFile = resumeFile,
+                                onEmailGenerated = { emailContent = it },
+                                onShowDialog = { showDialog = it },
+                                infoSource = "profile",
+                                enabled = true,
+                                userId = userId,
+                                selectedDocument = selectedDocument
+                            )
+
+                            Spacer(modifier = Modifier.width(30.dp))
+
+                            EmailGenerationButton(
+                                emailGenerationController = emailGenerationController,
+                                userInput = userInput,
+                                userProfile = userProfile,
+                                gotEducation = gotEducation,
+                                gotWorkExperience = gotWorkExperience,
+                                gotSkills = gotSkills,
+                                resumeFile = resumeFile,
+                                onEmailGenerated = { emailContent = it },
+                                onShowDialog = { showDialog = it },
+                                infoSource = "resume",
+                                enabled = selectedDocument != null,
+                                userId = userId,
+                                selectedDocument = selectedDocument
+                            )
+                        }
                     }
                 }
             }

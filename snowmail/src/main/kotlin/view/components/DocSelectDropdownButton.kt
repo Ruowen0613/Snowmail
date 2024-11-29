@@ -37,11 +37,11 @@ fun DocumentSelectionDropdownButton(
             onClick = { expanded = true },
             modifier = Modifier.width(650.dp),
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = if (selectedDocument == null) Color(0xFFD5D7E0) else Color(0xFF487B96),
-                contentColor = if (selectedDocument == null) Color(0xFF8E97A5) else MaterialTheme.colors.onPrimary
+                backgroundColor = if (selectedDocument == null) Color(0xFFD5D7E0) else MaterialTheme.colors.primary,
+                contentColor = if (selectedDocument == null) Color(0xFF8E97A5) else Color.White
             )
         ) {
-            Text(selectedDocument ?: "Choose one resume you would like to include for generating your cold email")
+            Text(selectedDocument ?: "Your Resume's")
         }
         DropdownMenu(
             expanded = expanded,

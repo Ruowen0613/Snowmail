@@ -49,7 +49,6 @@ fun EmailGenerationButton(
                             education = gotEducation,
                             workExperience = gotWorkExperience,
                             skills = gotSkills
-                            //resumeFile = resumeFile
                         )
 
                         println("Generated Email: ${generatedEmail?.body}")
@@ -83,8 +82,7 @@ fun EmailGenerationButton(
                         onShowDialog(true)
                     }
                 } catch (e: Exception) {
-                    println("Email gen button try failed, Error: ${e.message}")
-                    // console log error message
+                    println("Email generation button try failed, Error: ${e.message}")
                 }
             }
         },
@@ -92,8 +90,8 @@ fun EmailGenerationButton(
             .height(70.dp)
             .width(230.dp),
         colors = ButtonDefaults.buttonColors(
-            backgroundColor = Color(0xFF487B96),
-            contentColor = MaterialTheme.colors.onPrimary
+            backgroundColor = MaterialTheme.colors.primary,
+            contentColor = Color.White
         ),
         enabled = enabled
     ) {

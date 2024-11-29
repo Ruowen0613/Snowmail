@@ -334,7 +334,7 @@ fun ProfilePage(userId: String,
                                     contentColor = Color.White
                                 )
                             ) {
-                                Text("gmail linking")
+                                Text("Gmail Linking")
                             }
 
                             if (showGmailLinkingDialog) {

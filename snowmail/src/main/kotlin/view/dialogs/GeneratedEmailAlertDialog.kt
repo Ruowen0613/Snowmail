@@ -16,7 +16,8 @@ import androidx.compose.ui.window.DialogProperties
 import ca.uwaterloo.controller.DocumentController
 import controller.SendEmailController
 import integration.SupabaseClient
-
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.painterResource
 
 @Composable
 fun GeneratedEmailAlertDialog(
@@ -36,6 +37,7 @@ fun GeneratedEmailAlertDialog(
     val attachedDocuments = remember { mutableStateListOf<Pair<String, String>>() }
     var errorMessage by remember { mutableStateOf("") }
     var sendEmailTrigger by remember { mutableStateOf(false) }
+    var showSuccessDialog by remember { mutableStateOf(false) }
 
     if (showAttachDialog) {
         AttachDocumentDialog(
@@ -69,10 +71,9 @@ fun GeneratedEmailAlertDialog(
                     companyName = companyName
                 )
                 if (returnMessage == "Success") {
-                    println("Setting showSuccessDialog = true")
                     errorMessage = ""
                     onConfirm(text)
-                    onDismissRequest()
+                    showSuccessDialog = true
                 } else {
                     errorMessage = returnMessage
                 }
@@ -85,6 +86,55 @@ fun GeneratedEmailAlertDialog(
         }
     }
 
+    if (showSuccessDialog) {
+        Dialog(
+            onDismissRequest = { },
+            properties = DialogProperties(usePlatformDefaultWidth = false)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.6f)
+                    .padding(16.dp)
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    color = MaterialTheme.colors.surface,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .fillMaxWidth()
+                    ) {
+                        Icon(
+                            painter = painterResource("sendCheck.svg"),
+                            modifier = Modifier.size(32.dp),
+                            contentDescription = "Email Sent Successfully",
+                            tint = Color.Gray
+                        )
+
+                        Text(
+                            text = "Email Sent Successfully!",
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 16.sp,
+                            color = Color.Black,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                        Button(onClick = {
+                            showSuccessDialog = false
+                            onDismissRequest()
+                        }) {
+                            Text("Close")
+                        }
+                    }
+                }
+            }
+        }
+        return
+    }
 
 
     Dialog(onDismissRequest = onDismissRequest,
@@ -102,120 +152,121 @@ fun GeneratedEmailAlertDialog(
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
-                Column(
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .fillMaxWidth()
-                ) {
-                    if (errorMessage.isNotEmpty()) {
-                        Text(
-                            text = errorMessage,
-                            color = Color.Red,
+                    Column(
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .fillMaxWidth()
+                    ) {
+                        if (errorMessage.isNotEmpty()) {
+                            Text(
+                                text = errorMessage,
+                                color = Color.Red,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 8.dp)
+                            )
+                        }
+
+                        OutlinedTextField(
+                            value = recipientEmailAddy,
+                            onValueChange = { recipientEmailAddy = it },
+                            label = { Text("Recipient Email") },
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(5.dp))
+                                .fillMaxWidth(),
+                            colors = TextFieldDefaults.outlinedTextFieldColors()
+                        )
+                        OutlinedTextField(
+                            value = emailSubject,
+                            onValueChange = { emailSubject = it },
+                            label = { Text("Subject") },
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(5.dp))
+                                .fillMaxWidth(),
+                            colors = TextFieldDefaults.outlinedTextFieldColors()
+                        )
+                        Button(
+                            onClick = { showAttachDialog = true },
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = Color(0xFF487B96),
+                                contentColor = MaterialTheme.colors.onPrimary
+                            )
+                        ) {
+                            Text("Attach Document")
+                        }
+                        Row(
+                            horizontalArrangement = Arrangement.Start,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(bottom = 8.dp)
-                        )
-                    }
-
-                    OutlinedTextField(
-                        value = recipientEmailAddy,
-                        onValueChange = { recipientEmailAddy = it },
-                        label = { Text("Recipient Email") },
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(5.dp))
-                            .fillMaxWidth(),
-                        colors = TextFieldDefaults.outlinedTextFieldColors()
-                    )
-                    OutlinedTextField(
-                        value = emailSubject,
-                        onValueChange = { emailSubject = it },
-                        label = { Text("Subject") },
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(5.dp))
-                            .fillMaxWidth(),
-                        colors = TextFieldDefaults.outlinedTextFieldColors()
-                    )
-                    Button(
-                        onClick = { showAttachDialog = true },
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = Color(0xFF487B96),
-                            contentColor = MaterialTheme.colors.onPrimary
-                        )
-                    ) {
-                        Text("Attach Document")
-                    }
-                    Row(
-                        horizontalArrangement = Arrangement.Start,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .wrapContentHeight(),
-                    ) {
-                        var text = "Attached Files:"
-                        attachedDocuments.forEach { (name, type) ->
-                            text += " $name"
-                        }
-                        Spacer(modifier = Modifier.width(16.dp))
-                        Text(
-                            text = text,
-                            color = Color.DarkGray,
-                            fontWeight = FontWeight.Bold,
-                            //fontStyle = FontStyle.Italic,
-                            fontSize = 12.sp,
-
-                        )
-                    }
-                    OutlinedTextField(
-                        value = text,
-                        onValueChange = { text = it },
-                        label = { Text("Editable email content") },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(400.dp)
-                            .background(Color.Transparent),
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
-                            focusedLabelColor = Color.Transparent,
-                            //unfocusedLabelColor = Color.Transparent,
-                            focusedBorderColor = Color.Transparent,
-                            unfocusedBorderColor = Color.Transparent
-                        )
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Row(
-                        horizontalArrangement = Arrangement.End,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Button(
-                            onClick = onDismissRequest,
-                            colors = ButtonDefaults.buttonColors(
-                                backgroundColor = Color(0xFF487B96),
-                                contentColor = MaterialTheme.colors.onPrimary
-                            )
+                                .wrapContentHeight(),
                         ) {
-                            Text("Cancel")
-                        }
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Button(
-                            onClick = {
-                                when {
-                                    recipientEmailAddy.isBlank() -> {
-                                        errorMessage = "Recipient email cannot be empty."
-                                    }
-                                    else -> {
-                                        errorMessage = ""
-                                        sendEmailTrigger = true
-                                    }
-                                }
-                            },
-                            colors = ButtonDefaults.buttonColors(
-                                backgroundColor = Color(0xFF487B96),
-                                contentColor = MaterialTheme.colors.onPrimary
-                            )
-                        ) {
-                            Text("Send")
-                        }
+                            var text = "Attached Files:"
+                            attachedDocuments.forEach { (name, type) ->
+                                text += " $name"
+                            }
+                            Spacer(modifier = Modifier.width(16.dp))
+                            Text(
+                                text = text,
+                                color = Color.DarkGray,
+                                fontWeight = FontWeight.Bold,
+                                //fontStyle = FontStyle.Italic,
+                                fontSize = 12.sp,
 
+                                )
+                        }
+                        OutlinedTextField(
+                            value = text,
+                            onValueChange = { text = it },
+                            label = { Text("Editable email content") },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(400.dp)
+                                .background(Color.Transparent),
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                focusedLabelColor = Color.Transparent,
+                                //unfocusedLabelColor = Color.Transparent,
+                                focusedBorderColor = Color.Transparent,
+                                unfocusedBorderColor = Color.Transparent
+                            )
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Row(
+                            horizontalArrangement = Arrangement.End,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Button(
+                                onClick = onDismissRequest,
+                                colors = ButtonDefaults.buttonColors(
+                                    backgroundColor = Color(0xFF487B96),
+                                    contentColor = MaterialTheme.colors.onPrimary
+                                )
+                            ) {
+                                Text("Cancel")
+                            }
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Button(
+                                onClick = {
+                                    when {
+                                        recipientEmailAddy.isBlank() -> {
+                                            errorMessage = "Recipient email cannot be empty."
+                                        }
+
+                                        else -> {
+                                            errorMessage = ""
+                                            sendEmailTrigger = true
+                                        }
+                                    }
+                                },
+                                colors = ButtonDefaults.buttonColors(
+                                    backgroundColor = Color(0xFF487B96),
+                                    contentColor = MaterialTheme.colors.onPrimary
+                                )
+                            ) {
+                                Text("Send")
+                            }
+
+                        }
                     }
-                }
             }
         }
     }

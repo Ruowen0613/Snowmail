@@ -320,7 +320,7 @@ fun EmailGenerationPage(
                             companyName = companyInput,
                             onConfirm = { newText ->
                                 emailContent = newText
-                                showDialog = false
+                                showDialog = true
                             }
                         )
                     }

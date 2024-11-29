@@ -294,11 +294,61 @@ fun EmailGenerationPage(
                         .padding(horizontal = 16.dp),
                     horizontalArrangement = Arrangement.Center
                 ) {
+                    
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
                             text = "Click a source to generate your email",
                             color = MaterialTheme.colors.secondary,
-                            modifier = Modifier.padding(bottom = 5.dp)
+                            modifier = Modifier.padding(bottom = 5.dp))
+
+                    EmailGenerationButton(
+                        emailGenerationController = emailGenerationController,
+                        userInput = userInput,
+                        userProfile = userProfile,
+                        gotEducation = gotEducation,
+                        gotWorkExperience = gotWorkExperience,
+                        gotSkills = gotSkills,
+                        resumeFile = resumeFile,
+                        onEmailGenerated = { emailContent = it },
+                        onShowDialog = { showDialog = it },
+                        infoSource = "profile",
+                        enabled = true,
+                        userId = userId,
+                        selectedDocument = selectedDocument
+                    )
+
+                    Spacer(modifier = Modifier.width(30.dp))
+
+                    EmailGenerationButton(
+                        emailGenerationController = emailGenerationController,
+                        userInput = userInput,
+                        userProfile = userProfile,
+                        gotEducation = gotEducation,
+                        gotWorkExperience = gotWorkExperience,
+                        gotSkills = gotSkills,
+                        resumeFile = resumeFile,
+                        onEmailGenerated = { emailContent = it },
+                        onShowDialog = { showDialog = it },
+                        infoSource = "resume",
+                        enabled = selectedDocument != null,
+                        userId = userId,
+                        selectedDocument = selectedDocument
+                    )
+
+
+                    if (showDialog) {
+                        GeneratedEmailAlertDialog(
+                            userId = userId,
+                            onDismissRequest = { showDialog = false },
+                            title = "Generated Email",
+                            initialText = emailContent,
+                            reciepientAddress = recruiterEmailInput,
+                            jobTitle = jobtitleInput,
+                            companyName = companyInput,
+                            onConfirm = { newText ->
+                                emailContent = newText
+                                showDialog = true
+                            }
                         )
 
                         Row(

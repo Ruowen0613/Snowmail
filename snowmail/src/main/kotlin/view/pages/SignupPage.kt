@@ -55,7 +55,7 @@ fun SignUpPage(NavigateToLogin: () -> Unit, NavigateToHome: () -> Unit) {
                         text = "Snowmail!",
                         fontSize = 40.sp,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colors.onPrimary,
+                        color = MaterialTheme.colors.primary,
                         fontFamily = FontFamily.Default
                     )
                 }
@@ -231,7 +231,7 @@ fun RegisterForm(NavigateToLogin: () -> Unit, NavigateToHome: () -> Unit) {
 
                     },
                         colors = ButtonDefaults.buttonColors(
-                            backgroundColor = MaterialTheme.colors.onPrimary,
+                            backgroundColor = MaterialTheme.colors.primary,
                             contentColor = Color.White
                         )) {
                         Text("Register")
@@ -254,7 +254,7 @@ fun RegisterForm(NavigateToLogin: () -> Unit, NavigateToHome: () -> Unit) {
                     Text("Already have an account?",
                         style = MaterialTheme.typography.body1.copy(fontSize = 14.sp))
                     TextButton(onClick = { navigateLoginPage(NavigateToLogin) }) {
-                        Text("Sign in", color = MaterialTheme.colors.onPrimary, style = MaterialTheme.typography.body1.copy(fontSize = 14.sp))
+                        Text("Sign in", color = MaterialTheme.colors.primary, style = MaterialTheme.typography.body1.copy(fontSize = 14.sp))
                     }
                 }
 

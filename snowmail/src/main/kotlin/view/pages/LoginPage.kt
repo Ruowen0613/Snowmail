@@ -52,7 +52,7 @@ fun loginPage(NavigateToSignup: () -> Unit, NavigateToHome: () -> Unit) {
                         textAlign = TextAlign.Center,
                         fontSize = 40.sp,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colors.onPrimary,
+                        color = MaterialTheme.colors.primary,
                         modifier = Modifier.padding(bottom = 12.dp)
                     )
                 }
@@ -69,7 +69,7 @@ fun loginPage(NavigateToSignup: () -> Unit, NavigateToHome: () -> Unit) {
                         textAlign = TextAlign.Center,
                         fontSize = 40.sp,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colors.onPrimary,
+                        color = MaterialTheme.colors.primary,
                     )
                 }
 
@@ -181,7 +181,7 @@ fun loginWithAccount(NavigateToSignup: () -> Unit, NavigateToHome: () -> Unit) {
                     }
                 },
                 colors = ButtonDefaults.buttonColors(
-                    backgroundColor = MaterialTheme.colors.onPrimary,
+                    backgroundColor = MaterialTheme.colors.primary,
                     contentColor = Color.White,
                 )
             ) {
@@ -194,7 +194,7 @@ fun loginWithAccount(NavigateToSignup: () -> Unit, NavigateToHome: () -> Unit) {
             Text("Forgot your password?",
                 style = MaterialTheme.typography.body1.copy(fontSize = 14.sp))
             TextButton(onClick = { showOtpLoginDialog = true }) {
-                Text("Sign in with OTP", color = MaterialTheme.colors.onPrimary, style = MaterialTheme.typography.body1.copy(fontSize = 14.sp))
+                Text("Sign in with OTP", color = MaterialTheme.colors.primary, style = MaterialTheme.typography.body1.copy(fontSize = 14.sp))
             }
         }
 
@@ -214,7 +214,7 @@ fun loginWithAccount(NavigateToSignup: () -> Unit, NavigateToHome: () -> Unit) {
                 Text("Don't have an account?",
                     style = MaterialTheme.typography.body1.copy(fontSize = 14.sp))
                 TextButton(onClick = { navigateLoginPage(NavigateToSignup) }) {
-                    Text("Sign up", color = MaterialTheme.colors.onPrimary, style = MaterialTheme.typography.body1.copy(fontSize = 14.sp))
+                    Text("Sign up", color = MaterialTheme.colors.primary, style = MaterialTheme.typography.body1.copy(fontSize = 14.sp))
                 }
             }
         }

@@ -85,7 +85,7 @@ fun TopNavigationBar(
                         }
                     },
                     colors = ButtonDefaults.buttonColors(
-                        backgroundColor = MaterialTheme.colors.onPrimary,
+                        backgroundColor = MaterialTheme.colors.primary,
                         contentColor = Color.White
                     ),
                     modifier = Modifier

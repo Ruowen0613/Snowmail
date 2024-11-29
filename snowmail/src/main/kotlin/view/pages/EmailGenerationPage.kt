@@ -78,7 +78,6 @@ fun EmailGenerationPage(
 
     val resumeFile = selectedDocument?.let { File(it) }
 
-//======================================================================================================
     val dbStorage = SupabaseClient()
     val profileController = ProfileController(dbStorage.userProfileRepository)
     var gotName by remember { mutableStateOf("") }
@@ -125,9 +124,7 @@ fun EmailGenerationPage(
         lastName = "",
         //skills = listOf("Java", "Kotlin", "SQL")
     )
-    //val (userProfile, userInput, emailGenerationController) = EmailGenVariables(userId)
-    //val userProfile = FetchUserProfileData(userId)
-//======================================================================================================
+
     AppTheme {
         Box(
             modifier = Modifier

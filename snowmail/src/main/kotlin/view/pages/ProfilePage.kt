@@ -338,7 +338,7 @@ fun ProfilePage(userId: String,
                             Button(
                                 onClick = { showGmailLinkingDialog = true },
                                 colors = ButtonDefaults.buttonColors(
-                                    backgroundColor = Color(0xFF487896),
+                                    backgroundColor = MaterialTheme.colors.primary,
                                     contentColor = Color.White
                                 )
                             ) {

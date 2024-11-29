@@ -38,7 +38,7 @@ fun DocumentPage(NavigateToEmailGen: () -> Unit, NavigateToProfile: () -> Unit,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp)
-                .background(Color(0xFFF8FAFC))
+//                .background(Color(0xFFF8FAFC))
         ) {
             TopNavigationBar(
                 selectedTabIndex = selectedTabIndex,
@@ -55,39 +55,49 @@ fun DocumentPage(NavigateToEmailGen: () -> Unit, NavigateToProfile: () -> Unit,
             )
 
             Spacer(modifier = Modifier.height(20.dp))
+
             Row(
-                modifier= Modifier
+                modifier = Modifier
                     .fillMaxWidth()
+                    .padding(start = 1000.dp)
                     .padding(16.dp)
                     .background(Color.Transparent),
-                horizontalArrangement = Arrangement.End,
+                horizontalArrangement = Arrangement.Start,
             ) {
                 DocumentUploadButton(documentController)
             }
+
             Spacer(modifier = Modifier.height(15.dp))
-            Box(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .padding(16.dp)
-                    .shadow(8.dp, shape = RoundedCornerShape(15.dp))
-                    .clip(RoundedCornerShape(15.dp))
-                    .background(Color.White)
-                    .padding(16.dp)
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
             ) {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize()
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .width(1100.dp)
+                        .padding(16.dp)
+                        .shadow(8.dp, shape = RoundedCornerShape(15.dp))
+                        .clip(RoundedCornerShape(15.dp))
+                        .background(Color.White)
+                        .padding(16.dp)
                 ) {
-                    item { Spacer(modifier = Modifier.height(25.dp)) }
-                    item { DocDropdownRow("Resume", documentController) }
-                    item { Spacer(modifier = Modifier.height(20.dp)) }
-                    item { DocDropdownRow("Cover Letter", documentController) }
-                    item { Spacer(modifier = Modifier.height(20.dp)) }
-                    item { DocDropdownRow("Transcript", documentController) }
-                    item { Spacer(modifier = Modifier.height(20.dp)) }
-                    item { DocDropdownRow("Certificates", documentController) }
-                    item { Spacer(modifier = Modifier.height(20.dp)) }
-                    item { DocDropdownRow("Others", documentController) }
-                    item { Spacer(modifier = Modifier.height(20.dp)) }
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        item { Spacer(modifier = Modifier.height(25.dp)) }
+                        item { DocDropdownRow("Resume", documentController) }
+                        item { Spacer(modifier = Modifier.height(20.dp)) }
+                        item { DocDropdownRow("Cover Letter", documentController) }
+                        item { Spacer(modifier = Modifier.height(20.dp)) }
+                        item { DocDropdownRow("Transcript", documentController) }
+                        item { Spacer(modifier = Modifier.height(20.dp)) }
+                        item { DocDropdownRow("Certificates", documentController) }
+                        item { Spacer(modifier = Modifier.height(20.dp)) }
+                        item { DocDropdownRow("Others", documentController) }
+                        item { Spacer(modifier = Modifier.height(20.dp)) }
+                    }
                 }
             }
         }

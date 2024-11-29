@@ -296,7 +296,7 @@ fun EmailGenerationPage(
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
-                            text = "Click a button to generate an email",
+                            text = "Click a source to generate your email",
                             color = MaterialTheme.colors.secondary,
                             modifier = Modifier.padding(bottom = 5.dp)
                         )

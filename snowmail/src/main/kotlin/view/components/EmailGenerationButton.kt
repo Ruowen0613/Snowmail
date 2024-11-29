@@ -87,7 +87,7 @@ fun EmailGenerationButton(
             }
         },
         modifier = Modifier
-            .height(70.dp)
+            .height(40.dp)
             .width(230.dp),
         colors = ButtonDefaults.buttonColors(
             backgroundColor = MaterialTheme.colors.primary,
@@ -95,6 +95,6 @@ fun EmailGenerationButton(
         ),
         enabled = enabled
     ) {
-        Text(if (infoSource == "profile") "Generate with Profile information" else "Generate with uploaded Resume")
+        Text(if (infoSource == "profile") "Profile information" else "Selected Resume")
     }
 }

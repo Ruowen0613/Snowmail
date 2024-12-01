@@ -25,7 +25,7 @@ object UserSession {
 }
 
 @Composable
-fun loginPage(NavigateToSignup: () -> Unit, NavigateToHome: () -> Unit) {
+fun loginPage(NavigateToSignup: () -> Unit, NavigateToWelcomePage: () -> Unit, NavigateToHome: () -> Unit) {
     AppTheme {
         Box (
             modifier = Modifier
@@ -33,11 +33,33 @@ fun loginPage(NavigateToSignup: () -> Unit, NavigateToHome: () -> Unit) {
                 .background(MaterialTheme.colors.background)
         )  {
             Column(
-                modifier = Modifier.fillMaxSize().padding(16.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colors.background)
+                    .padding(50.dp),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Row { Spacer(modifier = Modifier.padding(60.dp)) }
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp, start = 16.dp, end = 16.dp)
+                ) {
+                    Button(
+                        onClick = NavigateToWelcomePage,
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = Color.White,
+                            contentColor = MaterialTheme.colors.primary
+                        )
+                    ) {
+                        Text("Back")
+                    }
+                }
+
+
+                Spacer(modifier = Modifier.padding(50.dp))
+
                 Row {
                     Text(
                         "Job Hunting's ",
@@ -73,7 +95,7 @@ fun loginPage(NavigateToSignup: () -> Unit, NavigateToHome: () -> Unit) {
                     )
                 }
 
-                Row { Spacer(modifier = Modifier.padding(20.dp)) }
+                Spacer(modifier = Modifier.padding(20.dp))
                 Row(Modifier.fillMaxWidth()) { loginForm(NavigateToSignup, NavigateToHome) }
             }
 
@@ -103,21 +125,25 @@ fun loginWithAccount(NavigateToSignup: () -> Unit, NavigateToHome: () -> Unit) {
     ) {
 
         // Email Address
-        Row { Text("Email Address", fontSize = 16.sp) }
-        Spacer(modifier = Modifier.height(8.dp)) // Increased spacing
+        Row { Text("Email Address", fontSize = 16.sp, color = MaterialTheme.colors.primary) }
+        Spacer(modifier = Modifier.height(8.dp))
         var email by remember { mutableStateOf("") }
         Row {
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                singleLine = true,
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    textColor = MaterialTheme.colors.secondary,
+                )
             )
         }
 
-        // Passowrd
-        Spacer(modifier = Modifier.height(24.dp)) // Increased spacing
-        Row { Text("Password", fontSize = 16.sp) }
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Password
+        Row { Text("Password", fontSize = 16.sp, color = MaterialTheme.colors.primary) }
         Spacer(modifier = Modifier.height(8.dp))
         var password by remember { mutableStateOf("") }
         Row {
@@ -127,19 +153,22 @@ fun loginWithAccount(NavigateToSignup: () -> Unit, NavigateToHome: () -> Unit) {
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    textColor = MaterialTheme.colors.secondary,
+                ),
                 trailingIcon = {
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
                         if (passwordVisible) {
                             Icon(
                                 painter = painterResource("VisibilityOff.svg"),
                                 contentDescription = "Hide password",
-                                tint = Color.Gray
+                                tint = MaterialTheme.colors.secondary
                             )
                         } else {
                             Icon(
                                 painter = painterResource("Visibility.svg"),
                                 contentDescription = "Show password",
-                                tint = Color.Gray
+                                tint = MaterialTheme.colors.secondary
                             )
                         }
                     }
@@ -147,7 +176,6 @@ fun loginWithAccount(NavigateToSignup: () -> Unit, NavigateToHome: () -> Unit) {
             )
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
         // potential error message shown
         var errorMessage by remember { mutableStateOf("") }
         if (errorMessage.isNotEmpty()) {
@@ -159,7 +187,7 @@ fun loginWithAccount(NavigateToSignup: () -> Unit, NavigateToHome: () -> Unit) {
             )
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
         // Sign In Button
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
@@ -190,9 +218,10 @@ fun loginWithAccount(NavigateToSignup: () -> Unit, NavigateToHome: () -> Unit) {
         }
 
         Spacer(modifier = Modifier.height(24.dp))
+
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text("Forgot your password?",
-                style = MaterialTheme.typography.body1.copy(fontSize = 14.sp))
+                style = MaterialTheme.typography.body1.copy(fontSize = 14.sp, color = MaterialTheme.colors.onSecondary))
             TextButton(onClick = { showOtpLoginDialog = true }) {
                 Text("Sign in with OTP", color = MaterialTheme.colors.primary, style = MaterialTheme.typography.body1.copy(fontSize = 14.sp))
             }
@@ -212,7 +241,7 @@ fun loginWithAccount(NavigateToSignup: () -> Unit, NavigateToHome: () -> Unit) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text("Don't have an account?",
-                    style = MaterialTheme.typography.body1.copy(fontSize = 14.sp))
+                    style = MaterialTheme.typography.body1.copy(fontSize = 14.sp, color = MaterialTheme.colors.onSecondary))
                 TextButton(onClick = { navigateLoginPage(NavigateToSignup) }) {
                     Text("Sign up", color = MaterialTheme.colors.primary, style = MaterialTheme.typography.body1.copy(fontSize = 14.sp))
                 }
@@ -319,16 +348,3 @@ fun signinWithOtpPage(onDismiss: () -> Unit, NavigateToHome: () -> Unit) {
         }
     }
 }
-
-@Composable
-fun WebsitePage2() {
-    var currentPage by remember { mutableStateOf("login") }
-
-    when (currentPage) {
-        "login" -> loginPage ({ currentPage = "signup" }, {currentPage = "profilePage"})
-        "signup" -> SignUpPage ({ currentPage = "login"}, { currentPage = "login"})
-    }
-}
-
-
-

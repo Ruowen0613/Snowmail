@@ -28,25 +28,6 @@ import service.EmailGenerationService
 import kotlinx.coroutines.runBlocking
 
 @Composable
-fun WebsitePageWelcome() {
-    var currentPage by remember { mutableStateOf("welcome") }
-
-    when (currentPage) {
-        "login" -> loginPage ({ currentPage = "signup" }, {currentPage = "profilePage"})
-        "signup" -> SignUpPage ({ currentPage = "login"}, { currentPage = "login"})
-    }
-}
-
-
-fun main() {
-    application {
-        Window(onCloseRequest = ::exitApplication) {
-            WebsitePage2()
-        }
-    }
-}
-
-@Composable
 fun WelcomePage(
     NavigateToSignup: () -> Unit,
     NavigateToLogin: () -> Unit,
@@ -58,17 +39,15 @@ fun WelcomePage(
                     .fillMaxSize()
                     .background(MaterialTheme.colors.background)
                     .padding(50.dp)
-                    //.border(BorderStroke(2.dp, Color.Gray)), // Add border here
             ) {
                 Column (
                     modifier = Modifier
                     .fillMaxHeight()
                     .fillMaxWidth(0.50f),
-                    //.border(BorderStroke(2.dp, Color.Gray)), // Add border here
                     horizontalAlignment = Alignment.Start,
                     verticalArrangement = Arrangement.Top
                 ) {
-                    Spacer(modifier = Modifier.height(250.dp))
+                    Spacer(modifier = Modifier.height(300.dp))
                     Text(
                         text = "Find your dream job with our help",
                         fontWeight = FontWeight.Bold,
@@ -80,7 +59,7 @@ fun WelcomePage(
                     Text(
                         text = "No longer spend hours writing emails to recruiters, instead spend that time on your personal development",
                         style = MaterialTheme.typography.body1.copy(fontSize = 20.sp),
-                        color = MaterialTheme.colors.secondary
+                        color = MaterialTheme.colors.onSecondary
                     )
                     Spacer(modifier = Modifier.height(15.dp))
                     Button(
@@ -99,7 +78,6 @@ fun WelcomePage(
                     modifier = Modifier
                     .fillMaxHeight()
                     .fillMaxWidth()
-                    //.border(BorderStroke(2.dp, Color.Gray)), // Add border here
                 ) {
                     Row(
                         horizontalArrangement = Arrangement.End,
@@ -112,7 +90,7 @@ fun WelcomePage(
                             onClick = NavigateToLogin,
                             colors = ButtonDefaults.buttonColors(
                                 backgroundColor = Color.White,
-                                contentColor = MaterialTheme.colors.primary,
+                                contentColor = MaterialTheme.colors.onPrimary,
                             )
                         ) {
                             Text("Log in")
@@ -157,7 +135,6 @@ fun WelcomePage(
                             userId = "0",
                             firstName = "",
                             lastName = "",
-                            //skills = listOf("Java", "Kotlin", "SQL")
                         )
 
                         TextField(
@@ -167,13 +144,12 @@ fun WelcomePage(
                                 Text(
                                     "Test it out!",
                                     style = TextStyle(fontSize = 20.sp),
-                                    modifier = Modifier.padding(top = 16.dp, bottom = 16.dp)
+                                    modifier = Modifier.padding(top = 16.dp, bottom = 20.dp)
                                 ) },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(500.dp)
+                                .height(550.dp)
                                 .padding(16.dp)
-                                .padding(top = 32.dp)
                                 .padding(top = 32.dp)
                                 .shadow(8.dp, shape = RoundedCornerShape(8.dp)),
                             colors = TextFieldDefaults.textFieldColors(

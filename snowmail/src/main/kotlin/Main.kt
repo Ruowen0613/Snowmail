@@ -41,8 +41,8 @@ fun websitePage() {
     var currentPage by remember { mutableStateOf("welcome") }
 
     when (currentPage) {
-        "login" -> loginPage ({ currentPage = "signup" }, {currentPage = "profilePage"})
-        "signup" -> SignUpPage ({ currentPage = "login"}, { currentPage = "login"})
+        "login" -> loginPage ({ currentPage = "signup" }, { currentPage = "welcome" }, {currentPage = "profilePage"})
+        "signup" -> SignUpPage ({ currentPage = "login"}, { currentPage = "welcome" }, { currentPage = "login"})
         "welcome" -> WelcomePage ({ currentPage = "signup"}, {currentPage = "login"}, {currentPage = "introductionPage"})
         "introductionPage" -> IntroductionPage ({ currentPage = "signup"}, {currentPage = "login"}, {currentPage = "welcome"}, {currentPage = "coldEmailGenerationIntroduction"}, {currentPage = "jobApplicationProgressIntroduction"}, {currentPage = "sendEmailsDirectlyIntroduction"})
         "coldEmailGenerationIntroduction" -> ColdEmailGenerationIntroduction ({ currentPage = "signup"}, {currentPage = "login"}, {currentPage = "introductionPage"}, {currentPage = "jobApplicationProgressIntroduction"})

@@ -3,6 +3,7 @@ package ca.uwaterloo.view.components
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -48,7 +49,8 @@ fun DocViewButton(
     ) {
         Icon(
             painter = painterResource("ViewIcon.svg"),
-            contentDescription = "View"
+            contentDescription = "View",
+            tint = MaterialTheme.colors.primary
         )
     }
 }

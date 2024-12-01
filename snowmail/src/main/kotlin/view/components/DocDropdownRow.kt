@@ -20,6 +20,7 @@ import ca.uwaterloo.controller.DocumentController
 import ca.uwaterloo.view.pages.UserSession
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 
 // A function that is a row in the document page.
@@ -57,7 +58,7 @@ fun DocDropdownRow(documentType: String, documentController: DocumentController)
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
                 .clip(RoundedCornerShape(5.dp))
-                .background(Color(0xFFE2E2E2))
+                .background(MaterialTheme.colors.onSecondary.copy(alpha = 0.2f))
                 .fillMaxWidth()
                 .height(55.dp)
                 .padding(horizontal = 20.dp)
@@ -74,12 +75,14 @@ fun DocDropdownRow(documentType: String, documentController: DocumentController)
             if (expanded) {
                 Image(
                     painter = painterResource("arrow_up.png"),
-                    contentDescription = null
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(MaterialTheme.colors.primary)
                 )
             } else {
                 Image(
                     painter = painterResource("arrow_down.png"),
-                    contentDescription = null
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(MaterialTheme.colors.primary)
                 )
             }
         }
@@ -99,7 +102,7 @@ fun DocDropdownRow(documentType: String, documentController: DocumentController)
                         Text(
                             text = document,
                             modifier = Modifier.weight(0.6f),
-                            color = Color.Black,
+                            color = MaterialTheme.colors.secondary,
                         )
                         Spacer(modifier = Modifier.width(32.dp))
                         DocViewButton(

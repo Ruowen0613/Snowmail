@@ -1,8 +1,5 @@
 package ca.uwaterloo.view.pages
 
-//import androidx.compose.material3.*
-//import kotlinx.serialization.Serializable
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -38,7 +35,6 @@ fun DocumentPage(NavigateToEmailGen: () -> Unit, NavigateToProfile: () -> Unit,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp)
-//                .background(Color(0xFFF8FAFC))
         ) {
             TopNavigationBar(
                 selectedTabIndex = selectedTabIndex,
@@ -59,7 +55,7 @@ fun DocumentPage(NavigateToEmailGen: () -> Unit, NavigateToProfile: () -> Unit,
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(end = 100.dp)
+                    .padding(end = 200.dp)
                     .padding(16.dp)
                     .background(Color.Transparent),
                 horizontalArrangement = Arrangement.End,

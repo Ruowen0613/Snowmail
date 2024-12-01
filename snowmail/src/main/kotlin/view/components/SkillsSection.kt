@@ -51,7 +51,7 @@ fun SkillsSection(
 
             IconButton(
                 onClick = { onShowSkillsDialogChange(true) },
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier.size(15.dp)
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,

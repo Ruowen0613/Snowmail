@@ -57,13 +57,6 @@ fun EditPortfolioDialog(
                         fontWeight = FontWeight.Bold,
                         color = Color.Black
                     )
-                    IconButton(onClick = onDismiss) {
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = "Close",
-                            tint = Color.Gray
-                        )
-                    }
                 }
 
                 OutlinedTextField(

@@ -54,13 +54,6 @@ fun EditContactDialog(
                         fontWeight = FontWeight.Bold,
                         color = Color.Black
                     )
-                    IconButton(onClick = onDismiss) {
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = "Close",
-                            tint = Color.Gray
-                        )
-                    }
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))

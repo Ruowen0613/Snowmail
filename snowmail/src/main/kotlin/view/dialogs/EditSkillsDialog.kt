@@ -111,7 +111,11 @@ fun EditSkillsDialog(
                         }
                     },
                     modifier = Modifier.align(Alignment.End),
-                    enabled = skillInput.isNotBlank() && !isTooLongSkill
+                    enabled = skillInput.isNotBlank() && !isTooLongSkill,
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = MaterialTheme.colors.primary,
+                        contentColor = Color.White
+                    )
                 ) {
                     Text("Add")
                 }
@@ -146,7 +150,12 @@ fun EditSkillsDialog(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    TextButton(onClick = onDismiss) {
+                    TextButton(
+                        onClick = onDismiss,
+                        colors = ButtonDefaults.textButtonColors(
+                            contentColor = MaterialTheme.colors.primary
+                        )
+                    ) {
                         Text("Cancel")
                     }
                     Button(
@@ -172,7 +181,7 @@ fun EditSkillsDialog(
                             }
                         },
                         colors = ButtonDefaults.buttonColors(
-                            backgroundColor = Color(0xFF487896),
+                            backgroundColor = MaterialTheme.colors.primary,
                             contentColor = Color.White
                         )
                     ) {

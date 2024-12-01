@@ -117,7 +117,7 @@ fun EditPortfolioDialog(
                             }
                         },
                         colors = ButtonDefaults.buttonColors(
-                            backgroundColor = Color(0xFF487896),
+                            backgroundColor = MaterialTheme.colors.primary,
                             contentColor = Color.White
                         )
                     ) {

@@ -143,7 +143,7 @@ fun WelcomePage(
                             label = {
                                 Text(
                                     "Test it out!",
-                                    style = TextStyle(fontSize = 20.sp),
+                                    style = TextStyle(fontSize = 20.sp, color = MaterialTheme.colors.primary),
                                     modifier = Modifier.padding(top = 16.dp, bottom = 20.dp)
                                 ) },
                             modifier = Modifier

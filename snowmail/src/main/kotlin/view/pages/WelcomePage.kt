@@ -90,7 +90,7 @@ fun WelcomePage(
                             onClick = NavigateToLogin,
                             colors = ButtonDefaults.buttonColors(
                                 backgroundColor = Color.White,
-                                contentColor = MaterialTheme.colors.onPrimary,
+                                contentColor = MaterialTheme.colors.primary,
                             )
                         ) {
                             Text("Log in")

@@ -227,28 +227,26 @@ fun loginWithAccount(NavigateToSignup: () -> Unit, NavigateToHome: () -> Unit) {
             }
         }
 
-            if (showOtpLoginDialog) {
-                signinWithOtpPage(
-                    onDismiss = { showOtpLoginDialog = false },
-                    NavigateToHome = NavigateToHome
-                )
-            }
-
-
-            // Sign-up Section
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text("Don't have an account?",
-                    style = MaterialTheme.typography.body1.copy(fontSize = 14.sp, color = MaterialTheme.colors.onSecondary))
-                TextButton(onClick = { navigateLoginPage(NavigateToSignup) }) {
-                    Text("Sign up", color = MaterialTheme.colors.primary, style = MaterialTheme.typography.body1.copy(fontSize = 14.sp))
-                }
-            }
+        if (showOtpLoginDialog) {
+            signinWithOtpPage(
+                onDismiss = { showOtpLoginDialog = false },
+                NavigateToHome = NavigateToHome
+            )
         }
 
+
+        // Sign-up Section
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text("Don't have an account?", style = MaterialTheme.typography.body1.copy(fontSize = 14.sp, color = MaterialTheme.colors.onSecondary))
+            TextButton(onClick = { navigateLoginPage(NavigateToSignup) }) {
+                Text("Sign up", color = MaterialTheme.colors.primary, style = MaterialTheme.typography.body1.copy(fontSize = 14.sp))
+            }
+        }
     }
+}
 
 
 @Composable

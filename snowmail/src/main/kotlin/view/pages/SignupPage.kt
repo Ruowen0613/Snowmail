@@ -108,9 +108,9 @@ fun RegisterForm(NavigateToLogin: () -> Unit, NavigateToHome: () -> Unit) {
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 400.dp)
             ) {
 
-                Row(modifier = Modifier.fillMaxWidth(0.95f).fillMaxHeight(0.06f)) {
-                    Column(Modifier.fillMaxWidth(0.53f)) { Text("First Name", textAlign = TextAlign.Start) }
-                    Column { Text(text = "Last Name", textAlign = TextAlign.End) }
+                Row(modifier = Modifier.fillMaxWidth().fillMaxHeight(0.06f)) {
+                    Column(Modifier.fillMaxWidth(0.53f)) { Text("First Name", textAlign = TextAlign.Start, color = MaterialTheme.colors.primary) }
+                    Column { Text(text = "Last Name", textAlign = TextAlign.End, color = MaterialTheme.colors.primary) }
                 }
 
                 var firstName by remember { mutableStateOf("") }
@@ -132,7 +132,7 @@ fun RegisterForm(NavigateToLogin: () -> Unit, NavigateToHome: () -> Unit) {
                         )
                     }
 
-                    Column(Modifier.fillMaxWidth(0.07f)) { Box{} }
+                    Column(Modifier.fillMaxWidth(0.12f)) { Box{} }
 
                     // last name input
                     Column(Modifier.fillMaxWidth()) {
@@ -242,8 +242,7 @@ fun RegisterForm(NavigateToLogin: () -> Unit, NavigateToHome: () -> Unit) {
 
                 var errorMessage by remember { mutableStateOf("") }
 
-                Row(modifier = Modifier.fillMaxHeight(0.07f)) {}
-
+                Spacer(modifier = Modifier.height(24.dp))
 
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                     // register button
@@ -288,13 +287,12 @@ fun RegisterForm(NavigateToLogin: () -> Unit, NavigateToHome: () -> Unit) {
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                Row(modifier = Modifier.fillMaxHeight(0.03f)) {}
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text("Already have an account?",
-                        style = MaterialTheme.typography.body1.copy(fontSize = 14.sp))
+                        style = MaterialTheme.typography.body1.copy(fontSize = 14.sp, color = MaterialTheme.colors.onSecondary))
                     TextButton(onClick = { navigateLoginPage(NavigateToLogin) }) {
                         Text("Sign in", color = MaterialTheme.colors.primary, style = MaterialTheme.typography.body1.copy(fontSize = 14.sp))
                     }
@@ -308,6 +306,8 @@ fun RegisterForm(NavigateToLogin: () -> Unit, NavigateToHome: () -> Unit) {
             Column(Modifier.fillMaxWidth(0.3f)) { Box {} }
         }
 
+
+// Navigate between Login and Signup pages
 fun navigateLoginPage(NavigateToLogin: () -> Unit) {
     NavigateToLogin()
 }

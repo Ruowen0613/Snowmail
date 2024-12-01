@@ -139,7 +139,7 @@ fun EmailGenerationPage(
                     .fillMaxSize()
                     .verticalScroll(scrollState)
                     .padding(16.dp)
-                    .background(Color(0xFFF8FAFC))
+                    .background(MaterialTheme.colors.background)
             ) {
                 TopNavigationBar(
                     selectedTabIndex = selectedTabIndex,
@@ -299,7 +299,7 @@ fun EmailGenerationPage(
                         Text(
                             text = "Click a source to generate your email",
                             color = MaterialTheme.colors.secondary,
-                            modifier = Modifier.padding(bottom = 5.dp)
+                            modifier = Modifier.padding(bottom = 15.dp)
                         )
 
                         Row(

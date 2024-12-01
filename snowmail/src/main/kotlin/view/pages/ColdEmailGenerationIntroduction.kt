@@ -79,7 +79,6 @@ fun ColdEmailGenerationIntroduction (
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                //.background(Color(176 / 255f, 212 / 255f, 213 / 255f, 0.2f))
                 .height(maxHeight * 0.7f)
                 .align(Alignment.Center),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -114,8 +113,6 @@ fun ColdEmailGenerationIntroduction (
                 Row(
                     modifier = Modifier
                         .fillMaxSize(),
-                        //.weight(1f)
-                        //.padding(end = 16.dp),
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -135,7 +132,6 @@ fun ColdEmailGenerationIntroduction (
                     Image(
                         painter = painterResource("egss.png"),
                         contentDescription = null,
-                        //contentScale = ContentScale.Crop
                     )
 
                 }

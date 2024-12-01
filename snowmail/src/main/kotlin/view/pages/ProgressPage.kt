@@ -116,9 +116,15 @@ fun JobProgressPage(
                 ) {
                     CircularProgressIndicator()
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text("Please wait while we check for any new emails related to your job applications. This process may take 10-60 seconds.")
-
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            "Please wait while we check for any new emails related to your job applications. This process may take 10-60 seconds.",
+                            color = MaterialTheme.colors.secondary
+                        )
+                    }
                 }
             }
         }
@@ -293,12 +299,12 @@ fun JobStatusColumn(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(100.dp)
-                            .background(Color(0xFFD3D3D3), shape = RoundedCornerShape(8.dp)),
+                            .background(MaterialTheme.colors.onSecondary, shape = RoundedCornerShape(8.dp)),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
                             text = "No applications",
-                            color = Color.Gray,
+                            color = MaterialTheme.colors.secondary,
                             fontSize = 12.sp
                         )
                     }
@@ -321,16 +327,15 @@ fun JobCard(position: String, company: String, recruiterEmail: String) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
                 imageVector = Icons.Filled.Home,
                 contentDescription = "Company Icon",
-                tint = Color.Gray,
+                tint = MaterialTheme.colors.primary,
                 modifier = Modifier.size(16.dp)
             )
             Spacer(modifier = Modifier.width(4.dp))
-            Text(text = company, color = Color.Gray, fontSize = 12.sp)
+            Text(text = company, color = MaterialTheme.colors.secondary, fontSize = 12.sp)
         }
 
         Spacer(modifier = Modifier.height(4.dp))
@@ -340,11 +345,11 @@ fun JobCard(position: String, company: String, recruiterEmail: String) {
             Icon(
                 imageVector = Icons.Filled.Email,
                 contentDescription = "Email Icon",
-                tint = Color.Gray,
+                tint = MaterialTheme.colors.primary,
                 modifier = Modifier.size(16.dp)
             )
             Spacer(modifier = Modifier.width(4.dp))
-            Text(text = recruiterEmail, color = Color.Gray, fontSize = 12.sp)
+            Text(text = recruiterEmail, color = MaterialTheme.colors.secondary, fontSize = 12.sp)
         }
     }
 }

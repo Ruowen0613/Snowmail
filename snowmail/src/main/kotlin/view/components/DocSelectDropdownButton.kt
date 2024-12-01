@@ -31,13 +31,12 @@ fun DocumentSelectionDropdownButton(
 
     Row(
         horizontalArrangement = Arrangement.Center,
-        //modifier = Modifier.fillMaxWidth()
     ) {
         OutlinedButton(
             onClick = { expanded = true },
             modifier = Modifier.width(650.dp),
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = if (selectedDocument == null) Color(0xFFD5D7E0) else MaterialTheme.colors.primary,
+                backgroundColor = if (selectedDocument == null) Color(0xFFE0E0E0) else MaterialTheme.colors.primary,
                 contentColor = if (selectedDocument == null) Color(0xFF8E97A5) else Color.White
             )
         ) {

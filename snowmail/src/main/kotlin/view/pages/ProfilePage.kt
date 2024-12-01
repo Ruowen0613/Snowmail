@@ -37,19 +37,29 @@ import integration.SupabaseClient
 import kotlinx.coroutines.runBlocking
 
 @Composable
-fun ProfilePage(userId: String,
-                NavigateToDocuments: () -> Unit, NavigateToEmailGen: () -> Unit,
-                NavigateToProgress: () -> Unit,  NavigateToLogin: () -> Unit) {
+fun ProfilePage(
+    userId: String,
+    NavigateToDocuments: () -> Unit,
+    NavigateToEmailGen: () -> Unit,
+    NavigateToProgress: () -> Unit,
+    NavigateToLogin: () -> Unit
+) {
+    // Initialize the controller
     val dbStorage = SupabaseClient()
     val profileController = ProfileController(dbStorage.userProfileRepository)
 
-
+    // State variables for dialog visibility
     var showEducationDialog by remember { mutableStateOf(false) }
     var showExperienceDialog by remember { mutableStateOf(false) }
     var showSkillsDialog by remember { mutableStateOf(false) }
     var EditContactDialog by remember { mutableStateOf(false) }
+    var showProjectDialog by remember { mutableStateOf(false) }
+    var showEditProjectDialog by remember { mutableStateOf(false) }
+    var showEditEducationDialog by remember { mutableStateOf(false) }
+    var showEditExperienceDialog by remember { mutableStateOf(false) }
+    var showEditPortfolioDialog by remember { mutableStateOf(false) }
 
-
+    // State variables for user profile
     var userName by remember { mutableStateOf("") }
     var educationList by remember { mutableStateOf<List<EducationWithDegreeName>>(emptyList()) }
     var errorMessage by remember { mutableStateOf("") }
@@ -60,28 +70,18 @@ fun ProfilePage(userId: String,
     var userLinkedIn by remember { mutableStateOf("") }
     var userGithub by remember { mutableStateOf("") }
     var userPersonalWebsite by remember { mutableStateOf("") }
-
-    var showEditEducationDialog by remember { mutableStateOf(false) }
     var selectedEducation by remember { mutableStateOf<EducationWithDegreeName?>(null) }
-    var showEditExperienceDialog by remember { mutableStateOf(false) }
     var selectedExperience by remember { mutableStateOf<WorkExperience?>(null) }
-    var showEditPortfolioDialog by remember { mutableStateOf(false) }
-
-
     var workExperienceList by remember { mutableStateOf<List<WorkExperience>>(emptyList()) }
-
-    // Project State Variables
     var projectList by remember { mutableStateOf<List<PersonalProject>>(emptyList()) }
-    var showProjectDialog by remember { mutableStateOf(false) }
-    var showEditProjectDialog by remember { mutableStateOf(false) }
     var selectedProject by remember { mutableStateOf<PersonalProject?>(null) }
+    var showGmailLinkingDialog by remember { mutableStateOf(false) }
 
-
+    // State variables for tab navigation
     var currentPage by remember { mutableStateOf("ProfilePage") }
-
     var selectedTabIndex by remember { mutableStateOf(3) }
 
-
+    // Functions to refresh the user profile
     fun refreshEducationList() {
         runBlocking {
             val educationResult = profileController.getEducation(userId)
@@ -112,7 +112,6 @@ fun ProfilePage(userId: String,
             }
         }
     }
-
 
     fun refreshContactInfo() {
         runBlocking {
@@ -171,7 +170,6 @@ fun ProfilePage(userId: String,
     }
 
     LaunchedEffect(userId) {
-
         val getNameResult = profileController.getUserName(userId)
         val educationResult = profileController.getEducation(userId)
         val experienceResult = profileController.getWorkExperience(userId)
@@ -182,7 +180,6 @@ fun ProfilePage(userId: String,
         val getLinkedInResult = profileController.getUserLinkedIn(userId)
         val getGithubResult = profileController.getUserGithub(userId)
         val getWebsiteResult = profileController.getUserPersonalWebsite(userId)
-
         val projectResult = profileController.getProjects(userId)
 
         projectResult.onSuccess { projects ->
@@ -192,32 +189,26 @@ fun ProfilePage(userId: String,
         }
 
         getNameResult.onSuccess { name ->
-
             userName = name
         }.onFailure { error ->
-
             errorMessage = error.message ?: "Failed to retrieve user name"
         }
 
         educationResult.onSuccess { educationRecords ->
-
             educationList = educationRecords
+        }.onFailure { error ->
+            errorMessage = error.message ?: "Failed to retrieve education records"
         }
-            .onFailure { error ->
-
-                errorMessage = error.message ?: "Failed to retrieve education records"
-            }
 
         experienceResult.onSuccess { experiences ->
             workExperienceList = experiences
+        }.onFailure { error ->
+            errorMessage = error.message ?: "Failed to retrieve work experience records"
         }
-            .onFailure { error -> errorMessage = error.message ?: "Failed to retrieve work experience records" }
 
         getEmailResult.onSuccess { email ->
-
             userEmail = email
         }.onFailure { error ->
-
             errorMessage = error.message ?: "Failed to retrieve user email"
         }
 
@@ -307,7 +298,7 @@ fun ProfilePage(userId: String,
                         Text(
                             text = userName.ifEmpty { "Loading..." },
                             fontSize = 24.sp,
-                            style = MaterialTheme.typography.h5,
+                            style = MaterialTheme.typography.h5.copy(color = MaterialTheme.colors.secondary),
                             modifier = Modifier.align(Alignment.CenterVertically)
                         )
                     }
@@ -323,18 +314,14 @@ fun ProfilePage(userId: String,
                         .padding(8.dp)
                         .padding(bottom = 16.dp)
                 ) {
-
                     Column(
                         modifier = Modifier.padding(8.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.End
                         ) {
-                            var showGmailLinkingDialog by remember { mutableStateOf(false) }
-
                             Button(
                                 onClick = { showGmailLinkingDialog = true },
                                 colors = ButtonDefaults.buttonColors(
@@ -352,49 +339,35 @@ fun ProfilePage(userId: String,
                                     profileController = profileController
                                 )
                             }
-
                             Spacer(modifier = Modifier.weight(0.1f))
-
                         }
-
 
                         Spacer(modifier = Modifier.height(4.dp))
 
                         SectionTitle("Contact Information")
-                        Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+                        Card(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+                            Column(modifier = Modifier.padding(8.dp)) {
+                                ProfileDetail(label = "Email Address:", value = userEmail)
+                                ProfileDetail(label = "Location:", value = userLocation ?: "Location not available")
+                                ProfileDetail(label = "Phone: +1 ", value = userPhone ?: "Phone not available")
+                            }
 
-                            Card(
+                            Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(8.dp),
-                                elevation = 4.dp
+                                    .padding(16.dp),
+                                horizontalArrangement = Arrangement.End
                             ) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(8.dp),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
+                                IconButton(
+                                    onClick = { EditContactDialog = true },
+                                    modifier = Modifier.size(15.dp)
                                 ) {
-                                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                                        ProfileDetail(label = "Email Address:", value = userEmail)
-                                        ProfileDetail(label = "Location:", value = userLocation ?: "Location not available")
-                                        ProfileDetail(label = "Phone: +1 ", value = userPhone ?: "Phone not available")
-                                    }
-
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                    }
-
-                                    IconButton(onClick = { EditContactDialog = true }) {
-                                        Icon(
-                                            imageVector = Icons.Default.Edit,
-                                            contentDescription = "Edit Contact",
-                                            tint = Color.Gray
-                                        )
-                                    }
+                                    Icon(
+                                        imageVector = Icons.Default.Edit,
+                                        contentDescription = "Edit Contact",
+                                        tint = Color(0xFF487896)
+                                    )
                                 }
-
                             }
                         }
 
@@ -414,7 +387,6 @@ fun ProfilePage(userId: String,
 
                         SectionTitle("Portfolio")
                         Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
-
                             Card(
                                 modifier = Modifier
                                     .fillMaxWidth()

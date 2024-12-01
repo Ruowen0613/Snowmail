@@ -21,7 +21,6 @@ import ca.uwaterloo.controller.SignUpController
 import ca.uwaterloo.view.theme.AppTheme
 import integration.SupabaseClient
 
-
 @Composable
 fun SignUpPage(NavigateToLogin: () -> Unit, NavigateToWelcomePage: () -> Unit, NavigateToHome: () -> Unit) {
 

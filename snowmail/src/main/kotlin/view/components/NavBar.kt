@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.unit.dp
 import ca.uwaterloo.controller.SignInController
 import integration.SupabaseClient
@@ -56,23 +57,19 @@ fun TopNavigationBar(
                     Tab(
                         selected = selectedTabIndex == 0,
                         onClick = { onTabSelected(0) },
-                        text = { Text("Cold Email Generation") }
-                    )
+                        text = { Text("Cold Email Generation") })
                     Tab(
                         selected = selectedTabIndex == 1,
                         onClick = { onTabSelected(1) },
-                        text = { Text("Job Application Progress") }
-                    )
+                        text = { Text("Job Application Progress") })
                     Tab(
                         selected = selectedTabIndex == 2,
                         onClick = { onTabSelected(2) },
-                        text = { Text("Documents") }
-                    )
+                        text = { Text("Documents") })
                     Tab(
                         selected = selectedTabIndex == 3,
                         onClick = { onTabSelected(3) },
-                        text = { Text("Profile") }
-                    )
+                        text = { Text("Profile") })
                 }
 
                 Button(

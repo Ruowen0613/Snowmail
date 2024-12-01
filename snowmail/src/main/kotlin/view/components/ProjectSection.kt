@@ -62,7 +62,7 @@ fun ProjectSection(
                                 Text(
                                     text = project.description ?: "",
                                     fontSize = 12.sp,
-                                    color = Color.Gray
+                                    color = MaterialTheme.colors.secondary
                                 )
                             }
                         }
@@ -86,7 +86,7 @@ fun ProjectSection(
                     Icon(
                         imageVector = Icons.Default.Add,
                         contentDescription = "Add",
-                        tint = Color(0xFF487896)
+                        tint = MaterialTheme.colors.primary
                     )
                 }
             }

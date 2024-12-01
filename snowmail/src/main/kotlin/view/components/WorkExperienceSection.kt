@@ -60,15 +60,15 @@ fun WorkExperienceSection(
                                     color = Color.Black
                                 )
                                 Text(
-                                    text = "From ${experience.startDate} to ${experience.endDate ?: "Present"}",
+                                    text = "${experience.startDate} to ${experience.endDate ?: "Present"}",
                                     fontSize = 12.sp,
-                                    color = Color.Gray
+                                    color = MaterialTheme.colors.secondary
                                 )
                                 if (!experience.description.isNullOrEmpty()) {
                                     Text(
                                         text = experience.description,
                                         fontSize = 12.sp,
-                                        color = Color.Gray
+                                        color = MaterialTheme.colors.secondary
                                     )
                                 }
                             }

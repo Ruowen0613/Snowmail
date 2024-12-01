@@ -13,12 +13,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.style.TextOverflow
 
-
 @Composable
 fun SkillChip(skill: String, onDelete: () -> Unit) {
     Surface(
         shape = RoundedCornerShape(16.dp),
-        color = Color(0xFFE0E0E0),
+        color = MaterialTheme.colors.onSecondary.copy(alpha = 0.2f),
         modifier = Modifier
             .padding(4.dp)
             .wrapContentWidth()
@@ -45,7 +44,7 @@ fun SkillChip(skill: String, onDelete: () -> Unit) {
                     imageVector = Icons.Default.Close,
                     contentDescription = "Delete Skill",
                     tint = Color.Red,
-                    modifier = Modifier.size(16.dp)
+                    modifier = Modifier.size(15.dp)
                 )
             }
         }

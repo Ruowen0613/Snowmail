@@ -298,7 +298,7 @@ fun ProfilePage(
                         Text(
                             text = userName.ifEmpty { "Loading..." },
                             fontSize = 24.sp,
-                            style = MaterialTheme.typography.h5.copy(color = MaterialTheme.colors.secondary),
+                            style = MaterialTheme.typography.h5.copy(color = MaterialTheme.colors.primary),
                             modifier = Modifier.align(Alignment.CenterVertically)
                         )
                     }
@@ -365,7 +365,7 @@ fun ProfilePage(
                                     Icon(
                                         imageVector = Icons.Default.Edit,
                                         contentDescription = "Edit Contact",
-                                        tint = Color(0xFF487896)
+                                        tint = MaterialTheme.colors.primary
                                     )
                                 }
                             }
@@ -385,34 +385,46 @@ fun ProfilePage(
                             )
                         }
 
+                        Spacer(modifier = Modifier.height(8.dp))
+
                         SectionTitle("Portfolio")
-                        Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
-                            Card(
+                        Card(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+                            if (userLinkedIn.isEmpty() && userGithub.isEmpty() && userPersonalWebsite.isEmpty()) {
+                                Text(
+                                    text = "No portfolio links added",
+                                    fontSize = 14.sp,
+                                    color = MaterialTheme.colors.secondary,
+                                    modifier = Modifier.padding(8.dp)
+                                )
+                            } else {
+                                Column(modifier = Modifier.padding(8.dp)) {
+                                    if (userLinkedIn.isNotEmpty()) {
+                                        ProfileDetail(label = "LinkedIn URL:", value = userLinkedIn)
+                                    }
+                                    if (userGithub.isNotEmpty()) {
+                                        ProfileDetail(label = "GitHub URL:", value = userGithub)
+                                    }
+                                    if (userPersonalWebsite.isNotEmpty()) {
+                                        ProfileDetail(label = "Portfolio URL:", value = userPersonalWebsite)
+                                    }
+                                }
+                            }
+
+                            Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(8.dp),
-                                elevation = 4.dp
+                                    .padding(16.dp),
+                                horizontalArrangement = Arrangement.End
                             ) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(8.dp),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
+                                IconButton(
+                                    onClick = { showEditPortfolioDialog = true },
+                                    modifier = Modifier.size(15.dp)
                                 ) {
-                                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                                        ProfileDetail(label = "LinkedIn URL:", value = userLinkedIn ?: "Not available")
-                                        ProfileDetail(label = "GitHub URL:", value = userGithub ?: "Not available")
-                                        ProfileDetail(label = "Portfolio URL:", value = userPersonalWebsite ?: "Not available")
-                                    }
-
-                                    IconButton(onClick = { showEditPortfolioDialog = true }) {
-                                        Icon(
-                                            imageVector = Icons.Default.Edit,
-                                            contentDescription = "Edit Portfolio & Socials",
-                                            tint = Color.Gray
-                                        )
-                                    }
+                                    Icon(
+                                        imageVector = Icons.Default.Edit,
+                                        contentDescription = "Edit Portfolio & Socials",
+                                        tint = MaterialTheme.colors.primary
+                                    )
                                 }
                             }
                         }
@@ -432,6 +444,8 @@ fun ProfilePage(
                             )
                         }
 
+                        Spacer(modifier = Modifier.height(8.dp))
+
                         EducationSection(
                             userId = userId,
                             profileController = profileController,
@@ -446,6 +460,8 @@ fun ProfilePage(
                             onShowEditEducationDialogChange = { showEditEducationDialog = it },
                             onSelectedEducationChange = { selectedEducation = it }
                         )
+
+                        Spacer(modifier = Modifier.height(8.dp))
 
                         WorkExperienceSection(
                             userId = userId,
@@ -462,6 +478,8 @@ fun ProfilePage(
                             onSelectedWorkExperienceChange = { selectedExperience = it }
                         )
 
+                        Spacer(modifier = Modifier.height(8.dp))
+
                         ProjectSection(
                             userId = userId,
                             profileController = profileController,
@@ -476,6 +494,8 @@ fun ProfilePage(
                             onShowEditProjectDialogChange = { showEditProjectDialog = it },
                             onSelectedProjectChange = { selectedProject = it }
                         )
+
+                        Spacer(modifier = Modifier.height(8.dp))
 
                         SkillsSection(
                             userId = userId,
@@ -521,16 +541,18 @@ fun SectionTitle(title: String) {
 // This is the style for profile details
 @Composable
 fun ProfileDetail(label: String, value: String) {
-    Row {
-        Text(
-            "$label ",
-            fontWeight = FontWeight.Bold,
-            style = TextStyle(fontSize = 14.sp, color = Color.Black)
-        )
-        Text(
-            value,
-            style = TextStyle(fontSize = 14.sp, color = Color.Black)
-        )
+    Column(modifier = Modifier.padding(vertical = 8.dp)) {
+        Row {
+            Text(
+                "$label ",
+                fontWeight = FontWeight.Bold,
+                style = TextStyle(fontSize = 14.sp, color = Color.Black)
+            )
+            Text(
+                value,
+                style = TextStyle(fontSize = 14.sp, color = MaterialTheme.colors.secondary)
+            )
+        }
     }
 }
 

@@ -55,19 +55,19 @@ fun EducationSection(
                         ) {
                             Column {
                                 Text(
-                                    text = "${education.institutionName}, ${education.degreeName} in ${education.major}",
+                                    text = "${education.institutionName} - ${education.degreeName} in ${education.major}",
                                     fontSize = 14.sp,
                                     color = Color.Black
                                 )
                                 Text(
-                                    text = "GPA: ${education.gpa ?: "N/A"}",
+                                    text = "${education.startDate} to ${education.endDate}",
                                     fontSize = 12.sp,
-                                    color = Color.Gray
+                                    color = MaterialTheme.colors.secondary
                                 )
                                 Text(
-                                    text = "From ${education.startDate} to ${education.endDate}",
+                                    text = "GPA: ${education.gpa ?: "N/A"}",
                                     fontSize = 12.sp,
-                                    color = Color.Gray
+                                    color = MaterialTheme.colors.secondary
                                 )
                             }
                         }
@@ -91,7 +91,7 @@ fun EducationSection(
                     Icon(
                         imageVector = Icons.Default.Add,
                         contentDescription = "Add",
-                        tint = Color(0xFF487896)
+                        tint = MaterialTheme.colors.primary
                     )
                 }
             }

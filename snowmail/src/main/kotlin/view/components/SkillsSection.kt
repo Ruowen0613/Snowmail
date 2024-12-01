@@ -17,6 +17,9 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 
 @Composable
 fun SkillsSection(
@@ -29,19 +32,33 @@ fun SkillsSection(
     onShowSkillsDialogChange: (Boolean) -> Unit
 ) {
     Column {
-        // Section Title
-        SectionTitle("Skills")
-
-        // Add Skill Button
-        IconButton(
-            onClick = { onShowSkillsDialogChange(true) },
-            modifier = Modifier.size(24.dp)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp, vertical = 16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                imageVector = Icons.Default.Add,
-                contentDescription = "Add Skill",
-                tint = MaterialTheme.colors.primary
+            Text(
+                text = "Skills",
+                style = TextStyle(
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                )
             )
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            IconButton(
+                onClick = { onShowSkillsDialogChange(true) },
+                modifier = Modifier.size(24.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Add Skill",
+                    tint = MaterialTheme.colors.primary
+                )
+            }
         }
 
         if (skills.isEmpty()) {

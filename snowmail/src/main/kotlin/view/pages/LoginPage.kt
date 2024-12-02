@@ -297,7 +297,10 @@ fun signinWithOtpPage(onDismiss: () -> Unit, NavigateToHome: () -> Unit) {
                                 }
                             }
                         },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(
+                            contentColor = Color.White
+                        )
                     ) {
                         Text("Send Temporary Password")
                     }
@@ -306,7 +309,7 @@ fun signinWithOtpPage(onDismiss: () -> Unit, NavigateToHome: () -> Unit) {
                     OutlinedTextField(
                         value = otp,
                         onValueChange = { otp = it },
-                        label = { Text("Enter temporary password") },
+                        label = { Text("Enter temporary password (check junk if not received)") },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -324,7 +327,10 @@ fun signinWithOtpPage(onDismiss: () -> Unit, NavigateToHome: () -> Unit) {
                                 }
                             }
                         },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(
+                            contentColor = Color.White
+                        )
                     ) {
                         Text("Verify Temporary Password")
                     }

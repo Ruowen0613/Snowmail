@@ -8,7 +8,6 @@ import model.UserProfile
 import kotlinx.datetime.LocalDate
 
 interface IUserProfileRepository {
-    suspend fun getUserProfile(userId: String): Result<UserProfile>
     suspend fun getUserLinkedGmailAccount(userId: String): Result<String>
     suspend fun editUserLinkedGmailAccount(userId: String, linkedGmailAccount: String): Result<Boolean>
     suspend fun getUserGmailAppPassword(userId: String): Result<String>

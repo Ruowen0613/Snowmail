@@ -19,22 +19,6 @@ import java.util.*
 
 class UserProfileRepository(private val supabase: SupabaseClient) : IUserProfileRepository{
 
-    override suspend fun getUserProfile(userId: String): Result<UserProfile> {
-        return try {
-            // fetch user's profile from db based on userid
-            val userProfile = supabase.from("user_profile")
-                .select {
-                    filter {
-                        eq("user_id", userId)
-                    }
-                }
-                .decodeSingle<UserProfile>()
-            Result.success(userProfile)
-        } catch (e: Exception) {
-            Result.failure(Exception("Failed to fetch profile: ${e.message}"))
-        }
-    }
-
     // get user's linked gmail account
     override suspend fun getUserLinkedGmailAccount(userId: String): Result<String> {
         return try {

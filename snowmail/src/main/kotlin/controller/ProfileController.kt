@@ -19,7 +19,6 @@ class ProfileController(private val userProfileRepository: IUserProfileRepositor
         return emailValidating.verifyEmail(email, password)
     }
 
-
     /**********************************************************
      *                                                        *
      *   The following 4 functions are for linking Gmail      *

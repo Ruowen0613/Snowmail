@@ -10,23 +10,19 @@ class DocumentRepository(private val supabase: SupabaseClient) : IDocumentReposi
 
     private val storage = supabase.storage
 
+    // Upload a document to the specified bucket
     override suspend fun uploadDocument(bucket: String, path: String, file: File): Result<String> {
         return try {
-            println("Checking if file exists: ${file.path}")
             if (!file.exists()) {
                 println("File does not exist: ${file.path}")
                 return Result.failure(Exception("File does not exist: ${file.path}"))
             }
-            println("File exists: ${file.path}")
-            println("Reading file content")
             val fileContent = try {
                 file.readBytes()
             } catch (e: Exception) {
                 println("Error reading file content: ${e.message}")
                 return Result.failure(Exception("Error reading file content: ${e.message}"))
             }
-            println("File content read successfully")
-            println("Uploading file to storage")
             try {
                 storage.from(bucket).upload(path, fileContent)
             } catch (e: Exception) {
@@ -41,6 +37,7 @@ class DocumentRepository(private val supabase: SupabaseClient) : IDocumentReposi
         }
     }
 
+    // Download a document from the specified bucket as a ByteArray
     override suspend fun downloadDocument(bucket: String, path: String): Result<ByteArray> {
         return try {
             val fileContent = storage.from(bucket).downloadAuthenticated(path)
@@ -50,6 +47,7 @@ class DocumentRepository(private val supabase: SupabaseClient) : IDocumentReposi
         }
     }
 
+    // Delete a document from the specified bucket
     override suspend fun deleteDocument(bucket: String, path: String): Result<String> {
         return try {
             storage.from(bucket).delete(path)
@@ -59,6 +57,7 @@ class DocumentRepository(private val supabase: SupabaseClient) : IDocumentReposi
         }
     }
 
+    // Create a signed URL to view a document
     override suspend fun createSignedUrl(bucket: String, path: String): Result<String> {
         return try {
             val url = storage.from(bucket).createSignedUrl(path, 5.minutes)
@@ -68,6 +67,7 @@ class DocumentRepository(private val supabase: SupabaseClient) : IDocumentReposi
         }
     }
 
+    // List all documents of a specific type for a user
     override suspend fun listDocuments(bucket: String, path: String): Result<List<String>> {
         return try {
             val files = storage.from(bucket).list(path)
@@ -78,7 +78,7 @@ class DocumentRepository(private val supabase: SupabaseClient) : IDocumentReposi
         }
     }
 
-    // get document from user_documents bucket and returns it as type File
+    // Get a document as a File
     override suspend fun getDocumentAsFile(bucket: String, path: String): Result<File> {
         return try {
             val fileContent = storage.from(bucket).downloadAuthenticated(path)
@@ -90,7 +90,7 @@ class DocumentRepository(private val supabase: SupabaseClient) : IDocumentReposi
         }
     }
 
-
+    // Upload an email attachment to the specified bucket
     override suspend fun uploadEmailAttachment(fileName: String, inputStream: InputStream): Result<String> {
         val tempFile = File.createTempFile("attachment", ".tmp")
         inputStream.use { input ->
@@ -113,6 +113,7 @@ class DocumentRepository(private val supabase: SupabaseClient) : IDocumentReposi
         }
     }
 
+    // Delete email attachments from the specified bucket
     override suspend fun deleteAttachments(files: List<String>): Result<String> {
         return try {
             for (file in files) {
@@ -126,6 +127,4 @@ class DocumentRepository(private val supabase: SupabaseClient) : IDocumentReposi
             Result.failure(Exception("Error deleting attachments: ${e.message}"))
         }
     }
-
-
 }

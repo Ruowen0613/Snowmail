@@ -240,7 +240,6 @@ fun JobStatusColumnPlaceholder(title: String, modifier: Modifier = Modifier) {
             modifier = Modifier.padding(bottom = 8.dp)
         )
 
-
         Box(
             modifier = Modifier
                 .fillMaxWidth()

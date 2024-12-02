@@ -82,7 +82,6 @@ class ProgressController(private val jobApplicationRepository: IJobApplicationRe
         documentRepository.deleteAttachments(files)
     }
 
-
 }
 
 

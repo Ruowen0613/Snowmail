@@ -1,7 +1,5 @@
 package service
 
-
-import ca.uwaterloo.model.Education
 import ca.uwaterloo.model.EducationWithDegreeName
 import ca.uwaterloo.model.PersonalProject
 import ca.uwaterloo.model.WorkExperience

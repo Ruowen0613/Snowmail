@@ -1,29 +1,20 @@
 package integration
 
-import ca.uwaterloo.model.Education
 import ca.uwaterloo.model.EducationWithDegreeName
 import ca.uwaterloo.model.PersonalProject
 import ca.uwaterloo.model.WorkExperience
 import io.ktor.client.*
-import io.ktor.client.call.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
-
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-
 import io.ktor.http.*
-import kotlinx.datetime.LocalDate
 import kotlinx.serialization.json.Json
-
-
 import model.UserInput
-import model.GeneratedEmail
 import model.OpenAIRequest
 import model.UserProfile
 
-
+// Data classes for OpenAI API
 @Serializable
 data class ChatCompletionResponse(
     val id: String,
@@ -43,6 +34,7 @@ data class Message(
 
 class OpenAIClient(private val httpClient: HttpClient) {
 
+    // Generate an email from a specified resume
     suspend fun generateEmailFromResume(userInput: UserInput, userProfile: UserProfile, resumeText:String): String? {
         val prompt = buildPromptFromResume(userInput, userProfile, resumeText)
         val message = prepareMessage(prompt)
@@ -51,6 +43,7 @@ class OpenAIClient(private val httpClient: HttpClient) {
         return emailContent
     }
 
+    // Generate an email from a user's profile
     suspend fun generateEmailFromProfile(userInput: UserInput, userProfile: UserProfile, education: List<EducationWithDegreeName>, workExperience: List<WorkExperience>, projects: List<PersonalProject>, skills: List<String>): String? {
         val prompt = buildPromptFromProfile(userInput, userProfile, education, workExperience, projects, skills)
         val message = prepareMessage(prompt)
@@ -59,6 +52,7 @@ class OpenAIClient(private val httpClient: HttpClient) {
         return emailContent
     }
 
+    // Build an LLM prompt for generating an email from a resume
     private fun buildPromptFromResume(userInput: UserInput, userProfile: UserProfile, resumeText: String, ): String {
         val companyName = userInput.company
         val jobDescription = userInput.jobDescription
@@ -76,6 +70,7 @@ class OpenAIClient(private val httpClient: HttpClient) {
         """.trimIndent()
     }
 
+    // Build an LLM prompt for generating an email from a user's profile
     private fun buildPromptFromProfile(userInput: UserInput, userProfile: UserProfile, education: List<EducationWithDegreeName>, workExperience: List<WorkExperience>, projects: List<PersonalProject>, skills: List<String>): String {
         val companyName = userInput.company
         val jobDescription = userInput.jobDescription
@@ -125,6 +120,7 @@ class OpenAIClient(private val httpClient: HttpClient) {
         """.trimIndent()
     }
 
+    // Prepare the message to send to the OpenAI API
     private fun prepareMessage(prompt: String): List<Map<String, String>> {
         return listOf(
             mapOf(
@@ -164,6 +160,7 @@ class OpenAIClient(private val httpClient: HttpClient) {
             mapOf("role" to "user", "content" to prompt))
     }
 
+    // Send a request to the OpenAI API
     private suspend fun sendOpenAIRequest(message: List<Map<String, String>>): HttpResponse {
         val request = OpenAIRequest(
             model = "gpt-3.5-turbo",
@@ -182,11 +179,12 @@ class OpenAIClient(private val httpClient: HttpClient) {
         }
     }
 
+    // Extract the email content from the OpenAI API response
     private suspend fun getEmailContent(response: HttpResponse): String? {
         val responseBody: String = response.bodyAsText()
 
         val json = Json {
-            ignoreUnknownKeys = true // This will ignore unknown keys
+            ignoreUnknownKeys = true
         }
 
         return try {
@@ -198,6 +196,7 @@ class OpenAIClient(private val httpClient: HttpClient) {
         }
     }
 
+    // Parse the resume to extract relevant details
     suspend fun parseResume(resumeText: String): Map<String, Any> {
         val prompt = """
             Extract the following details from the resume:
@@ -242,7 +241,7 @@ class OpenAIClient(private val httpClient: HttpClient) {
         }
     }
 
-    // Used to determine the status of the application
+    // Determines the status of the application
     suspend fun classifyStatusOfApplication(emailContent: String): String {
         val prompt = """
             Determine the application status based on the email content. The status can be one of the following:
@@ -266,62 +265,4 @@ class OpenAIClient(private val httpClient: HttpClient) {
         val response = sendOpenAIRequest(message)
         return getEmailContent(response)?.trim() ?: "Unknown"
     }
-}
-
-suspend fun main() {
-    val openAIClient = OpenAIClient(HttpClient(CIO))
-
-    val sampleEmailContent = """
-        Dear Applicant,
-
-        We are pleased to inform you that you have been selected for an interview for the Software Engineer position at Example Corp. Please let us know your availability for the interview.
-
-        Best regards,
-        Jane Doe
-    """.trimIndent()
-
-    val classificationResult = openAIClient.classifyStatusOfApplication(sampleEmailContent)
-    println(classificationResult)
-
-//    val openAIClient = OpenAIClient(HttpClient(CIO))
-//    val userInput = UserInput(
-//        jobDescription = "Software Engineer",
-//        recruiterEmail = "recruiter@example.com",
-//        jobTitle = "Software Engineer",
-//        company = "Example Corp",
-//        recruiterName = "Jane Doe",
-//        fileURLs = listOf("https://example.com/resume.pdf"),
-//    )
-//
-//    val userProfile = UserProfile(
-//        userId = "123",
-//        firstName = "John",
-//        lastName = "Doe",
-//        skills = listOf("Java", "Kotlin", "SQL")
-//    )
-//
-//    val education = Education(
-//        id = 12,
-//        userId = "123",
-//        degreeId = 3,
-//        institutionName = "University of Waterloo",
-//        major = "Computer Science",
-//        gpa = 3.8f,
-//        startDate = LocalDate(2019, 9, 1),
-//        endDate = LocalDate(2023, 6, 1)
-//    )
-//
-//
-//
-//    val workExperience = WorkExperience(
-//        userId = "123",
-//        currentlyWorking = false,
-//        startDate = LocalDate(2021, 5, 1),
-//        endDate = LocalDate(2021, 8, 1),
-//        companyName = "Example Corp",
-//        title = "Software Engineer",
-//        description = "Developed backend systems, deployed scalable solutions, and built efficient ETL pipelines for financial data processing."
-//    )
-//
-//    println(openAIClient.generateEmail(userInput, userProfile, listOf(education), listOf(workExperience)))
 }

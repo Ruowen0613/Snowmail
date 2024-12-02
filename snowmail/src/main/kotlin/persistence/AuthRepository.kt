@@ -1,6 +1,5 @@
 package ca.uwaterloo.persistence
 
-import ca.uwaterloo.model.Education
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.OtpType

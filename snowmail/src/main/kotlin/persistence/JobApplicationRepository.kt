@@ -32,9 +32,6 @@ class JobApplicationRepository(private val supabase: SupabaseClient) : IJobAppli
         }
     }
 
-
-
-
     override suspend fun createRecruiter(recruiterEmail: String): Int? {
         try {
             // check if the email already exists
@@ -325,10 +322,5 @@ class JobApplicationRepository(private val supabase: SupabaseClient) : IJobAppli
             Result.failure(Exception("Failed to get gmail account"))
         }
     }
-
-
-
-
-
 }
 

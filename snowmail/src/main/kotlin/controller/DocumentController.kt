@@ -11,140 +11,45 @@ import java.nio.file.Paths
 
 class DocumentController(private val documentRepository: IDocumentRepository) {
 
+    // Sanitize the document name to remove any invalid characters
     private fun sanitizeDocumentName(documentName: String): String {
         return documentName.replace(Regex("[^a-zA-Z0-9._-]"), "_")
     }
 
+    // Upload a document to the specified bucket
     suspend fun uploadDocument(bucket: String, userId: String, documentType: String, documentName: String, file: File): Result<String> {
         val sanitizedDocumentName = sanitizeDocumentName(documentName)
-
         val path = "$userId/$documentType/$sanitizedDocumentName"
-
-        println("Uploading document to $bucket/$path")
-
         return documentRepository.uploadDocument(bucket, path, file)
     }
 
+    // Download a document from the specified bucket as a ByteArray
     suspend fun downloadDocument(bucket: String, userId: String, documentType: String, documentName: String): Result<ByteArray> {
         val path = "$userId/$documentType/$documentName"
         return documentRepository.downloadDocument(bucket, path)
     }
 
+    // Delete a document from the specified bucket
     suspend fun deleteDocument(bucket: String, userId: String, documentType: String, documentName: String): Result<String> {
         val path = "$userId/$documentType/$documentName"
         return documentRepository.deleteDocument(bucket, path)
     }
 
+    // Create a signed URL to view a document
     suspend fun viewDocument(bucket: String, userId: String, documentType: String, documentName: String): Result<String> {
         val path = "$userId/$documentType/$documentName"
         return documentRepository.createSignedUrl(bucket, path)
     }
 
+    // List all documents of a specific type for a user
     suspend fun listDocuments(bucket: String, userId: String, documentType: String): Result<List<String>> {
         val path = "$userId/$documentType"
         return documentRepository.listDocuments(bucket, path)
     }
 
+    // Get a document as a File
     suspend fun getDocumentAsFile(bucket: String, userId: String, documentType: String, documentName: String): Result<File> {
         val path = "$userId/$documentType/$documentName"
         return documentRepository.getDocumentAsFile(bucket, path)
     }
 }
-
-fun main() = runBlocking<Unit> {
-//    Bucket Structure:
-//    - user_documents
-//        - user_id (folder)
-//            - resume
-//                - resume.pdf
-//            - cover_letter
-//                - cover_letter.pdf
-//            - transcript
-//                - transcript.pdf
-//            - other
-//                - other.pdf
-//
-//    val bucket = "user_documents"
-//    val path = "test/Q6-2.jpg"
-//    val file = File(System.getProperty("user.home") + "/Desktop/Q6-2.jpg")
-//
-//    // Call uploadDocument and print the result
-//    val result = documentController.uploadDocument(bucket, "test", "other", "Q6-2", file)
-//    result.onSuccess {
-//        println("Upload successful: $it")
-//    }.onFailure { error ->
-//        println("Error uploading document: ${error.message}")
-//    }
-
-//    val documentController = DocumentController(SupabaseClient().documentRepository)
-//    val bucket = "user_documents"
-//    val userId = "test"
-//    val documentType = "other"
-//    val documentName = "Q6-2"
-//
-//    val result = documentController.downloadAndViewDocument(bucket, userId, documentType, documentName)
-//    result.onSuccess { file ->
-//        println("Document downloaded and saved to: ${file.absolutePath}")
-//        // Open the file using the default viewer
-//        if (Desktop.isDesktopSupported()) {
-//            Desktop.getDesktop().open(file)
-//        } else {
-//            println("Desktop is not supported. Please open the file manually.")
-//        }
-//    }.onFailure { error ->
-//        println("Error downloading document: ${error.message}")
-//    }
-
-
-    val documentController = DocumentController(SupabaseClient().documentRepository)
-    val bucket = "user_documents"
-    val userId = "test"
-    val documentType = "other"
-    val documentName = "test resume.pdf"
-    val expiresInMinutes = 10
-
-    val file = File(System.getProperty("user.home") + "/Desktop/test resume.pdf")
-
-    // Call uploadDocument and print the result
-    val result = documentController.uploadDocument(bucket, "test", documentType, documentName, file)
-    result.onSuccess {
-        println("Upload successful: $it")
-    }.onFailure { error ->
-        println("Error uploading document: ${error.message}")
-    }
-
-//    val result = documentController.createSignedUrl(bucket, userId, documentType, documentName)
-//    result.onSuccess { url ->
-//        println("Signed URL: $url")
-//    }.onFailure { error ->
-//        println("Error creating signed URL: ${error.message}")
-//    }
-
-//    val result = documentController.listDocuments(bucket, userId, documentType)
-//    result.onSuccess { documents ->
-//        println("Documents in $bucket/$userId/$documentType:")
-//        documents.forEach { document ->
-//            println(document)
-//        }
-//    }.onFailure { error ->
-//        println("Error listing documents: ${error.message}")
-//    }
-
-//    val result = documentController.viewDocument(bucket, userId, documentType, documentName)
-//    result.onSuccess { url ->
-//        println("Signed URL: $url")
-//        // Open the URL in the default browser
-//        if (Desktop.isDesktopSupported()) {
-//            Desktop.getDesktop().browse(URI(url))
-//        } else {
-//            println("Desktop is not supported. Please open the URL manually.")
-//        }
-//    }.onFailure { error ->
-//        println("Error creating signed URL: ${error.message}")
-//    }
-
-
-
-
-}
-
